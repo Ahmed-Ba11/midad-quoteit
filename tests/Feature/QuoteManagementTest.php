@@ -104,6 +104,6 @@ test('deleting a user deletes their quotes', function () {
 test('only the owner sees edit and delete controls', function () {
     $quote = Quote::factory()->create();
 
-    $this->actingAs($quote->user)->get(route('home'))->assertSee('aria-label="Delete"', false);
-    $this->actingAs(User::factory()->create())->get(route('home'))->assertDontSee('aria-label="Delete"', false);
+    $this->actingAs($quote->user)->get(route('home'))->assertSee('aria-label="حذف"', false);
+    $this->actingAs(User::factory()->create())->get(route('home'))->assertDontSee('aria-label="حذف"', false);
 });

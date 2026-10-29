@@ -9,10 +9,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [QuoteController::class, 'index'])->name('home');
 
 Route::middleware('guest')->group(function () {
-    Route::view('/signup', 'Authentication.SignUp', ['page' => 'Sign Up'])->name('signup');
+    Route::view('/signup', 'auth.signup')->name('signup');
     Route::post('/signup', [SignupController::class, 'signup']);
 
-    Route::view('/login', 'Authentication.LogIn', ['page' => 'Log In'])->name('login');
+    Route::view('/login', 'auth.login')->name('login');
     Route::post('/login', [LoginController::class, 'login']);
 });
 

@@ -1,51 +1,107 @@
 @import 'tailwindcss';
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * thmanyah (خط ثمانية) — files live in resources/fonts/thmanyah (gitignored, see README).
+ * Vite bundles them; if they are missing, every stack falls back to an OFL Google font.
+ */
+@font-face {
+    font-family: 'thmanyah sans';
+    src: url('../fonts/thmanyah/thmanyahsans-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'thmanyah sans';
+    src: url('../fonts/thmanyah/thmanyahsans-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'thmanyah sans';
+    src: url('../fonts/thmanyah/thmanyahsans-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'thmanyah serif display';
+    src: url('../fonts/thmanyah/thmanyahserifdisplay-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'thmanyah serif display';
+    src: url('../fonts/thmanyah/thmanyahserifdisplay-Black.woff2') format('woff2');
+    font-weight: 900;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'thmanyah serif text';
+    src: url('../fonts/thmanyah/thmanyahseriftext-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'thmanyah serif text';
+    src: url('../fonts/thmanyah/thmanyahseriftext-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-display: swap;
+}
+
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'thmanyah sans', 'IBM Plex Sans Arabic', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'thmanyah serif display', 'Noto Naskh Arabic', serif;
+    --font-text: 'thmanyah serif text', 'Amiri', serif;
 
-         /* Tuwaiq club theme */
-    --color-tuwaiq-purple: #432a80;
-    --color-tuwaiq-purple-light: #53398f;
-    --color-tuwaiq-orange: #f2a54a;
-    --color-tuwaiq-teal: #4fc9b0;
-    --color-tuwaiq-text: #ece8f6;
-    --color-white: #ffffff;
-}
-@layer components {
-   .btn-primary {
-        @apply rounded-2xl bg-tuwaiq-purple px-6 py-3 text-lg font-medium text-white shadow-md transition hover:bg-tuwaiq-purple-light focus:outline-none focus-visible:ring-4 focus-visible:ring-tuwaiq-purple/30
-
-    }
-    .btn-secondary {
-        @apply rounded-2xl bg-tuwaiq-orange px-5 py-2 font-medium text-tuwaiq-purple shadow-md transition hover:opacity-90;
-    }
-    .label {
-        @apply block mb-1 font-semibold text-white;
-    }
-    .input {
-        @apply w-full rounded-lg border border-gray-300 px-4 py-2 text-white bg-[#241438] placeholder-gray-400 focus:border-tuwaiq-purple focus:ring focus:ring-tuwaiq-purple/30;
-    }
-}
-.site-name {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-
-    font: 800 1.8rem Georgia, serif;
-    letter-spacing: 1px;
-
-    background: linear-gradient(90deg,#4fc9b0,#938BB8,#f2a54a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    --color-paper: #F5EFE4;
+    --color-surface: #FBF8F3;
+    --color-ink: #2B2520;
+    --color-muted: #7A7068;
+    --color-line: #E6DED2;
+    --color-accent: #8A3324;
+    --color-accent-soft: #F2E6DC;
+    --color-gold: #A8873F;
 }
 
-.site-name:hover {
-    transform: translate(-50%, -50%) scale(1.08);
+.dark {
+    --color-paper: #14110F;
+    --color-surface: #1D1916;
+    --color-ink: #EEE6D8;
+    --color-muted: #A89D8F;
+    --color-line: #342D27;
+    --color-accent: #E3977D;
+    --color-accent-soft: #2F211C;
+    --color-gold: #C9A45C;
 }
 
+@layer base {
+    html {
+        color-scheme: light;
+    }
 
+    html.dark {
+        color-scheme: dark;
+    }
+
+    ::selection {
+        background-color: var(--color-accent-soft);
+        color: var(--color-ink);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
+
+.logo {
+    font-feature-settings: 'swsh' 1;
+}

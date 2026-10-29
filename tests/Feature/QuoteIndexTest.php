@@ -11,7 +11,7 @@ test('guests see quotes with text, sharer name and date (FR-01)', function () {
         ->assertOk()
         ->assertSee('العلم نور')
         ->assertSee('أحمد')
-        ->assertSee($quote->created_at->format('Y-m-d'));
+        ->assertSee($quote->created_at->translatedFormat('j F Y'));
 });
 
 test('quotes are paginated 12 per page, newest first', function () {
@@ -26,9 +26,9 @@ test('quotes are paginated 12 per page, newest first', function () {
     $this->get(route('home'))
         ->assertOk()
         ->assertSee('اقتباس رقم 13')
-        ->assertDontSee('اقتباس رقم 1”');
+        ->assertDontSee('<p>اقتباس رقم 1</p>', false);
 
     $this->get(route('home', ['page' => 2]))
         ->assertOk()
-        ->assertSee('اقتباس رقم 1”');
+        ->assertSee('<p>اقتباس رقم 1</p>', false);
 });

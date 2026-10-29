@@ -16,7 +16,7 @@ class QuoteController extends Controller
     {
         $quotes = Quote::with('user')->latest()->paginate(12);
 
-        return view('welcome', compact('quotes'));
+        return view('quotes.index', compact('quotes'));
     }
 
     /**

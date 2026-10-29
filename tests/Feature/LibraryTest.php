@@ -2,10 +2,12 @@
 
 use App\Models\Poet;
 use App\Models\Quote;
+use App\Models\Reply;
 use App\Models\Saying;
 use App\Models\User;
 use App\Models\Verse;
 use App\Models\Work;
+use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\LibrarySeeder;
 
 beforeEach(function () {
@@ -149,4 +151,16 @@ test('verse lines render on separate lines in the card', function () {
         ->assertSee(e($verse->sadr), false)
         ->assertSee('<br>', false)
         ->assertSee(e($verse->ajuz), false);
+});
+
+test('the demo seeder builds a complete, browsable dataset', function () {
+    $this->seed(DatabaseSeeder::class);
+
+    expect(User::count())->toBe(5)
+        ->and(Quote::count())->toBe(20)
+        ->and(Quote::whereNotNull('verse_id')->count())->toBeGreaterThan(5)
+        ->and(Reply::count())->toBeGreaterThan(10);
+
+    $this->get(route('home'))->assertOk()->assertSee('اقتبـــاس اليوم');
+    $this->get(route('library.index'))->assertOk();
 });

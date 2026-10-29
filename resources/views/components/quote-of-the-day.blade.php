@@ -19,10 +19,8 @@
     <div class="relative text-center">
         <h2 id="quote-of-the-day" class="font-display text-lg font-bold text-gold">اقتبـــاس اليوم</h2>
 
-        <blockquote class="mx-auto mt-5 max-w-3xl text-2xl leading-[1.9] sm:text-3xl @if ($font['italic'] ?? false) italic @endif"
-            style="font-family: {{ $font['stack'] }};">
-            {{ $quote->content }}
-        </blockquote>
+        <blockquote class="mx-auto mt-5 max-w-3xl whitespace-pre-line text-2xl leading-[1.9] sm:text-3xl @if ($font['italic'] ?? false) italic @endif"
+            style="font-family: {{ $font['stack'] }};">{{ $quote->content }}</blockquote>
 
         <p class="mt-5 text-sm text-muted">
             @if ($byline)

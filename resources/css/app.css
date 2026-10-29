@@ -1,0 +1,51 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+         /* Tuwaiq club theme */
+    --color-tuwaiq-purple: #432a80;
+    --color-tuwaiq-purple-light: #53398f;
+    --color-tuwaiq-orange: #f2a54a;
+    --color-tuwaiq-teal: #4fc9b0;
+    --color-tuwaiq-text: #ece8f6;
+    --color-white: #ffffff;
+}
+@layer components {
+   .btn-primary {
+        @apply rounded-2xl bg-tuwaiq-purple px-6 py-3 text-lg font-medium text-white shadow-md transition hover:bg-tuwaiq-purple-light focus:outline-none focus-visible:ring-4 focus-visible:ring-tuwaiq-purple/30
+
+    }
+    .btn-secondary {
+        @apply rounded-2xl bg-tuwaiq-orange px-5 py-2 font-medium text-tuwaiq-purple shadow-md transition hover:opacity-90;
+    }
+    .label {
+        @apply block mb-1 font-semibold text-white;
+    }
+    .input {
+        @apply w-full rounded-lg border border-gray-300 px-4 py-2 text-white bg-[#241438] placeholder-gray-400 focus:border-tuwaiq-purple focus:ring focus:ring-tuwaiq-purple/30;
+    }
+}
+.site-name {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    font: 800 1.8rem Georgia, serif;
+    letter-spacing: 1px;
+
+    background: linear-gradient(90deg,#4fc9b0,#938BB8,#f2a54a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.site-name:hover {
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+

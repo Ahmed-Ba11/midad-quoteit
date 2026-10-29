@@ -168,7 +168,7 @@ test('a quote cannot be linked to the library by sending verse_id or saying_id d
     $saying = Saying::first();
 
     $this->actingAs(User::factory()->create())
-        ->post(route('store_quote'), ['content' => 'نص مزيّف ينتحل بيتاً', 'author' => 'المتنبي', 'verse_id' => $verse->id, 'saying_id' => $saying->id]);
+        ->post(route('store_quote'), ['content' => 'نص مزيّف ينتحل بيتاً', 'author' => 'المتنبي', 'source' => 'مصدر ما', 'verse_id' => $verse->id, 'saying_id' => $saying->id]);
 
     expect(Quote::sole())
         ->verse_id->toBeNull()

@@ -150,3 +150,38 @@ test('the quick inline edit keeps the existing design', function () {
         ->font->toBe('ruqaa')
         ->ratio->toBe('square');
 });
+
+test('quoting someone else requires a source or a book (Saudi copyright law, art. 15)', function () {
+    $user = User::factory()->create();
+    $verse = ['content' => 'بيتٌ لشاعر معاصر أعجبني', 'author' => 'بدر بن عبدالمحسن'];
+
+    $this->actingAs($user)->post(route('store_quote'), $verse)
+        ->assertSessionHasErrors(['source' => 'اذكر مصدر الاقتباس (كتاباً أو صحيفة أو رابطاً) ما دمت تنقل كلام غيرك.']);
+
+    $this->actingAs($user)->post(route('store_quote'), [...$verse, 'source' => 'صحيفة الجزيرة'])
+        ->assertSessionHasNoErrors();
+
+    $this->actingAs($user)->post(route('store_quote'), [...$verse, 'book' => 'ديوان'])
+        ->assertSessionHasNoErrors();
+
+    expect(Quote::count())->toBe(2);
+});
+
+test('your own words need no source', function () {
+    $this->actingAs(User::factory()->create())
+        ->post(route('store_quote'), ['content' => 'كلماتي أنا'])
+        ->assertSessionHasNoErrors();
+});
+
+test('a web-address source becomes a safe external link; anything else stays plain text', function () {
+    $linked = Quote::factory()->create(['author' => 'شاعر', 'source' => 'https://www.al-jazirah.com/2020/poem']);
+    $plain = Quote::factory()->create(['author' => 'شاعر', 'source' => 'javascript:alert(1)']);
+
+    $this->get(route('quotes.show', $linked))
+        ->assertSee('href="https://www.al-jazirah.com/2020/poem"', false)
+        ->assertSee('rel="nofollow ugc noopener noreferrer"', false);
+
+    $this->get(route('quotes.show', $plain))
+        ->assertDontSee('href="javascript:', false)
+        ->assertSee('javascript:alert(1)');
+});

@@ -34,7 +34,7 @@
                     <div class="flex w-full items-center gap-1 border-y border-line py-1 sm:w-auto sm:border-0 sm:py-0">
                         <x-quote-actions :quote="$quote" :show-replies="false" />
 
-                        <button type="button" data-copy="{{ $quote->content }}{{ $byline ? ' — '.$byline : '' }}"
+                        <button type="button" data-copy="{{ $quote->content }}{{ $byline ? ' — '.$byline : '' }}{{ $quote->source ? ' (المصدر: '.$quote->source.')' : '' }}"
                             aria-label="انسخ الاقتباس" title="انسخ الاقتباس"
                             class="inline-flex h-11 items-center gap-1.5 rounded-full px-3 text-sm text-muted transition hover:bg-accent-soft hover:text-accent">
                             <x-icon name="copy" class="size-[18px]" data-copy-icon />
@@ -47,6 +47,20 @@
                         @endcan
                     </div>
                 </div>
+
+                @if ($quote->source)
+                    <p class="mx-auto mt-4 text-sm text-muted" style="max-width: {{ $ratioWidth }}px">
+                        المصدر:
+                        @if ($quote->sourceUrl())
+                            {{-- A user-supplied link: no ranking credit, no referrer, no opener. --}}
+                            <a href="{{ $quote->sourceUrl() }}" target="_blank" rel="nofollow ugc noopener noreferrer"
+                                class="inline-flex items-center gap-1 text-accent hover:underline" dir="ltr">{{ \Illuminate\Support\Str::limit(preg_replace('#^https?://(www\.)?#i', '', $quote->source), 60) }}
+                                <x-icon name="external" class="size-3.5" /></a>
+                        @else
+                            {{ $quote->source }}
+                        @endif
+                    </p>
+                @endif
             </article>
 
             {{-- Story --}}

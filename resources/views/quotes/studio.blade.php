@@ -94,6 +94,10 @@
 
                         <x-input name="book" label="الكتاب أو الديوان" hint="اختياري، حتى ١٥٠ حرفاً" maxlength="150"
                             :value="$quote->book" />
+
+                        <x-input name="source" label="المصدر" maxlength="200" :value="$quote->source"
+                            placeholder="مثل: صحيفة الجزيرة، أو رابط الصفحة"
+                            hint="مطلوب إذا نقلت كلام غيرك ولم تذكر الكتاب؛ اقتبس بيتاً أو بيتين فقط" />
                     @endif
 
                     <div>

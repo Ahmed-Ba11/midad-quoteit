@@ -8,6 +8,7 @@ use App\Models\Verse;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Validator;
 
 class QuoteRequest extends FormRequest
 {
@@ -89,6 +90,7 @@ class QuoteRequest extends FormRequest
             'category_id' => ['sometimes', 'nullable', 'integer', 'exists:categories,id'],
             'author' => ['sometimes', 'nullable', 'string', 'max:100'],
             'book' => ['sometimes', 'nullable', 'string', 'max:150'],
+            'source' => ['nullable', 'string', 'max:200'],
             'story' => ['sometimes', 'nullable', 'string', 'max:500'],
             'font' => ['sometimes', 'required', Rule::in(array_keys(config('quotes.fonts')))],
             'bg_color' => $hexColor,
@@ -107,6 +109,20 @@ class QuoteRequest extends FormRequest
     }
 
     /**
+     * Quoting someone else is allowed with their name and the source (Saudi copyright law, Art. 15):
+     * once "القائل" is filled, a book or a source is required. Library texts are exempt — their source
+     * is خزانة الأدب itself.
+     */
+    public function withValidator(Validator $validator): void
+    {
+        $editing = $this->route('quote');
+        $isLibraryText = $this->libraryLink !== [] || ($editing instanceof Quote && $editing->isFromLibrary());
+
+        $validator->sometimes('source', 'required',
+            fn ($input) => ! $isLibraryText && filled($input->author) && blank($input->book));
+    }
+
+    /**
      * @return array<string, string>
      */
     public function messages(): array
@@ -118,6 +134,8 @@ class QuoteRequest extends FormRequest
             'category_id.exists' => 'اختر تصنيفاً من القائمة.',
             'author.max' => 'اسم القائل حتى ١٠٠ حرف.',
             'book.max' => 'اسم الكتاب حتى ١٥٠ حرفاً.',
+            'source.max' => 'المصدر حتى ٢٠٠ حرف.',
+            'source.required' => 'اذكر مصدر الاقتباس (كتاباً أو صحيفة أو رابطاً) ما دمت تنقل كلام غيرك.',
             'story.max' => 'الحكاية حتى ٥٠٠ حرف.',
             'font.in' => 'اختر خطاً من القائمة.',
             '*_color.regex' => 'اللون يجب أن يكون بصيغة ‎#RRGGBB.',

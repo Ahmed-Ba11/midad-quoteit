@@ -71,7 +71,7 @@ class DatabaseSeeder extends Seeder
             [2, ['content' => 'ليست الحكمة أن تعرف الطريق، بل أن تمشيه وأنت تعرف لماذا.', 'category_id' => $category('falsafa'), ...$palette('navy'), 'font' => 'naskh', 'highlights' => [6, 7]]],
             [4, ['content' => 'كل كتابٍ نقرؤه يترك فينا رفّاً جديداً.', 'category_id' => $category('adab'), ...$palette('mauve'), 'font' => 'messiri', 'ratio' => 'square', 'font_size' => 42]],
             [0, ['content' => 'الصمت أحياناً أبلغ جوابٍ عن سؤالٍ لا يستحق.', 'category_id' => $category('taammul'), ...$palette('ink'), 'font' => 'amiri', 'highlights' => [0], 'highlight_style' => 'color']],
-            [3, ['content' => 'Simplicity is the soul of efficiency.', 'author' => 'R. Austin Freeman', 'category_id' => $category('hikma'), ...$palette('sand'), 'font' => 'cormorant', 'ratio' => 'wide', 'font_size' => 40]],
+            [3, ['content' => 'Every good book leaves a new shelf inside us.', 'category_id' => $category('taammul'), ...$palette('sand'), 'font' => 'cormorant', 'ratio' => 'wide', 'font_size' => 40]],
             [1, ['content' => 'من لم يتعلّم الصبر، علّمته الأيام إياه بطريقتها.', 'category_id' => $category('hikma'), ...$palette('cocoa'), 'font' => 'thmanyah-display', 'highlights' => [4, 5]]],
             [2, ['content' => 'الفجر لا يتأخر عن موعده، نحن من نتأخر عن رؤيته.', 'category_id' => $category('taammul'), ...$palette('sage'), 'font' => 'ruqaa', 'ratio' => 'tall', 'font_size' => 36]],
             [4, ['content' => 'اكتب ما تحب أن تقرأه، واقرأ ما تتمنى لو كتبته.', 'category_id' => $category('adab'), ...$palette('navy'), 'font' => 'amiri', 'highlights' => [0, 1, 2, 3, 4], 'texture' => false,

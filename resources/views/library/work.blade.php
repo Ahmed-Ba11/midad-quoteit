@@ -28,9 +28,9 @@
         {{-- Verses set as a printed diwan: صدر and عجز side by side, ruled like a manuscript page. --}}
         <ol class="manuscript-page divide-y divide-[#A8873F]/25 rounded-2xl px-5 py-8 sm:px-12">
             @foreach ($work->verses as $verse)
-                <li class="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:gap-6">
-                    <x-verse layout="paired" :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="flex-1 text-xl" />
-                    <div class="flex shrink-0 items-center gap-2">
+                <li class="py-6">
+                    <x-verse layout="paired" :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="text-xl" />
+                    <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
                         @if ($verse->occasion)
                             <span class="text-xs text-[#7A7068]">{{ config('library.occasions.'.$verse->occasion) }}</span>
                         @endif

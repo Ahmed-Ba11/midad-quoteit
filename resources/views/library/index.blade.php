@@ -76,9 +76,9 @@
                 @else
                     <ol class="mt-6 divide-y divide-line overflow-hidden rounded-3xl border border-line bg-surface">
                         @foreach ($results as $verse)
-                            <li class="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:gap-6">
-                                <x-verse layout="paired" :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="flex-1 text-lg" />
-                                <div class="flex shrink-0 items-center gap-3">
+                            <li class="p-5 sm:p-6">
+                                <x-verse layout="paired" :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="text-lg" />
+                                <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
                                     <a href="{{ route('library.work', $verse->work) }}" class="text-sm text-muted hover:text-accent">{{ $verse->work->poet->name }}</a>
                                     @if ($verse->source_url)
                                         <x-external-link :href="$verse->source_url" class="text-xs text-muted">القصيدة كاملة</x-external-link>
@@ -224,9 +224,9 @@
                     </div>
                     <ul class="space-y-4">
                         @foreach ($poet->works->flatMap->verses->take(3) as $verse)
-                            <li class="flex flex-col items-start gap-3 rounded-2xl bg-paper p-4 sm:flex-row sm:items-center">
-                                <x-verse layout="paired" :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="flex-1" />
-                                <x-pick-button :id="$verse->id" :text="$verse->sadr.' / '.$verse->ajuz" class="text-accent" />
+                            <li class="rounded-2xl bg-paper p-4">
+                                <x-verse :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="[&_blockquote_span]:my-1.5" />
+                                <x-pick-button :id="$verse->id" :text="$verse->sadr.' / '.$verse->ajuz" class="mx-auto mt-2 flex w-fit text-accent" />
                             </li>
                         @endforeach
                     </ul>

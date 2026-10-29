@@ -16,10 +16,7 @@
             style="font-family: {{ $font['stack'] }};"
             @if (($font['lang'] ?? 'ar') === 'en') dir="auto" @endif>
             @foreach ($quote->contentLines() as $line)
-                @if (! $loop->first)<br>@endif
-                @foreach ($line as $piece)
-                    @if (! $loop->first){{ ' ' }}@endif{!! $piece['highlighted'] ? '<span class="hl">'.e($piece['text']).'</span>' : e($piece['text']) !!}
-                @endforeach
+                <span class="quote-art-line block">@foreach ($line as $piece)@if (! $loop->first){{ ' ' }}@endif{!! $piece['highlighted'] ? '<span class="hl">'.e($piece['text']).'</span>' : e($piece['text']) !!}@endforeach</span>
             @endforeach
         </blockquote>
 

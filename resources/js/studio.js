@@ -108,7 +108,11 @@ export function initStudio(form) {
         field('content').value.trim().split(/\r?\n/).forEach((line) => {
             const lineWords = line.trim().split(/\s+/).filter(Boolean);
             if (lineWords.length === 0) return;
-            if (nodes.length > 0) nodes.push(document.createElement('br'));
+
+            // Each line (a hemistich) is its own block, so its words wrap in balance.
+            const lineNode = document.createElement('span');
+            lineNode.className = 'quote-art-line block';
+            nodes.push(lineNode);
 
             const pieces = [];
             lineWords.forEach((word) => {
@@ -122,14 +126,14 @@ export function initStudio(form) {
             });
 
             pieces.forEach((piece, position) => {
-                if (position > 0) nodes.push(' ');
+                if (position > 0) lineNode.append(' ');
                 if (piece.highlighted) {
                     const span = document.createElement('span');
                     span.className = 'hl';
                     span.textContent = piece.text;
-                    nodes.push(span);
+                    lineNode.append(span);
                 } else {
-                    nodes.push(piece.text);
+                    lineNode.append(piece.text);
                 }
             });
         });

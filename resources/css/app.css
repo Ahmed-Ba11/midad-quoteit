@@ -141,6 +141,19 @@
     box-decoration-break: clone;
 }
 
+/* Verses: balance the words of a hemistich so no single word drops to its own line. */
+.hemistich,
+.quote-art-line {
+    text-wrap: balance;
+}
+
+/* Diwan look on wide screens: two equal columns, each hemistich centred in its own column. */
+@media (min-width: 768px) {
+    .verse-paired .hemistich {
+        text-align: center;
+    }
+}
+
 /* ───────────── خزانة الأدب ───────────── */
 
 /* Hero: faint gold girih lattice fading out from the centre. */

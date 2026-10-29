@@ -148,9 +148,7 @@ test('verse lines render on separate lines in the card', function () {
     $this->actingAs(User::factory()->create())->post(route('store_quote'), ['verses' => [$verse->id]]);
 
     $this->get(route('home', ['q' => 'نبك']))
-        ->assertSee(e($verse->sadr), false)
-        ->assertSee('<br>', false)
-        ->assertSee(e($verse->ajuz), false);
+        ->assertSeeInOrder(['quote-art-line', e($verse->sadr), 'quote-art-line', e($verse->ajuz)], false);
 });
 
 test('the demo seeder builds a complete, browsable dataset', function () {

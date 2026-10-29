@@ -40,9 +40,9 @@
 
                 <ol class="mt-5 divide-y divide-line rounded-3xl border border-line bg-surface px-5 sm:px-8">
                     @foreach ($work->verses as $verse)
-                        <li class="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:gap-6">
-                            <x-verse layout="paired" :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="flex-1 text-lg" />
-                            <div class="flex shrink-0 items-center gap-3">
+                        <li class="py-6">
+                            <x-verse layout="paired" :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="text-lg" />
+                            <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
                                 @if ($verse->source_url)
                                     <x-external-link :href="$verse->source_url" class="text-xs text-muted">القصيدة كاملة</x-external-link>
                                 @endif

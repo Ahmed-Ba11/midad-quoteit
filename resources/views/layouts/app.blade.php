@@ -18,7 +18,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;700&family=Noto+Naskh+Arabic:wght@700&display=swap">
+        href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+Arabic:wght@300;400;500;700&family=Noto+Naskh+Arabic:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=El+Messiri:wght@400;600&family=Reem+Kufi:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=EB+Garamond:ital@0;1&family=Playfair+Display:ital@0;1&family=Libre+Baskerville:ital@0;1&family=IM+Fell+English:ital@0;1&display=swap">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -52,12 +52,17 @@
                     </button>
                 </div>
 
-                <x-textarea name="content" label="نص الاقتباس" hint="من ٣ إلى ١٥٥ حرفاً" rows="5" minlength="3"
+                <x-textarea name="content" id="share-content" label="نص الاقتباس" hint="من ٣ إلى ١٥٥ حرفاً" rows="5" minlength="3"
                     maxlength="155" required autofocus placeholder="اكتب اقتباساً أثّر فيك…"
                     :value="old('_form') === 'share' ? old('content') : ''"
                     :show-error="old('_form') === 'share'" />
 
                 <x-button type="submit" class="w-full">انشر الاقتباس</x-button>
+
+                <p class="text-center text-sm text-muted">
+                    تريد خطاً وألواناً خاصة؟
+                    <a href="{{ route('quotes.create') }}" class="font-medium text-accent hover:underline">صمّمه في رواق الحرف</a>
+                </p>
             </form>
         </div>
 

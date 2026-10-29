@@ -16,21 +16,17 @@ test('guests see quotes with text, sharer name and date (FR-01)', function () {
 
 test('quotes are paginated 12 per page, newest first', function () {
     $user = User::factory()->create();
-    foreach (range(1, 13) as $number) {
-        Quote::factory()->for($user)->create([
-            'content' => "اقتباس رقم {$number}",
-            'created_at' => now()->addMinutes($number),
-        ]);
-    }
+    Quote::factory()->for($user)->create(['content' => 'أقدم اقتباس', 'created_at' => now()->subDay()]);
+    Quote::factory()->for($user)->count(12)->create(['content' => 'اقتباس أحدث']);
 
     $this->get(route('home'))
         ->assertOk()
-        ->assertSee('اقتباس رقم 13')
-        ->assertDontSee('<p>اقتباس رقم 1</p>', false);
+        ->assertSee('اقتباس أحدث')
+        ->assertDontSee('أقدم اقتباس');
 
     $this->get(route('home', ['page' => 2]))
         ->assertOk()
-        ->assertSee('<p>اقتباس رقم 1</p>', false);
+        ->assertSee('أقدم اقتباس');
 });
 
 test('guests see a log-in button and no edit or delete options (US-01)', function () {

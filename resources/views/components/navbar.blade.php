@@ -9,6 +9,15 @@
                     'font-bold text-accent' => request()->routeIs('home'),
                 ]) @if (request()->routeIs('home')) aria-current="page" @endif>الرئيسية</a>
             </li>
+            @auth
+                @php $onSaved = request()->routeIs('profile.show') && request('tab') === 'saved'; @endphp
+                <li>
+                    <a href="{{ route('profile.show', [auth()->user(), 'tab' => 'saved']) }}" @class([
+                        'rounded-full px-3 py-2 transition hover:text-accent',
+                        'font-bold text-accent' => $onSaved,
+                    ]) @if ($onSaved) aria-current="page" @endif>المحفوظات</a>
+                </li>
+            @endauth
         </ul>
 
         <div class="ms-auto flex items-center gap-1 sm:gap-2">
@@ -23,13 +32,14 @@
                     <span class="hidden sm:inline">شارك اقتباساً</span>
                 </x-button>
 
-                <span class="flex items-center gap-2">
+                <a href="{{ route('profile.show', auth()->user()) }}" aria-label="ملفي الشخصي"
+                    class="flex items-center gap-2 rounded-full transition hover:text-accent">
                     <span aria-hidden="true"
                         class="grid size-10 shrink-0 place-items-center rounded-full bg-accent-soft font-bold text-accent">
                         {{ mb_substr(auth()->user()->name, 0, 1) }}
                     </span>
                     <span class="hidden max-w-28 truncate text-sm font-medium sm:inline">{{ auth()->user()->name }}</span>
-                </span>
+                </a>
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

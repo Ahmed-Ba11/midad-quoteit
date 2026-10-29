@@ -4,6 +4,7 @@ use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\SignupController;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [QuoteController::class, 'index'])->name('home');
 Route::get('/quote/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
+Route::get('/users/{user}', [ProfileController::class, 'show'])->name('profile.show');
 
 Route::middleware('guest')->group(function () {
     Route::view('/signup', 'auth.signup')->name('signup');
@@ -22,6 +24,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+    Route::patch('/profile/bio', [ProfileController::class, 'updateBio'])->name('profile.bio');
 
     Route::post('/', [QuoteController::class, 'store'])->name('store_quote');
     Route::get('/quotes/create', [QuoteController::class, 'create'])->name('quotes.create');

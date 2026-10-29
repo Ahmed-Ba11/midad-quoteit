@@ -13,13 +13,34 @@ use Illuminate\View\View;
 class QuoteController extends Controller
 {
     /**
-     * Display all quotes, newest first, 12 per page.
+     * Display all quotes, 12 per page, with search, sort and category filter.
      */
     public function index(Request $request): View
     {
-        $quotes = Quote::withCardData($request->user())->latest()->paginate(12);
+        $categories = Category::orderBy('id')->get();
 
-        return view('quotes.index', compact('quotes'));
+        // Unknown values are ignored rather than rejected, so a bad link still shows the quotes.
+        $filters = [
+            'q' => mb_substr(trim($request->string('q')), 0, 100),
+            'sort' => in_array($request->query('sort'), ['likes', 'replies'], true) ? $request->query('sort') : 'latest',
+            'category' => $categories->firstWhere('slug', $request->query('category'))?->slug,
+        ];
+
+        $quotes = Quote::withCardData($request->user())
+            ->search($filters['q'])
+            ->when($filters['category'], fn ($query, string $slug) => $query->whereRelation('category', 'slug', $slug))
+            ->sortBy($filters['sort'])
+            ->paginate(12)
+            ->withQueryString();
+
+        $isFiltering = $filters['q'] !== '' || $filters['category'] !== null;
+
+        return view('quotes.index', [
+            'quotes' => $quotes,
+            'categories' => $categories,
+            'filters' => $filters,
+            'quoteOfTheDay' => ! $isFiltering && $quotes->onFirstPage() ? Quote::ofTheDay() : null,
+        ]);
     }
 
     /**

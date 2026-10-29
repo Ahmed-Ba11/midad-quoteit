@@ -11,7 +11,7 @@
         </span>
 
         <div class="min-w-0 flex-1 leading-tight">
-            <p class="truncate text-sm font-medium">{{ $quote->user->name }}</p>
+            <a href="{{ route('profile.show', $quote->user) }}" class="block truncate text-sm font-medium hover:text-accent">{{ $quote->user->name }}</a>
             <time datetime="{{ $quote->created_at->toDateString() }}" class="text-xs text-muted">
                 {{ $quote->created_at->translatedFormat('j F Y') }}
             </time>

@@ -19,12 +19,13 @@ test('quotes are paginated 12 per page, newest first', function () {
     Quote::factory()->for($user)->create(['content' => 'أقدم اقتباس', 'created_at' => now()->subDay()]);
     Quote::factory()->for($user)->count(12)->create(['content' => 'اقتباس أحدث']);
 
-    $this->get(route('home'))
+    // A search hides the quote of the day, which could otherwise be the oldest quote.
+    $this->get(route('home', ['q' => 'اقتباس']))
         ->assertOk()
         ->assertSee('اقتباس أحدث')
         ->assertDontSee('أقدم اقتباس');
 
-    $this->get(route('home', ['page' => 2]))
+    $this->get(route('home', ['q' => 'اقتباس', 'page' => 2]))
         ->assertOk()
         ->assertSee('أقدم اقتباس');
 });

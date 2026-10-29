@@ -94,6 +94,57 @@ class Quote extends Model
     }
 
     /**
+     * Search the text, the author (القائل) and the book.
+     *
+     * @param  Builder<Quote>  $query
+     */
+    public function scopeSearch(Builder $query, ?string $term): void
+    {
+        $term = trim((string) $term);
+
+        if ($term === '') {
+            return;
+        }
+
+        $like = '%'.$term.'%';
+
+        $query->where(fn (Builder $matches) => $matches
+            ->where('content', 'like', $like)
+            ->orWhere('author', 'like', $like)
+            ->orWhere('book', 'like', $like));
+    }
+
+    /**
+     * latest (default) · likes (most liked) · replies (most discussed). Needs withCardData() for the counts.
+     *
+     * @param  Builder<Quote>  $query
+     */
+    public function scopeSortBy(Builder $query, ?string $sort): void
+    {
+        match ($sort) {
+            'likes' => $query->orderByDesc('likes_count')->latest(),
+            'replies' => $query->orderByDesc('replies_count')->latest(),
+            default => $query->latest(),
+        };
+    }
+
+    /**
+     * The same quote for everyone all day, changing at midnight.
+     */
+    public static function ofTheDay(): ?self
+    {
+        $count = static::count();
+
+        if ($count === 0) {
+            return null;
+        }
+
+        $offset = crc32(today()->toDateString()) % $count;
+
+        return static::with(['user', 'category'])->orderBy('id')->skip($offset)->first();
+    }
+
+    /**
      * Split the text into words (on whitespace) and merge neighbouring words that share the same
      * highlight state, so adjacent highlighted words render as ONE continuous highlight.
      *

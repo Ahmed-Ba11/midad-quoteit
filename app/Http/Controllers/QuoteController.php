@@ -6,6 +6,8 @@ use App\Http\Requests\QuoteRequest;
 use App\Models\Category;
 use App\Models\Quote;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class QuoteController extends Controller
@@ -13,11 +15,54 @@ class QuoteController extends Controller
     /**
      * Display all quotes, newest first, 12 per page.
      */
-    public function index(): View
+    public function index(Request $request): View
     {
-        $quotes = Quote::with(['user', 'category'])->latest()->paginate(12);
+        $quotes = Quote::withCardData($request->user())->latest()->paginate(12);
 
         return view('quotes.index', compact('quotes'));
+    }
+
+    /**
+     * The quote page: big card, story, replies and "قد يعجبك أيضاً".
+     */
+    public function show(Request $request, Quote $quote): View
+    {
+        $quote = Quote::withCardData($request->user())->findOrFail($quote->id);
+        $quote->load(['replies' => fn ($replies) => $replies->with('user')->oldest()]);
+
+        return view('quotes.show', [
+            'quote' => $quote,
+            'related' => $this->relatedQuotes($quote, $request),
+        ]);
+    }
+
+    /**
+     * Up to 4 suggestions: same author first, then same category — each with the reason it was picked.
+     *
+     * @return Collection<int, array{quote: Quote, reason: string}>
+     */
+    private function relatedQuotes(Quote $quote, Request $request): Collection
+    {
+        $limit = 4;
+        $sameAuthor = $quote->author
+            ? Quote::withCardData($request->user())
+                ->where('author', $quote->author)
+                ->whereKeyNot($quote->id)
+                ->latest()->take($limit)->get()
+            : collect();
+
+        $sameCategory = $quote->category_id && $sameAuthor->count() < $limit
+            ? Quote::withCardData($request->user())
+                ->where('category_id', $quote->category_id)
+                ->whereKeyNot([$quote->id, ...$sameAuthor->modelKeys()])
+                ->latest()->take($limit - $sameAuthor->count())->get()
+            : collect();
+
+        return $sameAuthor->map(fn (Quote $related) => ['quote' => $related, 'reason' => 'من القائل نفسه'])
+            ->concat($sameCategory->map(fn (Quote $related) => [
+                'quote' => $related,
+                'reason' => 'من تصنيف '.$quote->category->name,
+            ]));
     }
 
     /**
@@ -71,7 +116,10 @@ class QuoteController extends Controller
     {
         $quote->delete();
 
-        return redirect()->back();
+        // Deleting from the quote's own page: that page no longer exists, so go home.
+        return url()->previous() === route('quotes.show', $quote)
+            ? redirect()->route('home')
+            : redirect()->back();
     }
 
     /**

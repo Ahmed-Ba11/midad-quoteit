@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Database\Factories\QuoteFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'content', 'category_id', 'author', 'book', 'story',
@@ -54,6 +57,40 @@ class Quote extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function replies(): HasMany
+    {
+        return $this->hasMany(Reply::class);
+    }
+
+    public function likers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'likes')->withTimestamps();
+    }
+
+    public function bookmarkers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'bookmarks')->withTimestamps();
+    }
+
+    /**
+     * Eager-load what a quote card needs: sharer, category, like/reply counts,
+     * and whether the current user has liked or saved it.
+     *
+     * @param  Builder<Quote>  $query
+     */
+    public function scopeWithCardData(Builder $query, ?User $viewer): void
+    {
+        $query->with(['user', 'category'])
+            ->withCount(['likers as likes_count', 'replies']);
+
+        if ($viewer) {
+            $query->withExists([
+                'likers as liked_by_viewer' => fn (Builder $likers) => $likers->whereKey($viewer->id),
+                'bookmarkers as saved_by_viewer' => fn (Builder $savers) => $savers->whereKey($viewer->id),
+            ]);
+        }
     }
 
     /**

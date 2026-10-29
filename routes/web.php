@@ -1,12 +1,16 @@
 <?php
 
+use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\SignupController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [QuoteController::class, 'index'])->name('home');
+Route::get('/quote/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
 
 Route::middleware('guest')->group(function () {
     Route::view('/signup', 'auth.signup')->name('signup');
@@ -24,4 +28,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/quote/{quote}/edit', [QuoteController::class, 'edit'])->name('quotes.edit')->can('update', 'quote');
     Route::put('/quote/{quote}', [QuoteController::class, 'update'])->name('edit_quote')->can('update', 'quote');
     Route::delete('/quote/{quote}', [QuoteController::class, 'destroy'])->name('delete_quote')->can('delete', 'quote');
+
+    Route::post('/quote/{quote}/like', [LikeController::class, 'toggle'])->name('quotes.like');
+    Route::post('/quote/{quote}/bookmark', [BookmarkController::class, 'toggle'])->name('quotes.bookmark');
+    Route::post('/quote/{quote}/replies', [ReplyController::class, 'store'])->name('replies.store');
 });

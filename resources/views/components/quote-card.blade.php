@@ -1,23 +1,12 @@
 @props(['quote'])
 
-<article {{ $attributes->class('flex flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-lg') }}>
-    <x-quote-art :quote="$quote" />
+<article id="quote-{{ $quote->id }}" {{ $attributes->class('flex scroll-mt-24 flex-col overflow-hidden rounded-3xl border border-line bg-surface shadow-sm transition duration-300 hover:-translate-y-0.5 hover:shadow-lg') }}>
+    <a href="{{ route('quotes.show', $quote) }}" aria-label="افتح صفحة الاقتباس" class="block focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-accent">
+        <x-quote-art :quote="$quote" />
+    </a>
 
-    @if ($quote->category || $quote->story)
-        <div class="flex flex-wrap items-center gap-2 px-5 pt-4">
-            @if ($quote->category)
-                <x-chip class="h-7 px-3 text-xs">{{ $quote->category->name }}</x-chip>
-            @endif
-            @if ($quote->story)
-                <span class="inline-flex items-center gap-1 text-xs text-gold">
-                    <x-icon name="book-open" class="size-4" /> له حكاية
-                </span>
-            @endif
-        </div>
-    @endif
-
-    <footer class="flex items-center gap-1 px-5 py-3">
-        <span class="me-2 grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-bold text-accent">
+    <div class="flex items-center gap-3 px-5 pt-4">
+        <span class="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-bold text-accent">
             {{ mb_substr($quote->user->name, 0, 1) }}
         </span>
 
@@ -27,6 +16,20 @@
                 {{ $quote->created_at->translatedFormat('j F Y') }}
             </time>
         </div>
+
+        @if ($quote->category)
+            <x-chip class="h-7 px-3 text-xs">{{ $quote->category->name }}</x-chip>
+        @endif
+    </div>
+
+    @if ($quote->story)
+        <a href="{{ route('quotes.show', $quote) }}#story" class="mx-5 mt-3 inline-flex w-fit items-center gap-1 text-xs text-gold hover:underline">
+            <x-icon name="book-open" class="size-4" /> له حكاية
+        </a>
+    @endif
+
+    <footer class="mt-2 flex items-center border-t border-line px-3 py-1.5">
+        <x-quote-actions :quote="$quote" class="flex-1" />
 
         @can('update', $quote)
             <a href="{{ request()->fullUrlWithQuery(['edit' => $quote->id]) }}" aria-label="تعديل" title="تعديل النص"

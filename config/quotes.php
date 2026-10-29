@@ -44,4 +44,22 @@ return [
 
     'font_size' => ['min' => 20, 'max' => 56],
 
+    // Book shelves (رفوف القرّاء): reading statuses and genres a reader can pick.
+    'reading_statuses' => [
+        'reading' => 'أقرؤه الآن',
+        'read' => 'قرأته',
+        'want' => 'أريد قراءته',
+    ],
+
+    'book_genres' => [
+        'novel' => 'رواية',
+        'poetry' => 'شعر وأدب',
+        'thought' => 'فكر وفلسفة',
+        'self' => 'تطوير ذات',
+        'history' => 'تاريخ وسير',
+        'religion' => 'دين',
+        'science' => 'علوم',
+        'other' => 'أخرى',
+    ],
+
 ];

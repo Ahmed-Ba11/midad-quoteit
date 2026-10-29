@@ -166,7 +166,10 @@ export function initStudio(form) {
         artText.classList.toggle('hl-color', checkedValue('highlight_style') === 'color');
         artTexture.classList.toggle('hidden', !form.querySelector('input[type="checkbox"][name="texture"]').checked);
 
-        const byline = [field('author').value.trim(), field('book').value.trim()].filter(Boolean).join(' · ');
+        const page = field('page')?.value.trim();
+        const byline = [field('author').value.trim(), field('book').value.trim(), page ? `ص ${page}` : '']
+            .filter(Boolean)
+            .join(' · ');
         artByline.textContent = `— ${byline}`;
         artByline.classList.toggle('hidden', byline === '');
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\QuoteRequest;
+use App\Models\Book;
 use App\Models\Category;
 use App\Models\Quote;
 use App\Models\Saying;
@@ -96,6 +97,7 @@ class QuoteController extends Controller
         return view('quotes.studio', [
             'quote' => $this->draftFromLibrary($request),
             'categories' => Category::orderBy('id')->get(),
+            'bookTitles' => Book::latest()->limit(300)->pluck('title'),
         ]);
     }
 
@@ -124,6 +126,12 @@ class QuoteController extends Controller
         } elseif ($saying = Saying::find($request->query('saying'))) {
             $quote->fill(['content' => $saying->text, 'author' => $saying->source]);
             $quote->setRelation('saying', $saying);
+        } elseif ($request->filled('book')) {
+            // "أضف اقتباساً من هذا الكتاب" on a book page.
+            $quote->fill([
+                'book' => mb_substr(trim($request->string('book')), 0, 150),
+                'author' => mb_substr(trim($request->string('author')), 0, 100) ?: null,
+            ]);
         }
 
         return $quote;
@@ -135,6 +143,7 @@ class QuoteController extends Controller
     public function store(QuoteRequest $request): RedirectResponse
     {
         $quote = new Quote([...$this->validatedWithHighlights($request), ...$request->libraryLink()]);
+        $this->linkBook($quote, $request);
         $quote->user()->associate($request->user())->save();
 
         return redirect()->route('home');
@@ -148,6 +157,7 @@ class QuoteController extends Controller
         return view('quotes.studio', [
             'quote' => $quote,
             'categories' => Category::orderBy('id')->get(),
+            'bookTitles' => Book::latest()->limit(300)->pluck('title'),
         ]);
     }
 
@@ -156,7 +166,9 @@ class QuoteController extends Controller
      */
     public function update(QuoteRequest $request, Quote $quote): RedirectResponse
     {
-        $quote->update($this->validatedWithHighlights($request));
+        $quote->fill($this->validatedWithHighlights($request));
+        $this->linkBook($quote, $request);
+        $quote->save();
 
         return $request->input('_form') === 'studio'
             ? redirect()->route('home')
@@ -181,9 +193,34 @@ class QuoteController extends Controller
      *
      * @return array<string, mixed>
      */
+    /**
+     * A reader's quote from a book joins that book's page (رفوف القرّاء): the named book is reused
+     * if it already exists, otherwise added. Library diwans are not reader books.
+     */
+    private function linkBook(Quote $quote, QuoteRequest $request): void
+    {
+        if (! $request->has('book') || $quote->isFromLibrary()) {
+            return;
+        }
+
+        if (blank($quote->book)) {
+            $quote->book_id = null;
+
+            return;
+        }
+
+        $book = Book::findOrAdd($quote->book, $quote->author, $request->user());
+
+        if ($request->filled('book_genre') && $book->genre === null) {
+            $book->update(['genre' => $request->input('book_genre')]);
+        }
+
+        $quote->book_id = $book->id;
+    }
+
     private function validatedWithHighlights(QuoteRequest $request): array
     {
-        $data = $request->validated();
+        $data = collect($request->validated())->except('book_genre')->all();
 
         if ($request->has('highlights')) {
             $data['highlights'] = $request->input('highlights');

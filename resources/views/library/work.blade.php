@@ -39,6 +39,7 @@
                         @endif
                         <x-pick-button :id="$verse->id" :text="$verse->sadr.' / '.$verse->ajuz" class="text-[#8A3324]" />
                     </div>
+                    <x-verse-explanation :verse="$verse" class="mx-auto mt-3 max-w-2xl" />
                 </li>
             @endforeach
         </ol>

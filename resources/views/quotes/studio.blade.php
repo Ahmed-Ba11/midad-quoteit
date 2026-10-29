@@ -92,8 +92,29 @@
                         <x-input name="author" label="القائل" hint="اختياري، حتى ١٠٠ حرف" maxlength="100"
                             :value="$quote->author" />
 
-                        <x-input name="book" label="الكتاب أو الديوان" hint="اختياري، حتى ١٥٠ حرفاً" maxlength="150"
-                            :value="$quote->book" />
+                        <x-input name="book" label="الكتاب أو الديوان" maxlength="150" :value="$quote->book" list="book-titles"
+                            hint="اختياري، حتى ١٥٠ حرفاً؛ اختر من الكتب المقترحة إن وُجد، ليجتمع مع اقتباسات القرّاء الآخرين" />
+                        <datalist id="book-titles">
+                            @foreach ($bookTitles as $title)
+                                <option value="{{ $title }}"></option>
+                            @endforeach
+                        </datalist>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <x-input name="page" type="number" label="الصفحة" min="1" max="9999" inputmode="numeric"
+                                :value="$quote->page" hint="اختياري، رقم من ١ إلى ٩٩٩٩" />
+                            <div>
+                                <label for="book_genre" class="mb-1.5 block text-sm font-medium">نوع الكتاب</label>
+                                <select id="book_genre" name="book_genre"
+                                    class="block h-12 w-full rounded-xl border border-line bg-white px-3 text-ink focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/20 dark:bg-surface">
+                                    <option value="">—</option>
+                                    @foreach (config('quotes.book_genres') as $key => $label)
+                                        <option value="{{ $key }}" @selected(old('book_genre', $quote->bookRecord?->genre) === $key)>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                                <p class="mt-1.5 text-xs text-muted">اختياري، يرتّب الكتاب في رفوف القرّاء</p>
+                            </div>
+                        </div>
 
                         <x-input name="source" label="المصدر" maxlength="200" :value="$quote->source"
                             placeholder="مثل: صحيفة الجزيرة، أو رابط الصفحة"

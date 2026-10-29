@@ -18,7 +18,7 @@ class ProfileController extends Controller
     public function show(Request $request, User $user): View
     {
         $isOwner = $request->user()?->is($user) ?? false;
-        $tab = $isOwner && $request->query('tab') === 'saved' ? 'saved' : 'quotes';
+        $tab = $isOwner && in_array($request->query('tab'), ['saved', 'books'], true) ? $request->query('tab') : 'quotes';
 
         $quotes = ($tab === 'saved' ? $user->bookmarkedQuotes()->orderByPivot('created_at', 'desc') : $user->quotes()->latest())
             ->withCardData($request->user())
@@ -28,6 +28,10 @@ class ProfileController extends Controller
         return view('profile.show', [
             'user' => $user,
             'quotes' => $quotes,
+            // كتبي (owner only): the reader's shelf grouped by reading status.
+            'shelf' => $tab === 'books'
+                ? $user->books()->withCount('quotes')->orderByPivot('updated_at', 'desc')->get()->groupBy('pivot.status')
+                : collect(),
             'tab' => $tab,
             'isOwner' => $isOwner,
             'stats' => [

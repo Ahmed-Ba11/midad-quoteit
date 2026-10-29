@@ -8,9 +8,32 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['sadr', 'ajuz', 'occasion', 'sort_order', 'source_url'])]
+#[Fillable(['sadr', 'ajuz', 'occasion', 'sort_order', 'source_url', 'explanation', 'glossary'])]
 class Verse extends Model
 {
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return ['glossary' => 'array'];
+    }
+
+    /**
+     * The verse's words without diacritics, for looking each one up in لسان العرب.
+     *
+     * @return list<string>
+     */
+    public function lookupWords(): array
+    {
+        $plain = preg_replace('/[\x{0610}-\x{061A}\x{064B}-\x{065F}\x{0670}\x{0640}]/u', '', $this->sadr.' '.$this->ajuz);
+
+        return array_values(array_unique(array_filter(
+            preg_split('/\s+/u', $plain, -1, PREG_SPLIT_NO_EMPTY),
+            fn (string $word) => mb_strlen($word) > 2,
+        )));
+    }
+
     public function work(): BelongsTo
     {
         return $this->belongsTo(Work::class);

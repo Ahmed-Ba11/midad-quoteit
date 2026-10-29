@@ -15,6 +15,12 @@
                     'font-bold text-accent' => request()->routeIs('library.*'),
                 ]) @if (request()->routeIs('library.*')) aria-current="page" @endif>المكتبة</a>
             </li>
+            <li>
+                <a href="{{ route('books.index') }}" @class([
+                    'rounded-full px-3 py-2 transition hover:text-accent',
+                    'font-bold text-accent' => request()->routeIs('books.*'),
+                ]) @if (request()->routeIs('books.*')) aria-current="page" @endif>الكتب</a>
+            </li>
             @auth
                 @php $onSaved = request()->routeIs('profile.show') && request('tab') === 'saved'; @endphp
                 <li>

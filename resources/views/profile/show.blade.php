@@ -51,11 +51,36 @@
                     @class([$tabClass, 'border-accent font-bold text-accent' => $tab === 'saved', 'border-transparent text-muted hover:text-ink' => $tab !== 'saved'])>
                     المحفوظات
                 </a>
+                <a href="{{ route('profile.show', [$user, 'tab' => 'books']) }}" @if ($tab === 'books') aria-current="page" @endif
+                    @class([$tabClass, 'border-accent font-bold text-accent' => $tab === 'books', 'border-transparent text-muted hover:text-ink' => $tab !== 'books'])>
+                    كتبي
+                </a>
             @endif
         </nav>
 
         <div class="mt-8">
-            @if ($quotes->isEmpty())
+            @if ($tab === 'books')
+                {{-- كتبي: visible to its owner only. --}}
+                @forelse (config('quotes.reading_statuses') as $status => $label)
+                    @if ($shelf->has($status))
+                        <section class="mb-10" aria-label="{{ $label }}">
+                            <h2 class="font-display text-xl font-bold">{{ $label }} <span class="text-base font-normal text-muted">({{ $shelf[$status]->count() }})</span></h2>
+                            <ul class="mt-4 grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-4 lg:grid-cols-6">
+                                @foreach ($shelf[$status] as $book)
+                                    <li><x-book-tile :book="$book" /></li>
+                                @endforeach
+                            </ul>
+                        </section>
+                    @endif
+                @empty
+                @endforelse
+
+                @if ($shelf->isEmpty())
+                    <x-empty-state title="رفّك فارغ" icon="book-open">
+                        افتح صفحة أي كتاب في <a href="{{ route('books.index') }}" class="text-accent hover:underline">رفوف القرّاء</a> واختر: أقرؤه الآن، أو قرأته، أو أريد قراءته.
+                    </x-empty-state>
+                @endif
+            @elseif ($quotes->isEmpty())
                 <x-empty-state :title="$tab === 'saved' ? 'لا محفوظات بعد' : 'لا اقتباسات بعد'" :icon="$tab === 'saved' ? 'bookmark' : 'feather'">
                     {{ $tab === 'saved' ? 'احفظ ما يعجبك من الاقتباسات لتجده هنا.' : ($isOwner ? 'شارك أول اقتباس لك من زر «شارك اقتباساً».' : 'لم يشارك اقتباسات بعد.') }}
                 </x-empty-state>

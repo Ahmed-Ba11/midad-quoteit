@@ -47,6 +47,14 @@ class User extends Authenticatable
         return $this->belongsToMany(Quote::class, 'likes')->withTimestamps();
     }
 
+    /**
+     * The reader's shelf (كتبي) with the reading status of each book.
+     */
+    public function books(): BelongsToMany
+    {
+        return $this->belongsToMany(Book::class)->withPivot('status')->withTimestamps();
+    }
+
     public function bookmarkedQuotes(): BelongsToMany
     {
         return $this->belongsToMany(Quote::class, 'bookmarks')->withTimestamps();

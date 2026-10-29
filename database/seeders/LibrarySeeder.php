@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Poet;
 use App\Models\Saying;
+use App\Models\Verse;
 use Illuminate\Database\Seeder;
 
 /**
@@ -41,6 +42,18 @@ class LibrarySeeder extends Seeder
                     ]);
                 }
             }
+        }
+
+        // شرح البيت: a plain meaning + difficult words, each checked against لسان العرب.
+        foreach ($library['explanations'] ?? [] as $sadr => $explanation) {
+            Verse::where('sadr', $sadr)->update([
+                'explanation' => $explanation['meaning'],
+                'glossary' => json_encode(array_map(fn (array $word) => [
+                    'word' => $word[0],
+                    'meaning' => $word[1],
+                    'lisan_url' => $this->wikisourceUrl($word[2] ?? null),
+                ], $explanation['words']), JSON_UNESCAPED_UNICODE),
+            ]);
         }
 
         foreach ($library['sayings'] as [$text, $source]) {

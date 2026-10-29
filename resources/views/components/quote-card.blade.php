@@ -22,6 +22,12 @@
         @endif
     </div>
 
+    @if ($quote->book_id)
+        <a href="{{ route('books.show', $quote->book_id) }}" class="mx-5 mt-3 inline-flex w-fit items-center gap-1 text-xs text-muted hover:text-accent">
+            <x-icon name="book-open" class="size-4" /> صفحة الكتاب
+        </a>
+    @endif
+
     @if ($quote->story)
         <a href="{{ route('quotes.show', $quote) }}#story" class="mx-5 mt-3 inline-flex w-fit items-center gap-1 text-xs text-gold hover:underline">
             <x-icon name="book-open" class="size-4" /> له حكاية

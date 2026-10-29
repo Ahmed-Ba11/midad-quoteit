@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BookController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\LikeController;
@@ -18,6 +19,9 @@ Route::get('/users/{user}', [ProfileController::class, 'show'])->name('profile.s
 Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
 Route::get('/library/works/{work}', [LibraryController::class, 'work'])->name('library.work');
 Route::get('/library/poets/{poet}', [LibraryController::class, 'poet'])->name('library.poet');
+
+Route::get('/books', [BookController::class, 'index'])->name('books.index');
+Route::get('/books/{book}', [BookController::class, 'show'])->name('books.show');
 
 Route::middleware('guest')->group(function () {
     Route::view('/signup', 'auth.signup')->name('signup');
@@ -40,4 +44,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/quote/{quote}/like', [LikeController::class, 'toggle'])->name('quotes.like');
     Route::post('/quote/{quote}/bookmark', [BookmarkController::class, 'toggle'])->name('quotes.bookmark');
     Route::post('/quote/{quote}/replies', [ReplyController::class, 'store'])->name('replies.store');
+    Route::post('/books/{book}/shelf', [BookController::class, 'shelf'])->name('books.shelf');
 });

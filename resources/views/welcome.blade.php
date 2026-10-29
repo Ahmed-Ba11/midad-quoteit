@@ -22,7 +22,7 @@
             <h2 class="text-2xl font-bold text-white">Quotes</h2>
 
             @forelse ($quotes as $quote)
-                @php $isMine = auth()->check() && $quote->user_id === auth()->id(); @endphp
+                @php $isMine = auth()->user()?->can('update', $quote) ?? false; @endphp
 
                 @if ($isMine && $quote->id === $editingId)
                     {{-- Edit mode (my quote only) --}}
@@ -31,7 +31,8 @@
                         @csrf
                         @method('PUT')
 
-                        <textarea name="content" rows="3" required minlength="3" maxlength="280" class="input" autofocus>{{ old('content', $quote->content) }}</textarea>
+                        <textarea name="content" rows="3" required minlength="3" maxlength="155" class="input" autofocus>{{ old('content', $quote->content) }}</textarea>
+                        <p class="text-xs text-white/80">من ٣ إلى ١٥٥ حرفاً</p>
 
                         <div class="flex gap-2">
                             <button type="submit" class="btn btn-secondary">Save</button>
@@ -50,8 +51,7 @@
                             <a href="{{ route('home', ['edit' => $quote->id]) }}" class="hover:text-tuwaiq-orange"
                                 aria-label="Edit">✎</a>
 
-                            <form method="POST" action="{{ route('delete_quote', $quote) }}"
-                                onsubmit="return confirm('Delete this quote?')">
+                            <form method="POST" action="{{ route('delete_quote', $quote) }}">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="hover:text-tuwaiq-orange" aria-label="Delete">⌫</button>
@@ -73,6 +73,10 @@
             @endforelse
         </section>
 
+        <div class="mt-6">
+            {{ $quotes->links() }}
+        </div>
+
     </div>
 
     @auth
@@ -89,7 +93,7 @@
         <div id="quote-popup" popover
             class="m-auto w-[90%] max-w-lg rounded-3xl bg-white p-0 shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-sm">
 
-            <form method="POST" action="{{ route('home') }}" class="space-y-4 p-6">
+            <form method="POST" action="{{ route('store_quote') }}" class="space-y-4 p-6">
                 @csrf
                 <div class="flex items-center justify-between">
                     <h2 class="text-2xl font-bold text-tuwaiq-purple">Share a quote</h2>
@@ -103,16 +107,16 @@
                 </div>
 
                 <div>
-                    <textarea id="quote-body" name="content" rows="5" required minlength="3" maxlength="280" autofocus
+                    <textarea id="quote-body" name="content" rows="5" required minlength="3" maxlength="155" autofocus
                         placeholder="Write your quote…" class="input peer resize-none user-invalid:border-red-500">{{ old('content') }}</textarea>
-                    <p class="mt-1 text-xs text-gray-500 peer-user-invalid:text-red-600">3–255 characters.</p>
+                    <p class="mt-1 text-xs text-gray-500 peer-user-invalid:text-red-600">من ٣ إلى ١٥٥ حرفاً</p>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-full">Send</button>
             </form>
         </div>
     @else
-        <a href="/login"
+        <a href="{{ route('login') }}"
             class="fixed bottom-8 right-8 z-40 rounded-full bg-tuwaiq-purple px-6 py-4 text-white shadow-xl hover:bg-tuwaiq-purple-light">
             Log in to share a quote
         </a>

@@ -4,15 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\SignupRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
 class SignupController extends Controller
 {
-    public function signup(SignupRequest $request) {
-        // dd($request->email);
+    public function signup(SignupRequest $request): RedirectResponse
+    {
         $user = User::create($request->validated());
+
         Auth::login($user);
+        $request->session()->regenerate();
+
         return redirect()->route('home');
     }
 }

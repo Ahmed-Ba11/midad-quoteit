@@ -4,47 +4,48 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\QuoteRequest;
 use App\Models\Quote;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class QuoteController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display all quotes, newest first, 12 per page.
      */
-    public function index()
+    public function index(): View
     {
-        $quotes = Quote::latest()->limit(20)->get();
+        $quotes = Quote::with('user')->latest()->paginate(12);
+
         return view('welcome', compact('quotes'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created quote for the logged-in user.
      */
-    public function store(QuoteRequest $request)
+    public function store(QuoteRequest $request): RedirectResponse
     {
-        Auth::user()->quotes()->create($request->validated());
-        return redirect()->back();
+        $request->user()->quotes()->create($request->validated());
+
+        return redirect()->route('home');
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the quote (authorized by QuotePolicy@update on the route).
      */
-    public function update(QuoteRequest $request, Quote $quote)
+    public function update(QuoteRequest $request, Quote $quote): RedirectResponse
     {
-        abort_if($quote->user_id != Auth::id(), 403);
-
         $quote->update($request->validated());
+
         return redirect()->back();
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the quote immediately (authorized by QuotePolicy@delete on the route).
      */
-    public function destroy(Quote $quote)
+    public function destroy(Quote $quote): RedirectResponse
     {
-        abort_if($quote->user_id != Auth::id(), 403);
         $quote->delete();
+
         return redirect()->back();
     }
 }

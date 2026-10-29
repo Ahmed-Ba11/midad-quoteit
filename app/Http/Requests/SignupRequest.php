@@ -4,16 +4,15 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class SignupRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Guests only; enforced by the "guest" route middleware.
      */
     public function authorize(): bool
     {
-        return Auth::guest();
+        return true;
     }
 
     /**
@@ -24,9 +23,26 @@ class SignupRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "name" => ['required', 'min:3'],
-            "email" => ['required', 'email'],
-            "password" => ['required', 'min:8'],
+            'name' => ['required', 'string', 'regex:/^[\p{Arabic}A-Za-z\s]{2,50}$/u'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'name.required' => 'الاسم مطلوب.',
+            'name.regex' => 'الاسم من ٢ إلى ٥٠ حرفاً، حروف عربية أو إنجليزية ومسافات فقط.',
+            'email.required' => 'البريد الإلكتروني مطلوب.',
+            'email.email' => 'أدخل بريداً إلكترونياً صحيحاً، مثل name@example.com.',
+            'email.max' => 'البريد الإلكتروني طويل جداً.',
+            'email.unique' => 'هذا البريد مسجّل مسبقاً.',
+            'password.required' => 'كلمة المرور مطلوبة.',
+            'password.min' => 'كلمة المرور ٨ أحرف على الأقل.',
         ];
     }
 }

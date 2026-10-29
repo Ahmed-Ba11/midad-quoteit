@@ -10,8 +10,8 @@
         <li><a href="/signup" class="btn-primary">Sign Up</a></li>
         @else
         @auth
-        <form method="get" action="/logout">
-
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
             <li><button type="submit" class="btn-primary">Log Out</button></li>
         </form>
         <li>

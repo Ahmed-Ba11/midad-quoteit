@@ -4,16 +4,15 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class LoginRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Guests only; enforced by the "guest" route middleware.
      */
     public function authorize(): bool
     {
-        return Auth::guest();
+        return true;
     }
 
     /**
@@ -24,8 +23,20 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "email" => ['required', 'email'],
-            "password" => ['required', 'min:8'],
+            'email' => ['required', 'string', 'email'],
+            'password' => ['required', 'string'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'البريد الإلكتروني مطلوب.',
+            'email.email' => 'أدخل بريداً إلكترونياً صحيحاً، مثل name@example.com.',
+            'password.required' => 'كلمة المرور مطلوبة.',
         ];
     }
 }

@@ -4,16 +4,15 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class QuoteRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Logged-in users only ("auth" middleware); ownership is checked by QuotePolicy.
      */
     public function authorize(): bool
     {
-        return Auth::check();
+        return true;
     }
 
     /**
@@ -24,7 +23,19 @@ class QuoteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "content" => ['required', 'min:3', "max:255"]
+            'content' => ['required', 'string', 'min:3', 'max:155'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'content.required' => 'نص الاقتباس مطلوب.',
+            'content.min' => 'الاقتباس من ٣ إلى ١٥٥ حرفاً.',
+            'content.max' => 'الاقتباس من ٣ إلى ١٥٥ حرفاً.',
         ];
     }
 }

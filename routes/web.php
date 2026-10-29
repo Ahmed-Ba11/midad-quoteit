@@ -5,26 +5,21 @@ use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\SignupController;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-
-
 
 Route::get('/', [QuoteController::class, 'index'])->name('home');
 
-Route::get('/signup', [function () {
-    return view('Authentication.SignUp', ['page'=>'Sign Up']);
-}]);
-Route::post('/signup', [SignupController::class, 'signup']);
+Route::middleware('guest')->group(function () {
+    Route::view('/signup', 'Authentication.SignUp', ['page' => 'Sign Up'])->name('signup');
+    Route::post('/signup', [SignupController::class, 'signup']);
 
-Route::get('/login', function () {
-    return view('Authentication.LogIn', ['page'=>'Log In']);
+    Route::view('/login', 'Authentication.LogIn', ['page' => 'Log In'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
 });
-Route::post('/login', [LoginController::class, 'login']);
 
-Route::get('/logout', [LogoutController::class, 'logout']);
+Route::middleware('auth')->group(function () {
+    Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
-Route::post('/', [QuoteController::class, 'store']);
-
-Route::put('/quote/{quote}', [QuoteController::class, 'update'])->name('edit_quote');
-Route::delete('/quote/{quote}', [QuoteController::class, 'destroy'])->name('delete_quote');
-
+    Route::post('/', [QuoteController::class, 'store'])->name('store_quote');
+    Route::put('/quote/{quote}', [QuoteController::class, 'update'])->name('edit_quote')->can('update', 'quote');
+    Route::delete('/quote/{quote}', [QuoteController::class, 'destroy'])->name('delete_quote')->can('delete', 'quote');
+});

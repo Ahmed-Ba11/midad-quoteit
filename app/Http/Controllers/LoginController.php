@@ -3,17 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
-use App\Models\User;
-use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
-    public function login(LoginRequest $request)
+    public function login(LoginRequest $request): RedirectResponse
     {
         if (Auth::attempt($request->validated())) {
-            return redirect()->route('home');
+            $request->session()->regenerate();
+
+            return redirect()->intended(route('home'));
         }
-        return redirect()->back()->withInput($request->only('email'))->withErrors(['email' => 'The entered information is not correct']);
+
+        return redirect()->back()
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة.']);
     }
 }

@@ -12,29 +12,26 @@
                 <h2 class="mb-4 text-2xl font-bold  text-center text-white">Sign Up</h2>
                 <div class="mb-4">
                     <label for="name" class="label">Name</label>
-                    <input id="name" name="name" type="text" class="input peer user-invalid:border-red-500"
+                    <input id="name" name="name" type="text" value="{{ old('name') }}" class="input peer user-invalid:border-red-500"
     required minlength="2" maxlength="50" pattern="[A-Za-z\u0600-\u06FF ]+">
 
-                    <p class="mt-1 text-xs text-white peer-user-invalid:text-red-600">
-                        2–50 characters, letters only.
-                    </p>
+                    <p class="mt-1 text-xs text-white peer-user-invalid:text-red-600">من ٢ إلى ٥٠ حرفاً، حروف عربية أو إنجليزية فقط</p>
+                    @error('name') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
                 </div>
                 <div class="mb-4">
                     <label for="email" class="label">Email</label>
-                    <input id="email" name="email" type="email" class="input peer user-invalid:border-red-500" required
+                    <input id="email" name="email" type="email" value="{{ old('email') }}" class="input peer user-invalid:border-red-500" required
                         pattern="[^@\s]+@[^@\s]+\.[A-Za-z]{2,}">
-                    <p class="mt-1 text-xs text-white peer-user-invalid:text-red-600">
-                        A valid email, e.g. name@example.com
-                    </p>
+                    <p class="mt-1 text-xs text-white peer-user-invalid:text-red-600">بريد صحيح، مثل name@example.com</p>
+                    @error('email') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
                 </div>
 
                 <div class="mb-4">
                     <label for="password" class="label">Password</label>
                     <input id="password" name="password" type="password" class="input peer user-invalid:border-red-500" required
                         minlength="8">
-                    <p class="mt-1 text-xs text-white peer-user-invalid:text-red-600">
-                        At least 8 characters.
-                    </p>
+                    <p class="mt-1 text-xs text-white peer-user-invalid:text-red-600">٨ أحرف على الأقل</p>
+                    @error('password') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
                 </div>
               
                 <p class="mb-4 text-sm text-white">

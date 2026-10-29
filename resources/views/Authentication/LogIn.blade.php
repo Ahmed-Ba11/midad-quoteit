@@ -13,11 +13,10 @@
 
             <div class="mb-4">
                 <label for="email" class="label">Email</label>
-                <input id="email" name="email" type="email" class="input peer user-invalid:border-red-500" required
+                <input id="email" name="email" type="email" value="{{ old('email') }}" class="input peer user-invalid:border-red-500" required
                     pattern="[^@\s]+@[^@\s]+\.[A-Za-z]{2,}">
-                <p class="mt-1 text-xs text-white peer-user-invalid:text-red-600">
-                    A valid email, e.g. name@example.com
-                </p>
+                <p class="mt-1 text-xs text-white peer-user-invalid:text-red-600">بريد صحيح، مثل name@example.com</p>
+                    @error('email') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
 
             </div>
 
@@ -25,9 +24,8 @@
                 <label for="password" class="label">Password</label>
                 <input id="password" name="password" type="password" class="input peer user-invalid:border-red-500" required
                     minlength="8">
-                <p class="mt-1 text-xs text-white peer-user-invalid:text-red-600">
-                    At least 8 characters.
-                </p>
+                <p class="mt-1 text-xs text-white peer-user-invalid:text-red-600">٨ أحرف على الأقل</p>
+                    @error('password') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
             </div>
 
             <button type="submit" class="btn btn-primary w-full">Log In</button>

@@ -15,6 +15,6 @@ class LikeController extends Controller
     {
         $request->user()->likedQuotes()->toggle($quote);
 
-        return redirect()->to(url()->previous().'#quote-'.$quote->id);
+        return $this->backTo('#quote-'.$quote->id);
     }
 }

@@ -106,3 +106,17 @@ test('deleting a quote removes its likes, saves and replies', function () {
     $this->assertDatabaseCount('bookmarks', 0);
     $this->assertDatabaseCount('replies', 0);
 });
+
+test('after liking, an off-site referer sends the user home instead', function () {
+    $quote = Quote::factory()->create();
+
+    $this->actingAs(User::factory()->create())
+        ->withHeader('referer', 'https://evil.example/phish')
+        ->post(route('quotes.like', $quote))
+        ->assertRedirect(route('home').'#quote-'.$quote->id);
+
+    $this->actingAs(User::factory()->create())
+        ->withHeader('referer', 'http://localhost.evil.example/phish')
+        ->post(route('quotes.bookmark', $quote))
+        ->assertRedirect(route('home').'#quote-'.$quote->id);
+});

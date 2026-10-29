@@ -16,6 +16,14 @@ class LoginRequest extends FormRequest
     }
 
     /**
+     * Emails are stored in lower case, so compare them that way.
+     */
+    protected function prepareForValidation(): void
+    {
+        $this->merge(['email' => mb_strtolower(trim((string) $this->input('email')))]);
+    }
+
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array<string, ValidationRule|array<mixed>|string>

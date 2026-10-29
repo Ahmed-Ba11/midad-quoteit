@@ -30,11 +30,13 @@
             <form method="GET" action="{{ route('library.index') }}" role="search" class="relative mx-auto mt-10 max-w-xl">
                 <label for="library-q" class="sr-only">ابحث في المكتبة</label>
                 <x-icon name="search" class="pointer-events-none absolute start-5 top-1/2 size-5 -translate-y-1/2 text-[#C9A45C]" />
-                <input id="library-q" name="q" type="search" value="{{ $term }}" maxlength="60"
+                <input id="library-q" name="q" type="search" aria-describedby="library-search-hint" value="{{ $term }}" maxlength="60"
                     placeholder="ابحث عن بيت، أو شاعر، أو ديوان…"
                     class="block h-14 w-full rounded-full border border-[#C9A45C]/40 bg-[#F2ECE2]/5 ps-14 pe-28 text-lg text-[#F2ECE2] placeholder:text-[#F2ECE2]/45 focus:border-[#C9A45C] focus:outline-none focus:ring-3 focus:ring-[#C9A45C]/25">
                 <button type="submit" class="absolute end-2 top-1/2 h-10 -translate-y-1/2 rounded-full bg-[#C9A45C] px-5 font-medium text-[#1C1A18] transition hover:bg-[#E2C27E]">ابحث</button>
             </form>
+
+            <p id="library-search-hint" class="mt-3 text-xs text-[#F2ECE2]/55">كلمة من البيت، أو اسم شاعر، أو عنوان ديوان (حتى ٦٠ حرفاً)</p>
 
             <p class="mt-5 text-sm text-[#F2ECE2]/60">
                 {{ $counts['poets'] }} شاعراً، {{ $counts['works'] }} بين ديوانٍ ومعلقة، و{{ $counts['verses'] }} بيتاً مختاراً من عيون الشعر العربي

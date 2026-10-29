@@ -15,6 +15,6 @@ class BookmarkController extends Controller
     {
         $request->user()->bookmarkedQuotes()->toggle($quote);
 
-        return redirect()->to(url()->previous().'#quote-'.$quote->id);
+        return $this->backTo('#quote-'.$quote->id);
     }
 }

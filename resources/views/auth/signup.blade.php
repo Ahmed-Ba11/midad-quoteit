@@ -9,7 +9,7 @@
         @csrf
 
         <x-input name="name" label="الاسم" hint="من ٢ إلى ٥٠ حرفاً، حروف عربية أو إنجليزية فقط" required
-            minlength="2" maxlength="50" pattern="[A-Za-z؀-ۿ ]+" autocomplete="name" />
+            minlength="2" maxlength="50" pattern="[A-Za-zء-غف-ْٱ-ۓ ]+" autocomplete="name" />
 
         <x-input name="email" type="email" label="البريد الإلكتروني" hint="بريد صحيح، مثل name@example.com"
             dir="ltr" required autocomplete="email" />

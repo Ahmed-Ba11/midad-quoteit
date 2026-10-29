@@ -83,7 +83,7 @@
                             <input type="hidden" name="verses[]" value="{{ $verse->id }}">
                         @endforeach
                         @if ($librarySaying)
-                            <input type="hidden" name="saying_id" value="{{ $librarySaying->id }}">
+                            <input type="hidden" name="saying" value="{{ $librarySaying->id }}">
                         @endif
                     @else
                         <x-textarea name="content" label="نص الاقتباس" hint="من ٣ إلى ١٥٥ حرفاً" rows="4" minlength="3"
@@ -128,6 +128,7 @@
                             </div>
                         </fieldset>
                     @endforeach
+                    <p class="-mt-3 text-xs text-muted">خط واحد للاقتباس كله؛ الخطوط الإنجليزية للنصوص الإنجليزية</p>
 
                     <div>
                         <label for="font_size" class="{{ $sectionTitle }} flex justify-between">
@@ -151,6 +152,7 @@
                                 </label>
                             @endforeach
                         </div>
+                        <p class="mt-1.5 text-xs text-muted">عريض ١٦:٩، مربّع ١:١، طولي ٤:٥</p>
                     </fieldset>
                 </div>
 
@@ -210,6 +212,7 @@
                                 </label>
                             @endforeach
                         </div>
+                        <p class="mt-1.5 text-xs text-muted">التظليل يلوّن خلفية الكلمة، والتلوين يغيّر لون حروفها</p>
                     </fieldset>
 
                     <div>

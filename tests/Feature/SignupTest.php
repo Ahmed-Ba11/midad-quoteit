@@ -77,3 +77,36 @@ test('logged-in users cannot open the sign up page', function () {
         ->get('/signup')
         ->assertRedirect();
 });
+
+test('names with Arabic digits, punctuation or line breaks are rejected', function (string $name) {
+    $this->post('/signup', [
+        'name' => $name,
+        'email' => 'ahmed@example.com',
+        'password' => 'secret123',
+    ])->assertSessionHasErrors('name');
+
+    $this->assertGuest();
+})->with([
+    'arabic digits' => 'أحمد ١٢٣',
+    'arabic comma' => 'أحمد، خالد',
+    'line break' => "أحمد\nخالد",
+    'tab' => "Ahmed\tKhalid",
+]);
+
+test('an Arabic name with diacritics is accepted', function () {
+    $this->post('/signup', [
+        'name' => 'مُحمَّد علي',
+        'email' => 'm@example.com',
+        'password' => 'secret123',
+    ])->assertSessionHasNoErrors();
+});
+
+test('the same email in another letter case cannot register twice', function () {
+    User::factory()->create(['email' => 'taken@example.com']);
+
+    $this->post('/signup', [
+        'name' => 'Ahmed',
+        'email' => 'Taken@Example.COM',
+        'password' => 'secret123',
+    ])->assertSessionHasErrors('email');
+});

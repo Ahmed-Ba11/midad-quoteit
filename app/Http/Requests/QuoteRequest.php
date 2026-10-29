@@ -20,6 +20,14 @@ class QuoteRequest extends FormRequest
     }
 
     /**
+     * The library link (verse_id / saying_id) of a new quote. Never read from the request
+     * directly: it is set only from verses[] / saying that exist in خزانة الأدب.
+     *
+     * @var array{verse_id?: int|null, saying_id?: int|null}
+     */
+    private array $libraryLink = [];
+
+    /**
      * Library text is never taken from the browser: it is rebuilt from the chosen verses / saying
      * (or kept from the quote being edited), and attributed to its poet or source automatically.
      */
@@ -33,33 +41,37 @@ class QuoteRequest extends FormRequest
             return;
         }
 
-        $verseIds = collect($this->input('verses', []))->filter(fn ($id) => ctype_digit((string) $id))
+        $verseIds = collect((array) $this->input('verses', []))->filter(fn ($id) => ctype_digit((string) $id))
             ->map(fn ($id) => (int) $id)->unique()->take(config('library.max_selection'));
 
-        if ($verseIds->isNotEmpty()) {
-            $verses = Verse::with('work.poet')->findMany($verseIds)->sortBy(fn (Verse $verse) => $verseIds->search($verse->id))->values();
+        $verses = $verseIds->isEmpty() ? collect() : Verse::with('work.poet')->findMany($verseIds)
+            ->sortBy(fn (Verse $verse) => $verseIds->search($verse->id))->values();
 
-            if ($verses->isNotEmpty()) {
-                $this->merge([
-                    'content' => $verses->map->asText()->implode("\n"),
-                    'author' => $verses->pluck('work.poet.name')->unique()->implode(' و'),
-                    'book' => $verses->pluck('work.title')->unique()->count() === 1 ? $verses->first()->work->title : null,
-                    'verse_id' => $verses->first()->id,
-                    'saying_id' => null,
-                ]);
-            }
+        if ($verses->isNotEmpty()) {
+            $this->merge([
+                'content' => $verses->map->asText()->implode("\n"),
+                'author' => $verses->pluck('work.poet.name')->unique()->implode(' و'),
+                'book' => $verses->pluck('work.title')->unique()->count() === 1 ? $verses->first()->work->title : null,
+            ]);
+            $this->libraryLink = ['verse_id' => $verses->first()->id, 'saying_id' => null];
 
             return;
         }
 
-        if ($this->filled('saying_id') && $saying = Saying::find($this->input('saying_id'))) {
-            $this->merge([
-                'content' => $saying->text,
-                'author' => $saying->source,
-                'book' => null,
-                'verse_id' => null,
-            ]);
+        $sayingId = $this->input('saying');
+
+        if (ctype_digit((string) $sayingId) && $saying = Saying::find((int) $sayingId)) {
+            $this->merge(['content' => $saying->text, 'author' => $saying->source, 'book' => null]);
+            $this->libraryLink = ['verse_id' => null, 'saying_id' => $saying->id];
         }
+    }
+
+    /**
+     * @return array{verse_id?: int|null, saying_id?: int|null}
+     */
+    public function libraryLink(): array
+    {
+        return $this->libraryLink;
     }
 
     /**
@@ -75,8 +87,6 @@ class QuoteRequest extends FormRequest
         return [
             'content' => ['required', 'string', 'min:3', 'max:155'],
             'category_id' => ['sometimes', 'nullable', 'integer', 'exists:categories,id'],
-            'verse_id' => ['sometimes', 'nullable', 'integer', 'exists:verses,id'],
-            'saying_id' => ['sometimes', 'nullable', 'integer', 'exists:sayings,id'],
             'author' => ['sometimes', 'nullable', 'string', 'max:100'],
             'book' => ['sometimes', 'nullable', 'string', 'max:150'],
             'story' => ['sometimes', 'nullable', 'string', 'max:500'],
@@ -105,8 +115,6 @@ class QuoteRequest extends FormRequest
             'content.required' => 'نص الاقتباس مطلوب.',
             'content.min' => 'الاقتباس من ٣ إلى ١٥٥ حرفاً.',
             'content.max' => 'الاقتباس من ٣ إلى ١٥٥ حرفاً.',
-            'verse_id.exists' => 'هذا البيت غير موجود في المكتبة.',
-            'saying_id.exists' => 'هذا المأثور غير موجود في المكتبة.',
             'category_id.exists' => 'اختر تصنيفاً من القائمة.',
             'author.max' => 'اسم القائل حتى ١٠٠ حرف.',
             'book.max' => 'اسم الكتاب حتى ١٥٠ حرفاً.',

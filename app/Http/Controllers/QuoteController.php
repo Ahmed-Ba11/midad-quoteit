@@ -134,7 +134,8 @@ class QuoteController extends Controller
      */
     public function store(QuoteRequest $request): RedirectResponse
     {
-        $request->user()->quotes()->create($this->validatedWithHighlights($request));
+        $quote = new Quote([...$this->validatedWithHighlights($request), ...$request->libraryLink()]);
+        $quote->user()->associate($request->user())->save();
 
         return redirect()->route('home');
     }
@@ -159,7 +160,7 @@ class QuoteController extends Controller
 
         return $request->input('_form') === 'studio'
             ? redirect()->route('home')
-            : redirect()->back();
+            : $this->backTo();
     }
 
     /**
@@ -172,7 +173,7 @@ class QuoteController extends Controller
         // Deleting from the quote's own page: that page no longer exists, so go home.
         return url()->previous() === route('quotes.show', $quote)
             ? redirect()->route('home')
-            : redirect()->back();
+            : $this->backTo();
     }
 
     /**

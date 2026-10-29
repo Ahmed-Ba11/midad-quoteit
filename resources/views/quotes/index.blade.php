@@ -35,14 +35,14 @@
             <div class="relative flex-1">
                 <label for="q" class="sr-only">ابحث في الاقتباسات</label>
                 <x-icon name="search" class="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-muted" />
-                <input id="q" name="q" type="search" value="{{ $filters['q'] }}" maxlength="100"
+                <input id="q" name="q" type="search" aria-describedby="search-hint" value="{{ $filters['q'] }}" maxlength="100"
                     placeholder="ابحث في النص أو القائل أو الكتاب…"
                     class="block h-12 w-full rounded-full border border-line bg-surface ps-12 pe-4 text-ink placeholder:text-muted/70 focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/20">
             </div>
 
             <div class="flex gap-2">
                 <label for="sort" class="sr-only">الترتيب</label>
-                <select id="sort" name="sort" onchange="this.form.requestSubmit()"
+                <select id="sort" name="sort" aria-describedby="search-hint" onchange="this.form.requestSubmit()"
                     class="h-12 flex-1 rounded-full border border-line bg-surface px-5 text-ink focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/20">
                     @foreach ($sorts as $value => $label)
                         <option value="{{ $value }}" @selected($filters['sort'] === $value)>{{ $label }}</option>
@@ -51,6 +51,8 @@
                 <x-button type="submit" class="h-12">بحث</x-button>
             </div>
         </form>
+
+        <p id="search-hint" class="mt-2 text-xs text-muted">ابحث بكلمة من النص أو باسم القائل أو الكتاب (حتى ١٠٠ حرف)، واختر الترتيب.</p>
 
         {{-- Category chips --}}
         <nav aria-label="التصنيفات" class="mt-5 flex flex-wrap gap-2">

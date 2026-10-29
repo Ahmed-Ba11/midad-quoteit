@@ -21,7 +21,7 @@ Route::get('/library/poets/{poet}', [LibraryController::class, 'poet'])->name('l
 
 Route::middleware('guest')->group(function () {
     Route::view('/signup', 'auth.signup')->name('signup');
-    Route::post('/signup', [SignupController::class, 'signup']);
+    Route::post('/signup', [SignupController::class, 'signup'])->middleware('throttle:10,1');
 
     Route::view('/login', 'auth.login')->name('login');
     Route::post('/login', [LoginController::class, 'login']);

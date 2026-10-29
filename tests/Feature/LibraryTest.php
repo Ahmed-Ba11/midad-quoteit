@@ -120,7 +120,7 @@ test('a saying is published with its source', function () {
     $saying = Saying::where('text', 'like', 'خيرُ الكلامِ%')->first();
 
     $this->actingAs(User::factory()->create())
-        ->post(route('store_quote'), ['saying_id' => $saying->id]);
+        ->post(route('store_quote'), ['saying' => $saying->id]);
 
     expect(Quote::sole())
         ->content->toBe($saying->text)
@@ -163,4 +163,17 @@ test('the demo seeder builds a complete, browsable dataset', function () {
 
     $this->get(route('home'))->assertOk()->assertSee('اقتبـــاس اليوم');
     $this->get(route('library.index'))->assertOk();
+});
+
+test('a quote cannot be linked to the library by sending verse_id or saying_id directly', function () {
+    $verse = Verse::first();
+    $saying = Saying::first();
+
+    $this->actingAs(User::factory()->create())
+        ->post(route('store_quote'), ['content' => 'نص مزيّف ينتحل بيتاً', 'author' => 'المتنبي', 'verse_id' => $verse->id, 'saying_id' => $saying->id]);
+
+    expect(Quote::sole())
+        ->verse_id->toBeNull()
+        ->saying_id->toBeNull()
+        ->isFromLibrary()->toBeFalse();
 });

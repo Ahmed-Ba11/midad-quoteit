@@ -26,6 +26,8 @@
             </div>
         </header>
 
+        <x-read-more :poet="$poet" class="mt-10" />
+
         @foreach ($poet->works as $work)
             <section class="mt-14" aria-labelledby="work-{{ $work->id }}">
                 <div class="flex flex-wrap items-center justify-between gap-3">
@@ -40,7 +42,12 @@
                     @foreach ($work->verses as $verse)
                         <li class="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:gap-6">
                             <x-verse layout="paired" :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="flex-1 text-lg" />
-                            <x-pick-button :id="$verse->id" :text="$verse->sadr.' / '.$verse->ajuz" class="text-accent" />
+                            <div class="flex shrink-0 items-center gap-3">
+                                @if ($verse->source_url)
+                                    <x-external-link :href="$verse->source_url" class="text-xs text-muted">القصيدة كاملة</x-external-link>
+                                @endif
+                                <x-pick-button :id="$verse->id" :text="$verse->sadr.' / '.$verse->ajuz" class="text-accent" />
+                            </div>
                         </li>
                     @endforeach
                 </ol>

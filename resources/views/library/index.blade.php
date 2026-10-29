@@ -80,6 +80,9 @@
                                 <x-verse layout="paired" :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="flex-1 text-lg" />
                                 <div class="flex shrink-0 items-center gap-3">
                                     <a href="{{ route('library.work', $verse->work) }}" class="text-sm text-muted hover:text-accent">{{ $verse->work->poet->name }}</a>
+                                    @if ($verse->source_url)
+                                        <x-external-link :href="$verse->source_url" class="text-xs text-muted">القصيدة كاملة</x-external-link>
+                                    @endif
                                     <x-pick-button :id="$verse->id" :text="$verse->sadr.' / '.$verse->ajuz" />
                                 </div>
                             </li>
@@ -136,8 +139,17 @@
                             <p class="mt-1 text-sm text-[#7A7068]">{{ $book->poet->years }}</p>
                             <a href="{{ route('library.work', $book) }}"
                                 class="mt-7 inline-flex h-11 items-center gap-2 rounded-full bg-[#2B2520] px-5 text-sm font-medium text-[#F7F0E1] transition hover:bg-[#8A3324]">
-                                تصفّح {{ $book->type === 'muallaqa' ? 'المعلقة' : 'الديوان' }} كاملاً ({{ $book->verses_count }})
+                                عيون أبياته في المكتبة ({{ $book->verses_count }})
                             </a>
+                            <p class="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-[#7A7068]">
+                                {{ $book->type === 'muallaqa' ? 'اقرأ المعلقة كاملة في' : 'أكمل قراءة الديوان في' }}
+                                @if ($book->wikisource_url ?? $book->poet->wikisource_url)
+                                    <x-external-link :href="$book->wikisource_url ?? $book->poet->wikisource_url" class="text-[#8A3324]">ويكي مصدر</x-external-link>
+                                @endif
+                                @if ($book->poet->aldiwan_url)
+                                    <x-external-link :href="$book->poet->aldiwan_url" class="text-[#8A3324]">الديوان</x-external-link>
+                                @endif
+                            </p>
                         </div>
                         <div class="manuscript-page manuscript-page-end px-8 py-12 sm:px-12">
                             <h4 class="text-center font-display text-lg font-bold text-[#A8873F]">من عيون أبياته</h4>
@@ -200,6 +212,15 @@
                             @endif
                             <x-button variant="secondary" :href="route('library.poet', $poet)">كل أبياته ({{ $poet->verses_count }})</x-button>
                         </div>
+                        <p class="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted">
+                            شعره كاملاً في
+                            @if ($poet->wikisource_url)
+                                <x-external-link :href="$poet->wikisource_url" class="text-accent">ويكي مصدر</x-external-link>
+                            @endif
+                            @if ($poet->aldiwan_url)
+                                <x-external-link :href="$poet->aldiwan_url" class="text-accent">الديوان</x-external-link>
+                            @endif
+                        </p>
                     </div>
                     <ul class="space-y-4">
                         @foreach ($poet->works->flatMap->verses->take(3) as $verse)

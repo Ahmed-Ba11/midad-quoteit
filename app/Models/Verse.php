@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['sadr', 'ajuz', 'occasion', 'sort_order'])]
+#[Fillable(['sadr', 'ajuz', 'occasion', 'sort_order', 'source_url'])]
 class Verse extends Model
 {
     public function work(): BelongsTo

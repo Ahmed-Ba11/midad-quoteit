@@ -177,3 +177,35 @@ test('a quote cannot be linked to the library by sending verse_id or saying_id d
         ->saying_id->toBeNull()
         ->isFromLibrary()->toBeFalse();
 });
+
+test('every poet links to Wikisource and الديوان, and every muallaqa to its own page', function () {
+    Poet::all()->each(function (Poet $poet) {
+        expect($poet->wikisource_url)->toStartWith('https://ar.wikisource.org/wiki/')
+            ->and($poet->aldiwan_url)->toStartWith('https://www.aldiwan.net/cat-poet-');
+    });
+
+    Work::where('type', 'muallaqa')->get()->each(
+        fn (Work $work) => expect($work->wikisource_url)->toStartWith('https://ar.wikisource.org/wiki/')
+    );
+});
+
+test('verse source links only point to Wikisource poem pages', function () {
+    $linked = Verse::whereNotNull('source_url')->pluck('source_url');
+
+    expect($linked->count())->toBeGreaterThan(Verse::count() / 2);
+    $linked->each(fn (string $url) => expect($url)->toStartWith('https://ar.wikisource.org/wiki/'));
+});
+
+test('diwan and poet pages offer "read the full diwan" links that open safely in a new tab', function () {
+    $this->get(route('library.work', 'diwan-al-mutanabbi'))
+        ->assertOk()
+        ->assertSee('أكمل قراءة الديوان')
+        ->assertSee('https://www.aldiwan.net/cat-poet-Mutanabi', false)
+        ->assertSee('rel="noopener noreferrer external"', false)
+        ->assertSee('target="_blank"', false);
+
+    $this->get(route('library.work', 'muallaqa-zuhair'))->assertSee('اقرأ المعلقة كاملة');
+
+    $this->get(route('library.poet', 'al-khansa'))
+        ->assertSee('https://www.aldiwan.net/cat-poet-al-khansa', false);
+});

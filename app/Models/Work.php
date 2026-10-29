@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['title', 'slug', 'type', 'color', 'ink', 'sort_order'])]
+#[Fillable(['title', 'slug', 'type', 'color', 'ink', 'sort_order', 'wikisource_url'])]
 class Work extends Model
 {
     public function getRouteKeyName(): string

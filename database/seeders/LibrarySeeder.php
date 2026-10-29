@@ -19,19 +19,24 @@ class LibrarySeeder extends Seeder
         foreach ($library['poets'] as $poetOrder => $poetData) {
             $poet = Poet::updateOrCreate(['slug' => $poetData['slug']], [
                 ...collect($poetData)->only(['name', 'era', 'years', 'region', 'bio', 'is_peninsula', 'color'])->all(),
+                'wikisource_url' => $this->wikisourceUrl($poetData['wikisource'] ?? null),
+                'aldiwan_url' => isset($poetData['aldiwan']) ? 'https://www.aldiwan.net/'.$poetData['aldiwan'] : null,
                 'sort_order' => $poetOrder,
             ]);
 
             foreach ($poetData['works'] as $workOrder => $workData) {
                 $work = $poet->works()->updateOrCreate(['slug' => $workData['slug']], [
                     ...collect($workData)->only(['title', 'type', 'color', 'ink'])->all(),
+                    'wikisource_url' => $this->wikisourceUrl($workData['wikisource'] ?? null),
                     'sort_order' => $workOrder,
                 ]);
 
-                foreach ($workData['verses'] as $verseOrder => [$sadr, $ajuz, $occasion]) {
+                foreach ($workData['verses'] as $verseOrder => $verse) {
+                    [$sadr, $ajuz, $occasion] = $verse;
                     $work->verses()->updateOrCreate(['sadr' => $sadr], [
                         'ajuz' => $ajuz,
                         'occasion' => $occasion,
+                        'source_url' => $this->wikisourceUrl($verse[3] ?? null),
                         'sort_order' => $verseOrder,
                     ]);
                 }
@@ -41,5 +46,13 @@ class LibrarySeeder extends Seeder
         foreach ($library['sayings'] as [$text, $source]) {
             Saying::updateOrCreate(['text' => $text], ['source' => $source]);
         }
+    }
+
+    /**
+     * A Wikisource page title (e.g. "معلقة امرئ القيس") as a link.
+     */
+    private function wikisourceUrl(?string $title): ?string
+    {
+        return $title ? 'https://ar.wikisource.org/wiki/'.rawurlencode(str_replace(' ', '_', $title)) : null;
     }
 }

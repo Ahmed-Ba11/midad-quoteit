@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
-#[Fillable(['name', 'slug', 'era', 'years', 'region', 'bio', 'is_peninsula', 'color', 'sort_order'])]
+#[Fillable(['name', 'slug', 'era', 'years', 'region', 'bio', 'is_peninsula', 'color', 'sort_order', 'wikisource_url', 'aldiwan_url'])]
 class Poet extends Model
 {
     /**

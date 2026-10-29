@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::table('quotes', function (Blueprint $table) {
             $table->foreignId('book_id')->nullable()->after('saying_id')->constrained()->nullOnDelete();
             $table->unsignedSmallInteger('page')->nullable()->after('book');
+
+            $table->index('book_id');
         });
     }
 

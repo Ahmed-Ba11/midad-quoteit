@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\NormalizesArabic;
 use Database\Factories\BookFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Book extends Model
 {
     /** @use HasFactory<BookFactory> */
-    use HasFactory;
+    use HasFactory, NormalizesArabic;
 
     public function quotes(): HasMany
     {
@@ -33,12 +34,7 @@ class Book extends Model
      */
     public static function matchKey(string $title, ?string $author): string
     {
-        $normalise = fn (?string $text) => trim(preg_replace('/\s+/u', ' ', strtr(
-            preg_replace('/[\x{0610}-\x{061A}\x{064B}-\x{065F}\x{0670}\x{0640}]/u', '', mb_strtolower((string) $text)),
-            ['أ' => 'ا', 'إ' => 'ا', 'آ' => 'ا', 'ٱ' => 'ا', 'ة' => 'ه', 'ى' => 'ي', 'ؤ' => 'و', 'ئ' => 'ي'],
-        )));
-
-        return mb_substr($normalise($title).'|'.$normalise($author), 0, 255);
+        return mb_substr(static::normalizeArabic($title).'|'.static::normalizeArabic($author), 0, 255);
     }
 
     /**

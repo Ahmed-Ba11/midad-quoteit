@@ -262,6 +262,15 @@
 }
 
 .manuscript-page {
+    /* Paper stays paper in dark mode: everything inside uses the light palette. */
+    --color-paper: #f5efe4;
+    --color-surface: #fbf8f3;
+    --color-ink: #2b2520;
+    --color-muted: #7a7068;
+    --color-line: #e6ded2;
+    --color-accent: #8a3324;
+    --color-accent-soft: #f2e6dc;
+    --color-gold: #a8873f;
     background-color: #f7f0e1;
     color: #2b2520;
     box-shadow:

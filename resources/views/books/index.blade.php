@@ -50,6 +50,9 @@
                             <x-button :href="route('quotes.create', array_filter(['book' => $term]))" class="mt-5">أضف «{{ \Illuminate\Support\Str::limit($term ?: 'كتابك', 30) }}» باقتباس منه</x-button>
                         @endauth
                     </x-empty-state>
+                    @if ($term !== '')
+                        <x-search-elsewhere :term="$term" here="books" class="mt-8" />
+                    @endif
                 @else
                     <ul class="grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-4 lg:grid-cols-6">
                         @foreach ($results as $book)

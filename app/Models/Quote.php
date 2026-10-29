@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\NormalizesArabic;
 use Database\Factories\QuoteFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +20,20 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Quote extends Model
 {
     /** @use HasFactory<QuoteFactory> */
-    use HasFactory;
+    use HasFactory, NormalizesArabic;
+
+    protected static function booted(): void
+    {
+        static::saving(fn (Quote $quote) => $quote->search_text = $quote->buildSearchText());
+    }
+
+    /**
+     * Everything a reader might search a quote by, normalised (see NormalizesArabic).
+     */
+    public function buildSearchText(): string
+    {
+        return static::normalizeArabic(implode(' ', array_filter([$this->content, $this->author, $this->book, $this->source])));
+    }
 
     /**
      * Same defaults as the migration, so an unsaved quote (e.g. in رواق الحرف) renders correctly.
@@ -139,12 +153,7 @@ class Quote extends Model
             return;
         }
 
-        $like = '%'.$term.'%';
-
-        $query->where(fn (Builder $matches) => $matches
-            ->where('content', 'like', $like)
-            ->orWhere('author', 'like', $like)
-            ->orWhere('book', 'like', $like));
+        $query->where('search_text', 'like', '%'.static::normalizeArabic($term).'%');
     }
 
     /**

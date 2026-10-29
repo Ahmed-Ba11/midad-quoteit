@@ -108,3 +108,21 @@ test('a user can update their bio up to 160 characters', function () {
 test('guests cannot change a bio', function () {
     $this->patch(route('profile.bio'), ['bio' => 'زائر'])->assertRedirect(route('login'));
 });
+
+test('search ignores tashkeel and hamza forms', function () {
+    Quote::factory()->create(['content' => 'قفا نبكِ من ذكرى حبيبٍ ومنزلِ']);
+    Quote::factory()->create(['content' => 'سافرْ إلى المجد']);
+
+    $this->get(route('home', ['q' => 'قفا نبك']))->assertSee('قفا نبكِ من ذكرى');
+    $this->get(route('home', ['q' => 'الى المجد']))->assertSee('سافرْ إلى المجد');
+});
+
+test('a search with no results points to the other sections, trusted sites and quoting it yourself', function () {
+    $this->get(route('home', ['q' => 'بيت غير موجود']))
+        ->assertSee('لا نتائج')
+        ->assertSee(route('library.index', ['q' => 'بيت غير موجود']), false)
+        ->assertSee('https://ar.wikisource.org/w/index.php?', false)
+        ->assertSee('https://www.aldiwan.net/search.php?', false)
+        ->assertSee('وجدتَه في مكان آخر؟')
+        ->assertSee('rel="noopener noreferrer external"', false);
+});

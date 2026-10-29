@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Book;
 use App\Models\Category;
 use App\Models\Quote;
 use App\Models\Saying;
@@ -110,5 +111,23 @@ class DatabaseSeeder extends Seeder
 
         $users[0]->bookmarkedQuotes()->attach($created->whereIn('user_id', [$users[2]->id, $users[4]->id])->pluck('id'));
         $users[2]->bookmarkedQuotes()->attach($created->take(4)->pluck('id'));
+
+        // رفوف القرّاء: two lines checked word for word against مقدمة ابن خلدون on Wikisource.
+        $muqaddimah = Book::findOrAdd('مقدمة ابن خلدون', 'ابن خلدون', $users[1]);
+        $muqaddimah->update(['genre' => 'history']);
+
+        foreach ([[1, 'الظلم مؤذن بخراب العمران', 'ink'], [3, 'المغلوب مولع أبداً بالاقتداء بالغالب', 'sand']] as [$ownerIndex, $content, $paletteKey]) {
+            $quote = new Quote([
+                'content' => $content, 'author' => 'ابن خلدون', 'book' => $muqaddimah->title,
+                'category_id' => $category('falsafa'), 'font' => 'naskh', ...$palette($paletteKey),
+            ]);
+            $quote->book_id = $muqaddimah->id;
+            $quote->user()->associate($users[$ownerIndex])->save();
+            $quote->likers()->attach($users->reject(fn (User $user) => $user->id === $quote->user_id)->take(2)->pluck('id'));
+        }
+
+        $users[1]->books()->attach($muqaddimah, ['status' => 'read']);
+        $users[3]->books()->attach($muqaddimah, ['status' => 'reading']);
+        $users[0]->books()->attach($muqaddimah, ['status' => 'want']);
     }
 }

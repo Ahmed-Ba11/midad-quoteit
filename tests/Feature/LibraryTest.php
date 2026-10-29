@@ -155,7 +155,7 @@ test('the demo seeder builds a complete, browsable dataset', function () {
     $this->seed(DatabaseSeeder::class);
 
     expect(User::count())->toBe(5)
-        ->and(Quote::count())->toBe(20)
+        ->and(Quote::count())->toBe(22)
         ->and(Quote::whereNotNull('verse_id')->count())->toBeGreaterThan(5)
         ->and(Reply::count())->toBeGreaterThan(10);
 
@@ -206,4 +206,16 @@ test('diwan and poet pages offer "read the full diwan" links that open safely in
 
     $this->get(route('library.poet', 'al-khansa'))
         ->assertSee('https://www.aldiwan.net/cat-poet-al-khansa', false);
+});
+
+test('every verse has an explanation, and the diwan page shows it with Lisan al-Arab lookups', function () {
+    expect(Verse::whereNull('explanation')->count())->toBe(0);
+
+    $this->get(route('library.work', 'muallaqa-imru-al-qays'))
+        ->assertOk()
+        ->assertSee('شرح البيت ومعاني كلماته')
+        ->assertSee('يخاطب الشاعر صاحبَيه')
+        ->assertSee('غريب الألفاظ')
+        ->assertSee('منقطعه حيث يدقّ')
+        ->assertSee('https://ar.wikisource.org/w/index.php?search=', false);
 });

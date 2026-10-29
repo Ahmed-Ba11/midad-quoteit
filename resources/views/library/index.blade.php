@@ -71,8 +71,9 @@
 
                 @if ($results->isEmpty())
                     <x-empty-state title="لا أبيات تطابق بحثك" icon="search" class="mt-6">
-                        جرّب كلمة من البيت، أو اسم الشاعر، أو تصفّح الرفوف أدناه.
+                        جرّب كلمة من البيت، أو اسم الشاعر، أو تصفّح الرفوف أدناه. المكتبة تضم عيون الأبيات فقط، وقد تجده في مكان آخر:
                     </x-empty-state>
+                    <x-search-elsewhere :term="$term" here="library" class="mt-8" />
                 @else
                     <ol class="mt-6 divide-y divide-line overflow-hidden rounded-3xl border border-line bg-surface">
                         @foreach ($results as $verse)

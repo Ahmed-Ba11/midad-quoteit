@@ -70,6 +70,9 @@
                         لم نجد اقتباساً يطابق بحثك. جرّب كلمة أخرى أو
                         <a href="{{ route('home') }}" class="font-medium text-accent hover:underline">اعرض الكل</a>.
                     </x-empty-state>
+                    @if ($filters['q'] !== '')
+                        <x-search-elsewhere :term="$filters['q']" here="quotes" class="mt-8" />
+                    @endif
                 @else
                     <x-empty-state title="لا توجد اقتباسات بعد">
                         كن أول من يشارك اقتباساً يستحق أن يُقرأ.

@@ -1,9 +1,8 @@
 @props(['verse'])
 
 {{--
-    شرح البيت: the meaning (written for مِداد), the difficult words with meanings checked against
-    لسان العرب (each linked to its entry), and any word of the verse looked up in لسان العرب.
-    All dictionary links go to Wikisource (CC BY-SA); nothing is fetched at runtime.
+    شرح البيت: a plain meaning and the difficult words (written for مِداد), with every word one click
+    away from لسان العرب on Wikisource (CC BY-SA) so the reader can check it. Nothing is fetched at runtime.
 --}}
 @php
     $lisanSearch = fn (string $word) => 'https://ar.wikisource.org/w/index.php?'.http_build_query([
@@ -24,7 +23,7 @@
             <section>
                 <h4 class="mb-1 font-medium text-ink">المعنى</h4>
                 <p class="text-ink/85">{{ $verse->explanation }}</p>
-                <p class="mt-1 text-xs text-muted">شرح مبسّط من مِداد</p>
+                <p class="mt-1 text-xs text-muted">شرح مبسّط من مِداد؛ وللتوسّع ابحث عن أي كلمة في لسان العرب أدناه.</p>
             </section>
         @endif
 
@@ -37,9 +36,7 @@
                             <dt class="shrink-0 font-text font-bold text-accent">{{ $entry['word'] }}</dt>
                             <dd class="text-ink/85">
                                 {{ $entry['meaning'] }}
-                                @if (! empty($entry['lisan_url']))
-                                    <x-external-link :href="$entry['lisan_url']" class="text-xs text-muted">لسان العرب</x-external-link>
-                                @endif
+                                <x-external-link :href="$lisanSearch($entry['word'])" class="text-xs text-muted">لسان العرب</x-external-link>
                             </dd>
                         </div>
                     @endforeach

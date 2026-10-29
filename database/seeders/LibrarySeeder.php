@@ -39,20 +39,18 @@ class LibrarySeeder extends Seeder
                         'occasion' => $occasion,
                         'source_url' => $this->wikisourceUrl($verse[3] ?? null),
                         'sort_order' => $verseOrder,
-                    ]);
+                    ])->refreshSearchText();
                 }
             }
         }
 
-        // شرح البيت: a plain meaning + difficult words, each checked against لسان العرب.
+        // شرح البيت: a plain meaning and the meanings of its difficult words (written for مِداد).
         foreach ($library['explanations'] ?? [] as $sadr => $explanation) {
             Verse::where('sadr', $sadr)->update([
                 'explanation' => $explanation['meaning'],
-                'glossary' => json_encode(array_map(fn (array $word) => [
-                    'word' => $word[0],
-                    'meaning' => $word[1],
-                    'lisan_url' => $this->wikisourceUrl($word[2] ?? null),
-                ], $explanation['words']), JSON_UNESCAPED_UNICODE),
+                'glossary' => json_encode(collect($explanation['words'])
+                    ->map(fn (string $meaning, string $word) => ['word' => $word, 'meaning' => $meaning])
+                    ->values(), JSON_UNESCAPED_UNICODE),
             ]);
         }
 

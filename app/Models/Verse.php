@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\NormalizesArabic;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -11,6 +12,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[Fillable(['sadr', 'ajuz', 'occasion', 'sort_order', 'source_url', 'explanation', 'glossary'])]
 class Verse extends Model
 {
+    use NormalizesArabic;
+
+    /**
+     * Store the verse, its diwan and poet as normalised search text (see NormalizesArabic).
+     */
+    public function refreshSearchText(): void
+    {
+        $this->loadMissing('work.poet');
+        $this->search_text = static::normalizeArabic(implode(' ', [$this->sadr, $this->ajuz, $this->work->title, $this->work->poet->name]));
+        $this->saveQuietly();
+    }
+
     /**
      * @return array<string, string>
      */
@@ -59,13 +72,6 @@ class Verse extends Model
      */
     public function scopeSearch(Builder $query, string $term): void
     {
-        $like = '%'.$term.'%';
-
-        $query->where(fn (Builder $matches) => $matches
-            ->where('sadr', 'like', $like)
-            ->orWhere('ajuz', 'like', $like)
-            ->orWhereHas('work', fn (Builder $work) => $work
-                ->where('title', 'like', $like)
-                ->orWhereHas('poet', fn (Builder $poet) => $poet->where('name', 'like', $like))));
+        $query->where('search_text', 'like', '%'.static::normalizeArabic($term).'%');
     }
 }

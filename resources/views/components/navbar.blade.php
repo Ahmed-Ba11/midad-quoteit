@@ -23,9 +23,12 @@
                     <span class="hidden sm:inline">شارك اقتباساً</span>
                 </x-button>
 
-                <span title="{{ auth()->user()->name }}"
-                    class="grid size-10 place-items-center rounded-full bg-accent-soft font-bold text-accent">
-                    {{ mb_substr(auth()->user()->name, 0, 1) }}
+                <span class="flex items-center gap-2">
+                    <span aria-hidden="true"
+                        class="grid size-10 shrink-0 place-items-center rounded-full bg-accent-soft font-bold text-accent">
+                        {{ mb_substr(auth()->user()->name, 0, 1) }}
+                    </span>
+                    <span class="max-w-28 truncate text-sm font-medium">{{ auth()->user()->name }}</span>
                 </span>
 
                 <form method="POST" action="{{ route('logout') }}">

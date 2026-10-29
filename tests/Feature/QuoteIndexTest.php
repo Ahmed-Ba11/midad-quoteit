@@ -32,3 +32,19 @@ test('quotes are paginated 12 per page, newest first', function () {
         ->assertOk()
         ->assertSee('<p>اقتباس رقم 1</p>', false);
 });
+
+test('guests see a log-in button and no edit or delete options (US-01)', function () {
+    Quote::factory()->create();
+
+    $this->get(route('home'))
+        ->assertSee('سجّل دخولك لتشارك اقتباساً')
+        ->assertSee('href="'.route('login').'"', false)
+        ->assertDontSee('aria-label="حذف"', false)
+        ->assertDontSee('aria-label="تعديل"', false);
+});
+
+test('logged-in users see their name at the top (US-03)', function () {
+    $this->actingAs(User::factory()->create(['name' => 'سارة']))
+        ->get(route('home'))
+        ->assertSee('سارة');
+});

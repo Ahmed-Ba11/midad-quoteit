@@ -15,7 +15,7 @@
             </div>
 
             @guest
-                <x-button :href="route('signup')" icon="plus">انضم وشارك اقتباساً</x-button>
+                <x-button :href="route('login')" icon="plus">سجّل دخولك لتشارك اقتباساً</x-button>
             @endguest
         </header>
 

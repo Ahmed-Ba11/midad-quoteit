@@ -59,6 +59,7 @@
 
             {{-- Replies --}}
             <section id="replies" class="mx-auto mt-10 scroll-mt-24" style="max-width: {{ $ratioWidth }}px">
+                <p class="mb-2 font-text text-sm text-gold">«إنَّ من البيانِ لسحراً»</p>
                 <h2 class="font-display text-2xl font-bold">الردود <span class="text-base font-normal text-muted">({{ $quote->replies->count() }})</span></h2>
 
                 @auth

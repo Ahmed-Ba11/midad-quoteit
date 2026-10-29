@@ -15,8 +15,11 @@
         <blockquote data-art-text @class(['quote-art-text', 'hl-'.$quote->highlight_style, 'italic' => $font['italic'] ?? false])
             style="font-family: {{ $font['stack'] }};"
             @if (($font['lang'] ?? 'ar') === 'en') dir="auto" @endif>
-            @foreach ($quote->contentPieces() as $piece)
-                @if (! $loop->first){{ ' ' }}@endif{!! $piece['highlighted'] ? '<span class="hl">'.e($piece['text']).'</span>' : e($piece['text']) !!}
+            @foreach ($quote->contentLines() as $line)
+                @if (! $loop->first)<br>@endif
+                @foreach ($line as $piece)
+                    @if (! $loop->first){{ ' ' }}@endif{!! $piece['highlighted'] ? '<span class="hl">'.e($piece['text']).'</span>' : e($piece['text']) !!}
+                @endforeach
             @endforeach
         </blockquote>
 

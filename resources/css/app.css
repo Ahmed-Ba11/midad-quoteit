@@ -141,6 +141,209 @@
     box-decoration-break: clone;
 }
 
+/* ───────────── خزانة الأدب ───────────── */
+
+/* Hero: faint gold girih lattice fading out from the centre. */
+.girih {
+    color: #c9a45c;
+    opacity: 0.16;
+    mask-image: radial-gradient(ellipse at 50% 40%, #000 20%, transparent 75%);
+}
+
+/* The alcove that holds the shelves: an arched niche in dark walnut. */
+.library-niche {
+    background:
+        radial-gradient(ellipse at 50% 0%, rgb(201 164 92 / 0.14), transparent 60%),
+        linear-gradient(180deg, #2b1f17 0%, #1e1611 55%, #17110d 100%);
+    border-radius: clamp(80px, 18vw, 220px) clamp(80px, 18vw, 220px) 28px 28px;
+    box-shadow:
+        inset 0 0 0 1px rgb(201 164 92 / 0.35),
+        inset 0 0 0 7px #17110d,
+        inset 0 0 0 8px rgb(201 164 92 / 0.18),
+        inset 0 30px 60px -20px rgb(0 0 0 / 0.7),
+        0 30px 60px -30px rgb(43 37 32 / 0.6);
+}
+
+.shelf-row {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(201 164 92 / 0.4) transparent;
+}
+
+.shelf-plank {
+    height: 16px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #7a5536 0%, #5c3e27 45%, #3d2818 100%);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.12) inset, 0 14px 20px -8px rgb(0 0 0 / 0.75);
+}
+
+.brass-plaque {
+    background: linear-gradient(180deg, #e2c27e 0%, #b8924a 55%, #9c7a37 100%);
+    color: #2b1f17;
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.5) inset, 0 2px 6px rgb(0 0 0 / 0.5);
+}
+
+/* A leather-bound book seen from its spine: rounded with light, gold tooling bands top and bottom. */
+.book {
+    --leather: #5b1f1a;
+    --tooling: #e8c77e;
+    position: relative;
+    flex: none;
+    border-radius: 4px 4px 2px 2px;
+    background:
+        linear-gradient(90deg, rgb(0 0 0 / 0.45) 0%, rgb(255 255 255 / 0.14) 16%, rgb(255 255 255 / 0.03) 38%, rgb(0 0 0 / 0.12) 78%, rgb(0 0 0 / 0.5) 100%),
+        var(--leather);
+    color: var(--tooling);
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.3), 3px 0 4px -1px rgb(0 0 0 / 0.45);
+    transform-origin: 50% 100%;
+    transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1), filter 320ms ease;
+}
+
+.book::before,
+.book::after {
+    content: '';
+    position: absolute;
+    inset-inline: 5px;
+    height: 7px;
+    border-block: 1px solid var(--tooling);
+    opacity: 0.75;
+}
+
+.book::before {
+    top: 14px;
+}
+
+.book::after {
+    bottom: 16px;
+}
+
+.book-title {
+    writing-mode: vertical-rl;
+    line-height: 1.15;
+}
+
+.book:hover,
+.book:focus-visible {
+    transform: translateY(-12px);
+}
+
+.book[aria-pressed='true'] {
+    transform: translateY(-30px) rotate(-3deg);
+}
+
+.shelf-row[data-has-selection] .book:not([aria-pressed='true']) {
+    filter: brightness(0.5) saturate(0.7);
+}
+
+.book-leaning {
+    transform: rotate(7deg);
+}
+
+.book-leaning:hover,
+.book-leaning:focus-visible {
+    transform: rotate(7deg) translateY(-12px);
+}
+
+/* The opened diwan: two manuscript pages ruled with a double gold frame (الجدول). */
+.open-book {
+    perspective: 1800px;
+}
+
+.manuscript-page {
+    background-color: #f7f0e1;
+    color: #2b2520;
+    box-shadow:
+        inset 0 0 0 14px #f7f0e1,
+        inset 0 0 0 15px #a8873f,
+        inset 0 0 0 18px #f7f0e1,
+        inset 0 0 0 19px rgb(168 135 63 / 0.6),
+        0 24px 40px -18px rgb(0 0 0 / 0.55);
+}
+
+.manuscript-page-start {
+    border-radius: 4px 14px 14px 4px;
+    background-image: linear-gradient(to left, transparent 88%, rgb(43 37 32 / 0.12));
+    transform-origin: left center;
+}
+
+.manuscript-page-end {
+    border-radius: 14px 4px 4px 14px;
+    background-image: linear-gradient(to right, transparent 88%, rgb(43 37 32 / 0.12));
+    transform-origin: right center;
+}
+
+@media (max-width: 767px) {
+    .manuscript-page-start,
+    .manuscript-page-end {
+        border-radius: 14px;
+        background-image: none;
+    }
+}
+
+.open-book[data-opening] .manuscript-page-start {
+    animation: page-open-start 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.open-book[data-opening] .manuscript-page-end {
+    animation: page-open-end 700ms cubic-bezier(0.2, 0.7, 0.2, 1) 60ms both;
+}
+
+@keyframes page-open-start {
+    from {
+        transform: rotateY(-75deg);
+        opacity: 0.2;
+    }
+}
+
+@keyframes page-open-end {
+    from {
+        transform: rotateY(75deg);
+        opacity: 0.2;
+    }
+}
+
+/* Poets' arcade: tall arches with an inner hairline arch. */
+.arch {
+    width: 128px;
+    height: 232px;
+    border-radius: 64px 64px 6px 6px;
+    transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 300ms ease, color 300ms ease;
+}
+
+.arch::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border-radius: 58px 58px 3px 3px;
+    border: 1px solid rgb(168 135 63 / 0.45);
+    pointer-events: none;
+}
+
+.arch:hover {
+    transform: translateY(-4px);
+}
+
+.arch[aria-pressed='true'] {
+    background-color: var(--poet);
+    color: #f5efe4;
+    border-color: transparent;
+    transform: translateY(-8px);
+}
+
+.arch[aria-pressed='true']::before {
+    border-color: rgb(255 255 255 / 0.35);
+}
+
+/* Sayings wall: plaques hung on a nail and string, gently tilted. */
+.plaque {
+    transform: rotate(var(--tilt, 0deg));
+    transform-origin: 50% -40px;
+    transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.plaque:hover {
+    transform: rotate(0deg);
+}
+
 /* Paper texture: desaturated fractal noise + soft vignette. */
 .paper-texture {
     background-image:

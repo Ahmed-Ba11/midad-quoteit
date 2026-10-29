@@ -17,7 +17,8 @@
         <header class="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
                 <h1 class="font-display text-4xl font-bold">أحدث الاقتباســات</h1>
-                <p class="mt-2 text-muted">كلماتٌ تستحق أن تُقرأ مرتين، يشاركها أهل الحرف.</p>
+                <x-verse layout="paired" class="mt-3 max-w-xl text-muted" sadr="لسانُ الفتى نصفٌ ونصفٌ فؤادُه"
+                    ajuz="فلم يبقَ إلا صورةُ اللحمِ والدمِ" />
             </div>
 
             @guest

@@ -5,6 +5,9 @@
 @section('content')
     @php
         $isEditing = $quote->exists;
+        $libraryVerses = $quote->relationLoaded('libraryVerses') ? $quote->getRelation('libraryVerses') : collect();
+        $librarySaying = ! $isEditing && $quote->relationLoaded('saying') ? $quote->saying : null;
+        $isLibrary = $libraryVerses->isNotEmpty() || $librarySaying || $quote->isFromLibrary();
         $fonts = config('quotes.fonts');
         $ratioWidth = config('quotes.ratios.'.$quote->ratio.'.width', 760);
         $tabs = [
@@ -33,6 +36,7 @@
             <header class="px-6 pt-5">
                 <h1 class="font-display text-2xl font-bold">رواق الحـــرف</h1>
                 <p class="mt-1 text-sm text-muted">{{ $isEditing ? 'أعد تصميم اقتباسك.' : 'اكتب، ثم اختر الخط واللون، وانشر.' }}</p>
+                <p class="mt-2 font-text text-xs leading-relaxed text-gold">وجلا السيولُ عن الطلولِ كأنَّها ◆ زُبُرٌ تُجِدُّ متونَها أقلامُها — لبيد</p>
             </header>
 
             <div role="tablist" aria-label="أدوات التصميم" class="mt-4 grid grid-cols-5 border-b border-line px-2">
@@ -55,14 +59,42 @@
 
                 {{-- الكلمات --}}
                 <div role="tabpanel" id="panel-words" data-panel="words" aria-labelledby="tab-words" class="space-y-5">
-                    <x-textarea name="content" label="نص الاقتباس" hint="من ٣ إلى ١٥٥ حرفاً" rows="4" minlength="3"
-                        maxlength="155" required :value="old('content', $quote->content)" />
+                    @if ($isLibrary)
+                        {{-- Library text is locked: it is published exactly as it is in the diwan. --}}
+                        <div class="rounded-2xl border border-gold/40 bg-paper p-5">
+                            <p class="flex items-center gap-2 text-xs font-medium text-gold">
+                                <x-ornament name="star" class="size-3.5" /> من المكتبة · يُنشر كما هو
+                            </p>
+                            <p class="mt-3 whitespace-pre-line text-center font-text text-lg leading-loose">{{ $quote->content }}</p>
+                            <p class="mt-2 text-center text-sm text-muted">— {{ collect([$quote->author, $quote->book])->filter()->implode('، ') }}</p>
 
-                    <x-input name="author" label="القائل" hint="اختياري، حتى ١٠٠ حرف" maxlength="100"
-                        :value="$quote->author" />
+                            @if (! $isEditing)
+                                <div class="mt-4 flex flex-wrap justify-center gap-2 text-sm">
+                                    <a href="{{ route('library.index') }}#shelf" class="rounded-full border border-line px-4 py-2 transition hover:border-accent hover:text-accent">اختر بيتاً آخر</a>
+                                    <a href="{{ route('quotes.create') }}" class="rounded-full border border-line px-4 py-2 transition hover:border-accent hover:text-accent">اكتب نصك الخاص</a>
+                                </div>
+                            @endif
+                        </div>
 
-                    <x-input name="book" label="الكتاب أو الديوان" hint="اختياري، حتى ١٥٠ حرفاً" maxlength="150"
-                        :value="$quote->book" />
+                        <textarea name="content" hidden readonly>{{ $quote->content }}</textarea>
+                        <input type="hidden" name="author" value="{{ $quote->author }}">
+                        <input type="hidden" name="book" value="{{ $quote->book }}">
+                        @foreach ($libraryVerses as $verse)
+                            <input type="hidden" name="verses[]" value="{{ $verse->id }}">
+                        @endforeach
+                        @if ($librarySaying)
+                            <input type="hidden" name="saying_id" value="{{ $librarySaying->id }}">
+                        @endif
+                    @else
+                        <x-textarea name="content" label="نص الاقتباس" hint="من ٣ إلى ١٥٥ حرفاً" rows="4" minlength="3"
+                            maxlength="155" required :value="old('content', $quote->content)" />
+
+                        <x-input name="author" label="القائل" hint="اختياري، حتى ١٠٠ حرف" maxlength="100"
+                            :value="$quote->author" />
+
+                        <x-input name="book" label="الكتاب أو الديوان" hint="اختياري، حتى ١٥٠ حرفاً" maxlength="150"
+                            :value="$quote->book" />
+                    @endif
 
                     <div>
                         <label for="category_id" class="mb-1.5 block text-sm font-medium">التصنيف</label>

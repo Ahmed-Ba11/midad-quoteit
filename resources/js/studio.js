@@ -92,7 +92,8 @@ export function initStudio(form) {
         });
     }
 
-    // Merge neighbouring words with the same highlight state into one piece (one continuous highlight).
+    // Lines (صدر / عجز) stay on their own line; word indexes run across lines. Neighbouring words with
+    // the same highlight state merge into one piece, so adjacent highlights render as ONE span.
     function renderText(list) {
         if (list.length === 0) {
             artText.replaceChildren(PLACEHOLDER);
@@ -101,29 +102,38 @@ export function initStudio(form) {
         }
 
         artText.style.opacity = '';
-        const pieces = [];
-        list.forEach((word, index) => {
-            const isHighlighted = highlighted.has(index);
-            const last = pieces.at(-1);
-            if (last && last.highlighted === isHighlighted) {
-                last.text += ' ' + word;
-            } else {
-                pieces.push({ text: word, highlighted: isHighlighted });
-            }
+        const nodes = [];
+        let index = 0;
+
+        field('content').value.trim().split(/\r?\n/).forEach((line) => {
+            const lineWords = line.trim().split(/\s+/).filter(Boolean);
+            if (lineWords.length === 0) return;
+            if (nodes.length > 0) nodes.push(document.createElement('br'));
+
+            const pieces = [];
+            lineWords.forEach((word) => {
+                const isHighlighted = highlighted.has(index++);
+                const last = pieces.at(-1);
+                if (last && last.highlighted === isHighlighted) {
+                    last.text += ' ' + word;
+                } else {
+                    pieces.push({ text: word, highlighted: isHighlighted });
+                }
+            });
+
+            pieces.forEach((piece, position) => {
+                if (position > 0) nodes.push(' ');
+                if (piece.highlighted) {
+                    const span = document.createElement('span');
+                    span.className = 'hl';
+                    span.textContent = piece.text;
+                    nodes.push(span);
+                } else {
+                    nodes.push(piece.text);
+                }
+            });
         });
 
-        const nodes = [];
-        pieces.forEach((piece, index) => {
-            if (index > 0) nodes.push(' ');
-            if (piece.highlighted) {
-                const span = document.createElement('span');
-                span.className = 'hl';
-                span.textContent = piece.text;
-                nodes.push(span);
-            } else {
-                nodes.push(piece.text);
-            }
-        });
         artText.replaceChildren(...nodes);
     }
 

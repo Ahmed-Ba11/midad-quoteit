@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BookmarkController;
+use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
@@ -13,6 +14,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [QuoteController::class, 'index'])->name('home');
 Route::get('/quote/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
 Route::get('/users/{user}', [ProfileController::class, 'show'])->name('profile.show');
+
+Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
+Route::get('/library/works/{work}', [LibraryController::class, 'work'])->name('library.work');
+Route::get('/library/poets/{poet}', [LibraryController::class, 'poet'])->name('library.poet');
 
 Route::middleware('guest')->group(function () {
     Route::view('/signup', 'auth.signup')->name('signup');

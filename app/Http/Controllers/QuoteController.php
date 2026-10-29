@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\QuoteRequest;
 use App\Models\Category;
 use App\Models\Quote;
+use App\Models\Saying;
+use App\Models\Verse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -89,12 +91,42 @@ class QuoteController extends Controller
     /**
      * رواق الحرف — design a new quote.
      */
-    public function create(): View
+    public function create(Request $request): View
     {
         return view('quotes.studio', [
-            'quote' => new Quote,
+            'quote' => $this->draftFromLibrary($request),
             'categories' => Category::orderBy('id')->get(),
         ]);
+    }
+
+    /**
+     * A new quote pre-filled from خزانة الأدب (?verses[]=…, up to 2, or ?saying=…).
+     * The text is locked; QuoteRequest rebuilds it on the server when publishing.
+     */
+    private function draftFromLibrary(Request $request): Quote
+    {
+        $quote = new Quote;
+        $verseIds = collect($request->query('verses', []))->filter(fn ($id) => ctype_digit((string) $id))
+            ->map(fn ($id) => (int) $id)->unique()->take(config('library.max_selection'));
+
+        if ($verseIds->isNotEmpty()) {
+            $verses = Verse::with('work.poet')->findMany($verseIds)->sortBy(fn (Verse $verse) => $verseIds->search($verse->id))->values();
+
+            if ($verses->isNotEmpty()) {
+                $quote->fill([
+                    'content' => $verses->map->asText()->implode("\n"),
+                    'author' => $verses->pluck('work.poet.name')->unique()->implode(' و'),
+                    'book' => $verses->pluck('work.title')->unique()->count() === 1 ? $verses->first()->work->title : null,
+                    'category_id' => Category::where('slug', 'shir')->value('id'),
+                ]);
+                $quote->setRelation('libraryVerses', $verses);
+            }
+        } elseif ($saying = Saying::find($request->query('saying'))) {
+            $quote->fill(['content' => $saying->text, 'author' => $saying->source]);
+            $quote->setRelation('saying', $saying);
+        }
+
+        return $quote;
     }
 
     /**

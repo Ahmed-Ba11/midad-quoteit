@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'content', 'category_id', 'author', 'book', 'story',
+    'content', 'category_id', 'verse_id', 'saying_id', 'author', 'book', 'story',
     'font', 'bg_color', 'text_color', 'highlight_color', 'highlight_style', 'highlights',
     'texture', 'ratio', 'font_size',
 ])]
@@ -57,6 +57,24 @@ class Quote extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function verse(): BelongsTo
+    {
+        return $this->belongsTo(Verse::class);
+    }
+
+    public function saying(): BelongsTo
+    {
+        return $this->belongsTo(Saying::class);
+    }
+
+    /**
+     * Text taken from خزانة الأدب is published as it is and cannot be edited.
+     */
+    public function isFromLibrary(): bool
+    {
+        return $this->verse_id !== null || $this->saying_id !== null;
     }
 
     public function replies(): HasMany
@@ -145,28 +163,47 @@ class Quote extends Model
     }
 
     /**
-     * Split the text into words (on whitespace) and merge neighbouring words that share the same
-     * highlight state, so adjacent highlighted words render as ONE continuous highlight.
+     * The text as lines (a verse has صدر and عجز on separate lines), each split into words on
+     * whitespace. Word indexes run across all lines; neighbouring words in a line that share the
+     * same highlight state are merged, so adjacent highlighted words render as ONE highlight.
+     *
+     * @return list<list<array{text: string, highlighted: bool}>>
+     */
+    public function contentLines(): array
+    {
+        $highlighted = array_flip($this->highlights ?? []);
+        $index = 0;
+        $lines = [];
+
+        foreach (preg_split('/\R/u', trim((string) $this->content)) as $line) {
+            $pieces = [];
+
+            foreach (preg_split('/\s+/u', trim($line), -1, PREG_SPLIT_NO_EMPTY) as $word) {
+                $isHighlighted = isset($highlighted[$index++]);
+                $last = array_key_last($pieces);
+
+                if ($last !== null && $pieces[$last]['highlighted'] === $isHighlighted) {
+                    $pieces[$last]['text'] .= ' '.$word;
+                } else {
+                    $pieces[] = ['text' => $word, 'highlighted' => $isHighlighted];
+                }
+            }
+
+            if ($pieces !== []) {
+                $lines[] = $pieces;
+            }
+        }
+
+        return $lines;
+    }
+
+    /**
+     * All pieces of a one-line text (see contentLines()).
      *
      * @return list<array{text: string, highlighted: bool}>
      */
     public function contentPieces(): array
     {
-        $words = preg_split('/\s+/u', trim((string) $this->content), -1, PREG_SPLIT_NO_EMPTY);
-        $highlighted = array_flip($this->highlights ?? []);
-        $pieces = [];
-
-        foreach ($words as $index => $word) {
-            $isHighlighted = isset($highlighted[$index]);
-            $last = array_key_last($pieces);
-
-            if ($last !== null && $pieces[$last]['highlighted'] === $isHighlighted) {
-                $pieces[$last]['text'] .= ' '.$word;
-            } else {
-                $pieces[] = ['text' => $word, 'highlighted' => $isHighlighted];
-            }
-        }
-
-        return $pieces;
+        return array_merge(...$this->contentLines() ?: [[]]);
     }
 }

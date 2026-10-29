@@ -33,7 +33,7 @@
     <footer class="mt-16 border-t border-line">
         <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-8 text-sm text-muted">
             <p><span class="logo font-display text-base font-bold text-ink">مِـــداد</span> · منصّة لنشر الاقتباسات وتصميمها</p>
-            <p>معسكر القمّة · ٢٠٢٦</p>
+            <p>النصوص الأدبية من ويكي مصدر وويكي الاقتباس (CC BY-SA) · معسكر القمّة ٢٠٢٦</p>
         </div>
     </footer>
 

@@ -32,10 +32,12 @@
         <x-quote-actions :quote="$quote" class="flex-1" />
 
         @can('update', $quote)
-            <a href="{{ request()->fullUrlWithQuery(['edit' => $quote->id]) }}" aria-label="تعديل" title="تعديل النص"
-                class="grid size-11 place-items-center rounded-full text-muted transition hover:bg-accent-soft hover:text-accent">
-                <x-icon name="pencil" class="size-[18px]" />
-            </a>
+            @unless ($quote->isFromLibrary())
+                <a href="{{ request()->fullUrlWithQuery(['edit' => $quote->id]) }}" aria-label="تعديل" title="تعديل النص"
+                    class="grid size-11 place-items-center rounded-full text-muted transition hover:bg-accent-soft hover:text-accent">
+                    <x-icon name="pencil" class="size-[18px]" />
+                </a>
+            @endunless
             <a href="{{ route('quotes.edit', $quote) }}" aria-label="تصميم" title="أعد تصميمه في رواق الحرف"
                 class="grid size-11 place-items-center rounded-full text-muted transition hover:bg-accent-soft hover:text-accent">
                 <x-icon name="palette" class="size-[18px]" />

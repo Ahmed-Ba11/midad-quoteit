@@ -1,4 +1,7 @@
+import { initLibrary } from './library';
 import { initStudio } from './studio';
+
+initLibrary();
 
 const studio = document.getElementById('studio');
 if (studio) {

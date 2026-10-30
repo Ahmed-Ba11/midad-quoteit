@@ -8,7 +8,7 @@
         style="background: linear-gradient(90deg, rgb(0 0 0 / 0.28), rgb(255 255 255 / 0.06) 9%, transparent 14%), {{ $colors['bg'] }}; color: {{ $colors['text'] }}">
         <span aria-hidden="true" class="pointer-events-none absolute inset-2.5 rounded-e-xl rounded-s-sm border" style="border-color: {{ $colors['highlight'] }}55"></span>
 
-        <span class="relative text-[11px] opacity-75">{{ $diwan->is_public ? 'ديوان قارئ' : 'دفتر خاص' }}</span>
+        <span class="relative text-xs opacity-75">{{ $diwan->is_public ? 'ديوان قارئ' : 'دفتر خاص' }}</span>
         <x-ornament name="shamsa" class="relative size-12" style="color: {{ $colors['highlight'] }}" />
         <span class="relative">
             <span class="block font-display text-lg font-bold leading-snug" style="color: {{ $colors['highlight'] }}">{{ $diwan->title }}</span>

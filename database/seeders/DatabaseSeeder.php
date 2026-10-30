@@ -157,8 +157,10 @@ class DatabaseSeeder extends Seeder
             ->each(fn (Quote $quote) => $quote->update(['is_original' => true]));
 
         // Words only, between quotation marks; one private line that only its owner sees.
-        $quotes->firstWhere('content', 'كل كتابٍ نقرؤه يترك فينا رفّاً جديداً.')?->update(['presentation' => 'text']);
-        $quotes->firstWhere('content', 'الفجر لا يتأخر عن موعده، نحن من نتأخر عن رؤيته.')?->update(['presentation' => 'text']);
+        $quotes->firstWhere('content', 'كل كتابٍ نقرؤه يترك فينا رفّاً جديداً.')?->update(['presentation' => 'text', 'mark_style' => 'arch', 'font' => 'naskh']);
+        $quotes->firstWhere('content', 'الفجر لا يتأخر عن موعده، نحن من نتأخر عن رؤيته.')?->update(['presentation' => 'text', 'mark_style' => 'curly', 'font' => 'amiri']);
+        $quotes->firstWhere('content', 'من لم يتعلّم الصبر، علّمته الأيام إياه بطريقتها.')?->update(['presentation' => 'text', 'mark_style' => 'ornament', 'font' => 'thmanyah-text']);
+        $quotes->firstWhere('content', 'في كل غربةٍ وطنٌ صغير اسمه الكتاب.')?->update(['presentation' => 'text', 'mark_style' => 'guillemets', 'font' => 'ruqaa']);
         $quotes->firstWhere('content', 'الصمت أحياناً أبلغ جوابٍ عن سؤالٍ لا يستحق.')?->update(['is_public' => false]);
 
         $users[0]->update(['pinned_quote_id' => $quotes->firstWhere('user_id', $users[0]->id)->id]);

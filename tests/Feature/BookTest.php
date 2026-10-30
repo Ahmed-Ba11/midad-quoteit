@@ -66,6 +66,7 @@ test('a book page lists its quotes, best liked first', function () {
 test('a reader can shelve a book, change its status and remove it', function () {
     $reader = User::factory()->create();
     $book = Book::factory()->create();
+    Quote::factory()->create()->forceFill(['book_id' => $book->id])->save();
 
     $this->actingAs($reader)->post(route('books.shelf', $book), ['status' => 'reading']);
     expect($reader->books()->sole()->pivot->status)->toBe('reading');

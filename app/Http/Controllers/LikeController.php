@@ -13,8 +13,9 @@ class LikeController extends Controller
      */
     public function toggle(Request $request, Quote $quote): RedirectResponse
     {
-        $request->user()->likedQuotes()->toggle($quote);
+        $isLiked = $request->user()->likedQuotes()->toggle($quote)['attached'] !== [];
 
-        return $this->backTo('#quote-'.$quote->id);
+        return $this->backTo('#quote-'.$quote->id)
+            ->with('toast', $isLiked ? 'أعجبك؛ تجده في «أعجبني» بركنك.' : 'أُزيل من «أعجبني».');
     }
 }

@@ -123,8 +123,9 @@ class QuoteController extends Controller
     public function create(Request $request): View
     {
         return view('quotes.studio', [
-            'quote' => $this->draftFromLibrary($request),
+            'quote' => $this->withTemplate($this->draftFromLibrary($request), $request),
             'backUrl' => $this->previousOnSite(),
+            'myAnthologies' => $request->user()->anthologies()->latest('updated_at')->get(['id', 'title']),
             'categories' => Category::orderBy('id')->get(),
             'bookTitles' => Book::whereHas('quotes', fn ($quotes) => $quotes->public())->latest()->limit(300)->pluck('title'),
         ]);
@@ -165,12 +166,58 @@ class QuoteController extends Controller
                 'source' => $diwanVerse->diwan->source,
                 'category_id' => Category::where('slug', 'shir')->value('id'),
             ]);
+        } elseif (is_array($draft = $request->session()->get('quote_draft'))) {
+            // "صمّمه بطاقة" from the quick-share window: the words come along into the studio.
+            $quote->fill($draft);
         } elseif ($request->filled('book')) {
             // "أضف اقتباساً من هذا الكتاب" on a book page.
             $quote->fill([
                 'book' => mb_substr(trim($request->string('book')), 0, 150),
                 'author' => mb_substr(trim($request->string('author')), 0, 100) ?: null,
             ]);
+        }
+
+        return $quote;
+    }
+
+    /**
+     * "صمّمه بطاقة" in the quick-share window: keep what was typed (in the session, not the URL)
+     * and open مرسم الحروف with it, so nothing has to be typed twice.
+     */
+    public function draft(Request $request): RedirectResponse
+    {
+        $draft = $request->validate([
+            'content' => ['required', 'string', 'min:3', 'max:155'],
+            'author' => ['nullable', 'string', 'max:100'],
+            'source' => ['nullable', 'string', 'max:200'],
+            'source_url' => ['nullable', 'string', 'max:255', 'url:http,https'],
+            'is_public' => ['nullable', 'boolean'],
+        ], [
+            'content.required' => 'اكتب النص أولاً، ثم صمّمه.',
+            'content.min' => 'الاقتباس من ٣ إلى ١٥٥ حرفاً.',
+            'content.max' => 'الاقتباس من ٣ إلى ١٥٥ حرفاً.',
+        ]);
+
+        $request->session()->flash('quote_draft', array_filter($draft, fn ($value) => $value !== null));
+
+        return redirect()->route('quotes.create');
+    }
+
+    /**
+     * "استخدم التصميم": start a new quote with the look (font, colours, frame…) of one I can see —
+     * never its words, author or story.
+     */
+    private function withTemplate(Quote $quote, Request $request): Quote
+    {
+        $template = ctype_digit((string) $request->query('template'))
+            ? Quote::visibleTo($request->user())->find((int) $request->query('template'))
+            : null;
+
+        if ($template) {
+            $quote->fill($template->only([
+                'font', 'bg_color', 'text_color', 'highlight_color', 'highlight_style',
+                'texture', 'ratio', 'font_size', 'presentation', 'mark_style',
+            ]));
         }
 
         return $quote;
@@ -184,6 +231,11 @@ class QuoteController extends Controller
         $quote = new Quote([...$this->validatedWithHighlights($request), ...$request->libraryLink()]);
         $this->linkBook($quote, $request);
         $quote->user()->associate($request->user())->save();
+
+        // "أضف إلى": only into an anthology of my own; anything else is ignored.
+        if ($request->filled('anthology_id')) {
+            $request->user()->anthologies()->find($request->integer('anthology_id'))?->quotes()->attach($quote);
+        }
 
         return redirect()->route('quotes.show', $quote)->with('toast', $quote->is_public
             ? 'رُقِم اقتباسك، وصار في لوح القرّاء.'
@@ -261,7 +313,7 @@ class QuoteController extends Controller
 
     private function validatedWithHighlights(QuoteRequest $request): array
     {
-        $data = collect($request->validated())->except(['book_genre', 'kind', 'signature'])->all();
+        $data = collect($request->validated())->except(['book_genre', 'kind', 'signature', 'anthology_id'])->all();
 
         if ($request->has('highlights')) {
             $data['highlights'] = $request->input('highlights');

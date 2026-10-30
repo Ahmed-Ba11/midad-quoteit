@@ -37,7 +37,8 @@ test('the quotes page runs the same small number of queries however many quotes 
 
     $warm = queriesFor(fn () => $this->actingAs($viewer)->get(route('home'))->assertOk());
 
-    expect($few)->toBeLessThanOrEqual(12)
+    // 13 for a signed-in reader: the share window lists their anthologies (one indexed query).
+    expect($few)->toBeLessThanOrEqual(13)
         ->and($many)->toBe($few)
         ->and($warm)->toBeLessThan($few);
 });

@@ -8,7 +8,8 @@
     <meta name="description" content="رقيم: لوحٌ لما بقي معك من كلام؛ اقتبس من كتاب تقرؤه أو بيت تحفظه، وصمّمه وشاركه.">
 
     {{-- PWA: installable on phones, with the bar coloured like the page. --}}
-    <meta name="theme-color" content="#F5EFE4">
+    <meta name="theme-color" content="#F5EFE4" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#1B1714" media="(prefers-color-scheme: dark)">
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="/icons/raqeem.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icons/raqeem-192.png">
@@ -46,41 +47,7 @@
     <x-toast />
 
     @auth
-        <div id="quote-popup" popover
-            class="m-auto max-h-[92dvh] w-[min(94vw,34rem)] overflow-y-auto rounded-3xl border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-sm">
-            <form method="POST" action="{{ route('store_quote') }}" class="space-y-5 p-6 sm:p-8">
-                @csrf
-                <input type="hidden" name="_form" value="share">
-
-                <div class="flex items-center justify-between">
-                    <h2 class="font-display text-2xl font-bold">شارك اقتباساً</h2>
-                    <button type="button" popovertarget="quote-popup" popovertargetaction="hide" aria-label="إغلاق"
-                        class="grid size-11 place-items-center rounded-full text-muted transition hover:bg-accent-soft hover:text-accent">
-                        <x-icon name="x" />
-                    </button>
-                </div>
-
-                <x-textarea name="content" id="share-content" label="نص الاقتباس" hint="من ٣ إلى ١٥٥ حرفاً" rows="5" minlength="3"
-                    maxlength="155" required autofocus placeholder="اكتب اقتباساً أثّر فيك…"
-                    :value="old('_form') === 'share' ? old('content') : ''"
-                    :show-error="old('_form') === 'share'" />
-
-                @include("quotes.partials.text-origin", ["quote" => new \App\Models\Quote, "prefix" => "share-", "useOld" => old("_form") === "share"])
-
-                <x-button type="submit" class="w-full">انشر الاقتباس</x-button>
-
-                <p class="text-center text-sm text-muted">
-                    تريد خطاً وألواناً خاصة؟
-                    <a href="{{ route('quotes.create') }}" class="font-medium text-accent hover:underline">صمّمه في مرسم الحروف</a>
-                </p>
-            </form>
-        </div>
-
-        @if (old('_form') === 'share' && $errors->any())
-            <script>
-                document.getElementById('quote-popup').showPopover();
-            </script>
-        @endif
+        <x-share-sheet />
     @endauth
 </body>
 

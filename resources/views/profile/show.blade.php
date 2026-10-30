@@ -12,6 +12,7 @@
             'anthologies' => ['label' => $isOwner ? 'مختاراتي' : 'مختاراته', 'icon' => 'layers'],
             'poets' => ['label' => $isOwner ? 'شعرائي' : 'شعراؤه', 'icon' => 'user'],
             'diwans' => ['label' => $isOwner ? 'دواويني' : 'دواوينه', 'icon' => 'scroll'],
+            'liked' => ['label' => 'أعجبني', 'icon' => 'heart', 'private' => true],
             'saved' => ['label' => 'المحفوظات', 'icon' => 'bookmark', 'private' => true],
             'books' => ['label' => 'كتبي', 'icon' => 'book-open', 'private' => true],
         ])->only($tabs);
@@ -102,7 +103,7 @@
                     @if ($isOwner)
                         <form method="POST" action="{{ route('profile.pin', $pinned) }}" class="mt-3">
                             @csrf
-                            <button type="submit" class="text-sm text-muted transition hover:text-accent">إلغاء التثبيت</button>
+                            <button type="submit" class="inline-flex min-h-11 items-center text-sm text-muted transition hover:text-accent">إلغاء التثبيت</button>
                         </form>
                     @endif
                 </section>
@@ -123,7 +124,7 @@
         </div>
 
         {{-- Tabs: scroll sideways on small screens. --}}
-        <nav aria-label="أقسام الركن" class="-mx-4 mt-10 overflow-x-auto px-4">
+        <nav aria-label="أقسام الركن" class="relative -mx-4 mt-10 overflow-x-auto px-4">
             <div class="flex min-w-max border-b border-line">
                 @foreach ($tabItems as $key => $item)
                     <a href="{{ route('profile.show', $key === 'quotes' ? $user : [$user, 'tab' => $key]) }}"
@@ -246,6 +247,7 @@
                         @php
                             $empty = match ($tab) {
                                 'saved' => ['لا محفوظات بعد', 'bookmark', 'احفظ ما يعجبك من الاقتباسات لتجده هنا.'],
+                                'liked' => ['لم تُعجَب بشيء بعد', 'heart', 'اضغط القلب تحت أي اقتباس، فيظهر هنا فوراً.'],
                                 'original' => ['لا كتابات بعد', 'feather', $isOwner ? 'اكتب نصاً من تأليفك في مرسم الحروف، وفعّل «النص من تأليفي».' : 'لم ينشر شيئاً من تأليفه بعد.'],
                                 default => ['لا اقتباسات بعد', 'feather', $isOwner ? 'شارك أول اقتباس لك من زر «شارك اقتباساً».' : 'لم يشارك اقتباسات بعد.'],
                             };

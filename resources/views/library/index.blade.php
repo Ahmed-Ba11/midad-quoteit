@@ -81,7 +81,7 @@
                                 <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
                                     <a href="{{ route('library.work', $verse->work) }}" class="text-sm text-muted hover:text-accent">{{ $verse->work->poet->name }}</a>
                                     @if ($verse->source_url)
-                                        <x-external-link :href="$verse->source_url" class="text-xs text-muted">القصيدة كاملة</x-external-link>
+                                        <x-external-link :href="$verse->source_url" class="inline-flex min-h-11 items-center text-xs text-muted">القصيدة كاملة</x-external-link>
                                     @endif
                                     <x-pick-button :id="$verse->id" :text="$verse->sadr.' / '.$verse->ajuz" />
                                 </div>
@@ -144,10 +144,10 @@
                             <p class="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-[#7A7068]">
                                 {{ $book->type === 'muallaqa' ? 'اقرأ المعلقة كاملة في' : 'أكمل قراءة الديوان في' }}
                                 @if ($book->wikisource_url ?? $book->poet->wikisource_url)
-                                    <x-external-link :href="$book->wikisource_url ?? $book->poet->wikisource_url" class="text-[#8A3324]">ويكي مصدر</x-external-link>
+                                    <x-external-link :href="$book->wikisource_url ?? $book->poet->wikisource_url" class="inline-flex min-h-11 items-center text-[#8A3324]">ويكي مصدر</x-external-link>
                                 @endif
                                 @if ($book->poet->aldiwan_url)
-                                    <x-external-link :href="$book->poet->aldiwan_url" class="text-[#8A3324]">الديوان</x-external-link>
+                                    <x-external-link :href="$book->poet->aldiwan_url" class="inline-flex min-h-11 items-center text-[#8A3324]">الديوان</x-external-link>
                                 @endif
                             </p>
                         </div>
@@ -190,7 +190,7 @@
                                     <span class="mt-auto font-display text-lg font-bold leading-snug">{{ $poet->name }}</span>
                                     <span class="mt-1 text-xs opacity-70">{{ $poet->years }}</span>
                                     @if ($poet->is_peninsula)
-                                        <span class="mt-3 rounded-full border border-current/30 px-2.5 py-0.5 text-[11px] opacity-80">{{ $poet->region }}</span>
+                                        <span class="mt-3 rounded-full border border-current/30 px-2.5 py-0.5 text-xs opacity-80">{{ $poet->region }}</span>
                                     @endif
                                 </button>
                             @endforeach
@@ -215,10 +215,10 @@
                         <p class="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted">
                             شعره كاملاً في
                             @if ($poet->wikisource_url)
-                                <x-external-link :href="$poet->wikisource_url" class="text-accent">ويكي مصدر</x-external-link>
+                                <x-external-link :href="$poet->wikisource_url" class="inline-flex min-h-11 items-center text-accent">ويكي مصدر</x-external-link>
                             @endif
                             @if ($poet->aldiwan_url)
-                                <x-external-link :href="$poet->aldiwan_url" class="text-accent">الديوان</x-external-link>
+                                <x-external-link :href="$poet->aldiwan_url" class="inline-flex min-h-11 items-center text-accent">الديوان</x-external-link>
                             @endif
                         </p>
                     </div>
@@ -259,8 +259,8 @@
                 @foreach ($occasionVerses as $key => $verses)
                     <div data-occasion-group="{{ $key }}" @if (! $loop->first) hidden @endif>
                         @foreach ($verses as $verse)
-                            <div data-slide @if (! $loop->first) hidden @endif class="relative px-8 py-14 text-center sm:px-16">
-                                <x-verse :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="text-2xl sm:text-3xl" />
+                            <div data-slide @if (! $loop->first) hidden @endif class="relative px-5 py-12 text-center sm:px-16 sm:py-14">
+                                <x-verse :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="text-xl sm:text-3xl" />
                                 <p class="mt-6 text-sm text-[#F2ECE2]/60">
                                     <a href="{{ route('library.poet', $verse->work->poet) }}" class="hover:text-[#C9A45C]">{{ $verse->work->poet->name }}</a>
                                     · <a href="{{ route('library.work', $verse->work) }}" class="hover:text-[#C9A45C]">{{ $verse->work->title }}</a>

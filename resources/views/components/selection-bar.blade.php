@@ -1,8 +1,8 @@
 {{-- Sticky bar for the library selection (up to 2 verses, or 1 saying). Filled by resources/js/library.js. --}}
 <div data-selection-bar hidden
-    class="fixed inset-x-3 bottom-4 z-30 mx-auto max-w-2xl rounded-3xl bg-[#1C1A18] p-3 text-[#F2ECE2] shadow-2xl ring-1 ring-[#C9A45C]/40 sm:p-4">
+    class="fixed inset-x-3 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-50 mx-auto max-w-2xl rounded-3xl md:bottom-4 bg-[#1C1A18] p-3 text-[#F2ECE2] shadow-2xl ring-1 ring-[#C9A45C]/40 sm:p-4">
     <div class="flex flex-wrap items-center gap-3">
-        <div class="min-w-0 flex-1">
+        <div class="min-w-0 flex-1 basis-full sm:basis-auto">
             <p class="text-xs text-[#C9A45C]" data-selection-count></p>
             <p class="truncate font-text" data-selection-preview></p>
             <p class="hidden text-xs text-[#E3977D]" data-selection-warning>البيتان معاً أطول من ١٥٥ حرفاً؛ أبقِ بيتاً واحداً.</p>

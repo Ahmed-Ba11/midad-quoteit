@@ -87,6 +87,18 @@ html.dark body {
     background-attachment: fixed;
 }
 
+/* Share window: rises from the bottom on phones, fades in on wide screens. */
+.share-sheet:popover-open {
+    animation: sheet-in 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes sheet-in {
+    from {
+        opacity: 0;
+        translate: 0 40px;
+    }
+}
+
 /* Toast: rises in, fades out. */
 .toast {
     animation: toast-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
@@ -170,7 +182,7 @@ html.dark body {
 
 .quote-art-text {
     margin: 0;
-    font-size: calc(var(--fs) * 100cqi / var(--base));
+    font-size: max(0.875rem, calc(var(--fs) * 100cqi / var(--base)));
     line-height: 1.8;
     overflow-wrap: anywhere;
 }
@@ -179,7 +191,7 @@ html.dark body {
     margin-top: calc(18 * 100cqi / var(--base));
     font-family: 'IBM Plex Sans Arabic', var(--font-sans);
     font-weight: 300;
-    font-size: calc(15 * 100cqi / var(--base));
+    font-size: max(0.75rem, calc(15 * 100cqi / var(--base)));
     opacity: 0.8;
 }
 
@@ -204,8 +216,38 @@ html.dark body {
         radial-gradient(ellipse at 50% 0%, rgb(168 135 63 / 0.1), transparent 60%);
 }
 
-.quote-text-mark {
-    opacity: 0.8;
+/* Frame: the arch of the رقيم tablet, a thin gold outline with a diamond at its crown. */
+.quote-text-arch {
+    position: absolute;
+    inset: 6% 12% 5%;
+    border: 1.5px solid rgb(168 135 63 / 0.45);
+    border-radius: 50% 50% 0.6rem 0.6rem / 34% 34% 0.6rem 0.6rem;
+    pointer-events: none;
+}
+
+.quote-text-arch::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    translate: -50% 0;
+    rotate: 45deg;
+    background: var(--color-gold);
+}
+
+/* Frame: one large mark at the opening corner. */
+.quote-text-curly {
+    position: absolute;
+    inset-block-start: 2%;
+    inset-inline-start: 5%;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(3rem, 22cqi, 7rem);
+    line-height: 1;
+    color: var(--color-gold);
+    opacity: 0.35;
+    pointer-events: none;
 }
 
 /* Verses: balance the words of a hemistich so no single word drops to its own line. */
@@ -265,8 +307,10 @@ html.dark body {
     transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+@media (hover: hover) {
 .quote-leaf:hover {
     transform: rotate(0deg) translateY(-2px);
+}
 }
 
 /* ───────────── خزانة الأدب ───────────── */
@@ -349,9 +393,11 @@ html.dark body {
     line-height: 1.15;
 }
 
+@media (hover: hover) {
 .book:hover,
 .book:focus-visible {
     transform: translateY(-12px);
+}
 }
 
 .book[aria-pressed='true'] {
@@ -366,9 +412,11 @@ html.dark body {
     transform: rotate(7deg);
 }
 
+@media (hover: hover) {
 .book-leaning:hover,
 .book-leaning:focus-visible {
     transform: rotate(7deg) translateY(-12px);
+}
 }
 
 /* The opened diwan: two manuscript pages ruled with a double gold frame (الجدول). */
@@ -460,8 +508,10 @@ html.dark body {
     pointer-events: none;
 }
 
+@media (hover: hover) {
 .arch:hover {
     transform: translateY(-4px);
+}
 }
 
 .arch[aria-pressed='true'] {
@@ -482,8 +532,10 @@ html.dark body {
     transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
+@media (hover: hover) {
 .plaque:hover {
     transform: rotate(0deg);
+}
 }
 
 /* Paper texture: desaturated fractal noise + soft vignette. */
@@ -493,4 +545,13 @@ html.dark body {
         url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
     mix-blend-mode: overlay;
     opacity: 0.55;
+}
+
+/* Horizontal chip rows on phones: swipeable, without a visible scrollbar. */
+.no-scrollbar {
+    scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
 }

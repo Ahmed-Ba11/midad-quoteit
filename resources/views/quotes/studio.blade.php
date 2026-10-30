@@ -90,7 +90,7 @@
                         <x-textarea name="content" label="نص الاقتباس" hint="من ٣ إلى ١٥٥ حرفاً" rows="4" minlength="3"
                             maxlength="155" required :value="old('content', $quote->content)" />
 
-                        @include('quotes.partials.text-origin', ['quote' => $quote, 'withBook' => true])
+                        @include('quotes.partials.text-origin', ['quote' => $quote, 'withBook' => true, 'anthologies' => $myAnthologies ?? collect()])
                     @endif
 
                     <div>
@@ -238,7 +238,8 @@
         </section>
 
         {{-- Live preview --}}
-        <section aria-label="معاينة" class="flex flex-col items-center gap-6 overflow-y-auto rounded-3xl border border-dashed border-line p-4 sm:p-8 lg:min-h-0 lg:justify-center">
+        {{-- On phones the preview comes first and stays in view while the tools scroll beneath it. --}}
+        <section aria-label="معاينة" class="sticky top-16 z-10 order-first flex max-h-[42dvh] flex-col items-center gap-4 overflow-y-auto rounded-3xl border border-dashed border-line bg-paper/95 p-3 backdrop-blur sm:p-8 lg:static lg:order-none lg:max-h-none lg:min-h-0 lg:justify-center lg:gap-6">
             <div data-preview-frame class="w-full shadow-xl" style="max-width: {{ $ratioWidth }}px">
                 <x-quote-art :quote="$quote" class="rounded-2xl" />
             </div>

@@ -31,7 +31,7 @@
                             <span class="text-xs text-[#7A7068]">{{ config('library.occasions.'.$verse->occasion) }}</span>
                         @endif
                         @if ($verse->source_url)
-                            <x-external-link :href="$verse->source_url" class="text-xs text-[#7A7068]">القصيدة كاملة</x-external-link>
+                            <x-external-link :href="$verse->source_url" class="inline-flex min-h-11 items-center text-xs text-[#7A7068]">القصيدة كاملة</x-external-link>
                         @endif
                         <x-pick-button :id="$verse->id" :text="$verse->sadr.' / '.$verse->ajuz" class="text-[#8A3324]" />
                     </div>

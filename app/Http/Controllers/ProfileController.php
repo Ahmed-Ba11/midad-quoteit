@@ -18,7 +18,7 @@ class ProfileController extends Controller
      */
     private const PUBLIC_TABS = ['quotes', 'original', 'anthologies', 'poets', 'diwans'];
 
-    private const OWNER_TABS = ['saved', 'books'];
+    private const OWNER_TABS = ['liked', 'saved', 'books'];
 
     /**
      * ركني: a reader's corner — their colour, pinned quote, stats, and tabs for what they share,
@@ -44,6 +44,7 @@ class ProfileController extends Controller
             'quotes' => $myQuotes()->latest(),
             'original' => $myQuotes()->where('is_original', true)->latest(),
             'saved' => $user->bookmarkedQuotes()->visibleTo($viewer)->orderByPivot('created_at', 'desc'),
+            'liked' => $user->likedQuotes()->visibleTo($viewer)->orderByPivot('created_at', 'desc'),
             default => null,
         };
 

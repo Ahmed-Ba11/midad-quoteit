@@ -124,7 +124,7 @@
         <p id="search-hint" class="mt-2 text-xs text-muted">ابحث بكلمة من النص أو باسم القائل أو الكتاب (حتى ١٠٠ حرف)، واختر الترتيب.</p>
 
         {{-- Category chips --}}
-        <nav aria-label="التصنيفات" class="mt-5 flex flex-wrap gap-2">
+        <nav aria-label="التصنيفات" class="no-scrollbar relative -mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&>*]:shrink-0">
             <x-chip :href="route('home', \Illuminate\Support\Arr::except($keep, 'original'))" :active="$filters['category'] === null && ! $filters['original']">الكل</x-chip>
             <x-chip :href="route('home', [...$keep, 'original' => $filters['original'] ? null : '1'])" :active="$filters['original']">
                 <x-icon name="feather" class="size-4" /> بأقلام القرّاء

@@ -57,7 +57,7 @@
                             <x-verse layout="paired" :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="text-lg" />
                             <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
                                 @if ($verse->source_url)
-                                    <x-external-link :href="$verse->source_url" class="text-xs text-muted">القصيدة كاملة</x-external-link>
+                                    <x-external-link :href="$verse->source_url" class="inline-flex min-h-11 items-center text-xs text-muted">القصيدة كاملة</x-external-link>
                                 @endif
                                 <x-pick-button :id="$verse->id" :text="$verse->sadr.' / '.$verse->ajuz" class="text-accent" />
                             </div>

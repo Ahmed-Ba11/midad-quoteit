@@ -128,6 +128,8 @@ class QuoteRequest extends FormRequest
             'is_original' => ['sometimes', 'boolean'],
             'is_public' => ['sometimes', 'boolean'],
             'presentation' => ['sometimes', 'required', Rule::in(['card', 'text'])],
+            'mark_style' => ['sometimes', 'required', Rule::in(array_keys(config('quotes.marks')))],
+            'anthology_id' => ['sometimes', 'nullable', 'integer'],
             'page' => ['sometimes', 'nullable', 'integer', 'between:1,9999'],
             'book_genre' => ['sometimes', 'nullable', Rule::in(array_keys(config('quotes.book_genres')))],
             'story' => ['sometimes', 'nullable', 'string', 'max:500'],

@@ -86,7 +86,7 @@
             <li class="flex-1">
                 <a href="{{ route($place['route'], $place['params'] ?? []) }}" @if ($place['active']) aria-current="page" @endif
                     @class([
-                        'flex h-16 flex-col items-center justify-center gap-1 text-[11px] transition',
+                        'flex h-16 flex-col items-center justify-center gap-1 text-xs transition',
                         'font-bold text-accent' => $place['active'],
                         'text-muted' => ! $place['active'],
                     ])>

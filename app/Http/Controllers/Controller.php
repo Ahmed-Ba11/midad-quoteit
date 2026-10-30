@@ -21,8 +21,10 @@ abstract class Controller
     protected function previousOnSite(): string
     {
         $previous = url()->previous();
-        $isOwnSite = parse_url($previous, PHP_URL_HOST) === request()->getHost()
-            && parse_url($previous, PHP_URL_PORT) === parse_url(url('/'), PHP_URL_PORT);
+        $home = rtrim(url('/'), '/');
+
+        // Same scheme, host and port as this site — so never another site, nor a "javascript:" link.
+        $isOwnSite = $previous === $home || str_starts_with($previous, $home.'/') || str_starts_with($previous, $home.'?');
 
         return $isOwnSite && $previous !== request()->fullUrl() ? $previous : route('home');
     }

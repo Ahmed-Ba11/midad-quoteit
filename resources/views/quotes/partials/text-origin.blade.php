@@ -10,6 +10,8 @@
     $prefix ??= '';
     $useOld ??= true;
     $withBook ??= false;
+    $withPresentation ??= true;
+    $anthologies ??= collect();
     $old = fn (string $field, $default) => $useOld ? old($field, $default) : $default;
     $currentKind = $old('kind', match (true) {
         (bool) $quote->is_original => 'original',
@@ -33,7 +35,7 @@
                 <input type="radio" name="kind" value="{{ $key }}" class="sr-only" @checked($currentKind === $key)>
                 <x-icon :name="$kind['icon']" class="size-4 text-accent" />
                 <span class="text-sm font-medium">{{ $kind['title'] }}</span>
-                <span class="text-[11px] leading-snug text-muted">{{ $kind['text'] }}</span>
+                <span class="text-xs leading-snug text-muted">{{ $kind['text'] }}</span>
             </label>
         @endforeach
     </div>
@@ -98,16 +100,17 @@
         <label class="{{ $choice }}">
             <input type="radio" name="is_public" value="1" class="sr-only" @checked((string) $old('is_public', (int) $quote->is_public) === '1')>
             <span class="flex items-center gap-1.5 text-sm font-medium"><x-icon name="globe" class="size-4 text-accent" /> عام</span>
-            <span class="text-[11px] leading-snug text-muted">في الرئيسية ورفوف القرّاء وركنك؛ يراه أي قارئ ويعجب به ويحفظه ويشاركه.</span>
+            <span class="text-xs leading-snug text-muted">في الرئيسية ورفوف القرّاء وركنك؛ يراه أي قارئ ويعجب به ويحفظه ويشاركه.</span>
         </label>
         <label class="{{ $choice }}">
             <input type="radio" name="is_public" value="0" class="sr-only" @checked((string) $old('is_public', (int) $quote->is_public) === '0')>
             <span class="flex items-center gap-1.5 text-sm font-medium"><x-icon name="lock" class="size-4 text-accent" /> خاص</span>
-            <span class="text-[11px] leading-snug text-muted">في ركنك وحدك؛ لا يظهر في الرئيسية ولا في صفحة الكتاب، ولا يراه غيرك.</span>
+            <span class="text-xs leading-snug text-muted">في ركنك وحدك؛ لا يظهر في الرئيسية ولا في صفحة الكتاب، ولا يراه غيرك.</span>
         </label>
     </div>
 </fieldset>
 
+@if ($withPresentation)
 {{-- How it looks: a designed card, or the words alone between quotation marks. --}}
 <fieldset class="mt-5">
     <legend class="mb-2 text-sm font-medium">طريقة العرض</legend>
@@ -115,12 +118,28 @@
         <label class="{{ $choice }}">
             <input type="radio" name="presentation" value="card" class="sr-only" @checked($old('presentation', $quote->presentation) === 'card')>
             <span class="flex items-center gap-1.5 text-sm font-medium"><x-icon name="palette" class="size-4 text-accent" /> بطاقة مصمّمة</span>
-            <span class="text-[11px] leading-snug text-muted">بالخط واللون اللذين تختارهما.</span>
+            <span class="text-xs leading-snug text-muted">بالخط واللون اللذين تختارهما.</span>
         </label>
         <label class="{{ $choice }}">
             <input type="radio" name="presentation" value="text" class="sr-only" @checked($old('presentation', $quote->presentation) === 'text')>
             <span class="flex items-center gap-1.5 text-sm font-medium"><x-icon name="type" class="size-4 text-accent" /> نص مقتبس</span>
-            <span class="text-[11px] leading-snug text-muted">الكلمات وحدها بين «علامتي تنصيص».</span>
+            <span class="text-xs leading-snug text-muted">الكلمات وحدها بين «علامتي تنصيص».</span>
         </label>
     </div>
 </fieldset>
+@endif
+
+{{-- "أضف إلى": file it straight into one of my anthologies. --}}
+@if ($anthologies->isNotEmpty())
+    <div class="mt-5">
+        <label for="{{ $prefix }}anthology_id" class="mb-1.5 flex items-center gap-1.5 text-sm font-medium"><x-icon name="layers" class="size-4 text-accent" /> أضفه إلى مختاراتي</label>
+        <select id="{{ $prefix }}anthology_id" name="anthology_id" aria-describedby="{{ $prefix }}anthology_id-hint"
+            class="block h-12 w-full rounded-xl border border-line bg-white px-3 text-ink focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/20 dark:bg-surface">
+            <option value="">— لا —</option>
+            @foreach ($anthologies as $anthology)
+                <option value="{{ $anthology->id }}" @selected((string) $old('anthology_id', '') === (string) $anthology->id)>{{ $anthology->title }}</option>
+            @endforeach
+        </select>
+        <p id="{{ $prefix }}anthology_id-hint" class="mt-1.5 text-xs text-muted">اختياري؛ تجده بعد النشر في مختاراتك أيضاً</p>
+    </div>
+@endif

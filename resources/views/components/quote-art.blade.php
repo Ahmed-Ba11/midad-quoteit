@@ -16,14 +16,29 @@
 @endphp
 
 @if ($quote->presentation === 'text')
-    {{-- نص مقتبس: no design, just the words between quotation marks, set like a page of a book. --}}
-    <figure {{ $attributes->class('quote-text relative m-0 flex w-full flex-col items-center justify-center overflow-hidden bg-surface px-[9%] py-[8%] text-center') }}
+    {{--
+        نص مقتبس: the words in the reader's chosen font, framed by one of four marks (config/quotes.php →
+        marks): «guillemets», a large ❝ mark, gold ornaments above and below, or the arch of the رقيم tablet.
+    --}}
+    @php $markStyle = array_key_exists($quote->mark_style, config('quotes.marks')) ? $quote->mark_style : 'guillemets'; @endphp
+    <figure data-mark="{{ $markStyle }}" {{ $attributes->class(['quote-text relative m-0 flex w-full flex-col items-center justify-center overflow-hidden bg-surface text-center', $markStyle === 'arch' ? 'px-[17%] pb-[7%] pt-[11%]' : 'px-[10%] py-[8%]']) }}
         style="{{ $uniform ? 'aspect-ratio: 4 / 3;' : 'min-height: 16rem;' }}">
-        <x-ornament name="star" class="quote-text-mark mb-3 size-4 text-gold" />
-        <blockquote @class(['relative m-0 whitespace-pre-line font-text leading-[1.9] text-ink [text-wrap:balance]', 'text-2xl sm:text-3xl' => ! $uniform])
-            @if ($uniform) style="font-size: {{ $textSize }}" @endif><span class="text-gold">«</span>{{ $quote->content }}<span class="text-gold">»</span></blockquote>
+        @if ($markStyle === 'arch')
+            <span aria-hidden="true" class="quote-text-arch"></span>
+        @elseif ($markStyle === 'curly')
+            <span aria-hidden="true" class="quote-text-curly">❝</span>
+        @elseif ($markStyle === 'ornament')
+            <x-quote-mark style="ornament" class="relative mb-[4%] h-[1.4em] text-gold" />
+        @endif
+
+        <blockquote @class(['relative m-0 whitespace-pre-line leading-[1.9] text-ink [text-wrap:balance]', 'text-2xl sm:text-3xl' => ! $uniform, 'italic' => $font['italic'] ?? false])
+            style="font-family: {{ $font['stack'] }};@if ($uniform) font-size: {{ $textSize }};@endif">@if ($markStyle === 'guillemets')<span class="text-gold">«</span>@endif{{ $quote->content }}@if ($markStyle === 'guillemets')<span class="text-gold">»</span>@endif</blockquote>
+
+        @if ($markStyle === 'ornament')
+            <x-quote-mark style="ornament" class="relative mt-[4%] h-[1.4em] rotate-180 text-gold" />
+        @endif
         @if ($byline !== '')
-            <figcaption class="relative mt-4 text-sm text-muted">— {{ $byline }}</figcaption>
+            <figcaption class="relative mt-3 text-sm text-muted">— {{ $byline }}</figcaption>
         @endif
     </figure>
 @else

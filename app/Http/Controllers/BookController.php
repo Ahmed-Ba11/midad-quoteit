@@ -66,6 +66,9 @@ class BookController extends Controller
      */
     public function shelf(ReadingStatusRequest $request, Book $book): RedirectResponse
     {
+        // Only a book I can see: one quoted publicly, or one I quoted myself.
+        abort_unless($book->quotes()->public()->exists() || $book->quotes()->whereBelongsTo($request->user())->exists(), 404);
+
         $status = $request->validated('status');
 
         if ($status === null) {

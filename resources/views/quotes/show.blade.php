@@ -43,26 +43,13 @@
                         <x-chip>{{ $quote->category->name }}</x-chip>
                     @endif
 
-                    <div class="flex w-full flex-wrap items-center gap-1 border-y border-line py-1 sm:w-auto sm:border-0 sm:py-0">
-                        <x-quote-actions :quote="$quote" :show-replies="false" />
-
-                        <button type="button" data-copy="{{ $quote->content }}{{ $byline ? ' — '.$byline : '' }}{{ $quote->source ? ' (المصدر: '.$quote->source.')' : '' }}"
-                            aria-label="انسخ الاقتباس" title="انسخ الاقتباس"
+                    <div class="flex w-full items-center gap-1 border-y border-line py-1 sm:w-auto sm:border-0 sm:py-0">
+                        <x-quote-actions :quote="$quote" :show-replies="false" class="flex-1 sm:flex-none" />
+                        <a href="{{ route('quotes.create', ['template' => $quote->id]) }}" title="صمّم اقتباسك بالخط والألوان نفسها"
                             class="inline-flex h-11 items-center gap-1.5 rounded-full px-3 text-sm text-muted transition hover:bg-accent-soft hover:text-accent">
-                            <x-icon name="copy" class="size-[18px]" data-copy-icon />
-                            <x-icon name="check" class="hidden size-[18px]" data-copied-icon />
-                            <span data-copy-label>نسخ</span>
-                        </button>
-
-                        @can('update', $quote)
-                            <x-button variant="ghost" :href="route('quotes.edit', $quote)" icon="palette">تصميم</x-button>
-                            <form method="POST" action="{{ route('profile.pin', $quote) }}">
-                                @csrf
-                                <x-button type="submit" variant="ghost" icon="pin">
-                                    {{ auth()->user()->pinned_quote_id === $quote->id ? 'مثبّت في ركني' : 'ثبّت في ركني' }}
-                                </x-button>
-                            </form>
-                        @endcan
+                            <x-icon name="palette" class="size-[18px]" /> صمّم مثله
+                        </a>
+                        <x-quote-menu :quote="$quote" />
                     </div>
                 </div>
 
@@ -94,17 +81,26 @@
                 </section>
             @endif
 
-            {{-- مختاراتي: add this quote to one of my anthologies, or start a new one with it. --}}
+            {{-- مختاراتي: one line that opens into my anthologies (toggle each), or a new one with this quote. --}}
             @auth
-                <section id="anthologies" class="mx-auto mt-8 scroll-mt-24 rounded-3xl border border-line bg-surface" style="max-width: {{ $ratioWidth }}px">
-                    <div class="flex flex-wrap items-center gap-2 p-5">
-                        <h2 class="me-2 flex items-center gap-2 font-medium"><x-icon name="layers" class="size-5 text-accent" /> أضف إلى مختاراتي</h2>
+                @php $inMine = $myAnthologies->where('has_quote', true)->count(); @endphp
+                <details id="anthologies" class="group mx-auto mt-6 scroll-mt-24 rounded-2xl border border-line bg-surface" style="max-width: {{ $ratioWidth }}px"
+                    @if ($errors->hasAny(['title', 'description', 'palette'])) open @endif>
+                    <summary class="flex min-h-12 cursor-pointer list-none items-center gap-2 px-4 text-sm [&::-webkit-details-marker]:hidden">
+                        <x-icon name="layers" class="size-5 text-accent" />
+                        <span class="flex-1 font-medium">أضف إلى مختاراتي</span>
+                        @if ($inMine)
+                            <span class="rounded-full bg-accent-soft px-2.5 py-0.5 text-xs text-accent">في {{ $inMine }}</span>
+                        @endif
+                        <x-icon name="chevron-left" class="size-4 text-muted transition group-open:-rotate-90" />
+                    </summary>
+                    <div class="flex flex-wrap gap-2 border-t border-line p-4">
                         @foreach ($myAnthologies as $anthology)
                             <form method="POST" action="{{ route('anthologies.toggle', [$anthology, $quote]) }}">
                                 @csrf
                                 <button type="submit" aria-pressed="{{ $anthology->has_quote ? 'true' : 'false' }}"
                                     @class([
-                                        'inline-flex h-9 items-center gap-1.5 rounded-full border px-4 text-sm transition',
+                                        'inline-flex min-h-11 items-center gap-1.5 rounded-full border px-4 text-sm transition',
                                         'border-accent bg-accent-soft text-accent' => $anthology->has_quote,
                                         'border-line hover:border-accent hover:text-accent' => ! $anthology->has_quote,
                                     ])>
@@ -120,14 +116,13 @@
                             <p class="text-sm text-muted">اجمع ما يعجبك في مختارات باسمها: «أبيات الصبر»، «من رمضان»…</p>
                         @endif
                     </div>
-
-                    <details class="group border-t border-line" @if ($errors->hasAny(['title', 'description', 'palette'])) open @endif>
-                        <summary class="flex cursor-pointer list-none items-center gap-2 px-5 py-3 text-sm text-accent [&::-webkit-details-marker]:hidden">
+                    <details class="border-t border-line" @if ($errors->hasAny(['title', 'description', 'palette'])) open @endif>
+                        <summary class="flex min-h-12 cursor-pointer list-none items-center gap-2 px-4 text-sm text-accent [&::-webkit-details-marker]:hidden">
                             <x-icon name="plus" class="size-4" /> مختارات جديدة بهذا الاقتباس
                         </summary>
                         @include('anthologies.partials.form', ['anthology' => new \App\Models\Anthology, 'action' => route('anthologies.store'), 'quoteId' => $quote->id])
                     </details>
-                </section>
+                </details>
             @endauth
 
             @if ($inAnthologies->isNotEmpty())

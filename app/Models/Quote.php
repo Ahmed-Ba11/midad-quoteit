@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'content', 'category_id', 'verse_id', 'saying_id', 'author', 'book', 'page', 'source', 'source_url', 'is_original', 'is_public', 'presentation', 'story',
+    'content', 'category_id', 'verse_id', 'saying_id', 'author', 'book', 'page', 'source', 'source_url', 'is_original', 'is_public', 'presentation', 'mark_style', 'story',
     'font', 'bg_color', 'text_color', 'highlight_color', 'highlight_style', 'highlights',
     'texture', 'ratio', 'font_size',
 ])]
@@ -52,6 +52,7 @@ class Quote extends Model
         'is_public' => true,
         'is_original' => false,
         'presentation' => 'card',
+        'mark_style' => 'guillemets',
     ];
 
     /**

@@ -44,6 +44,17 @@ return [
 
     'font_size' => ['min' => 20, 'max' => 56],
 
+    // How a text-only quote is framed (presentation = text).
+    'marks' => [
+        'guillemets' => ['label' => '«علامتا تنصيص»', 'open' => '«', 'close' => '»'],
+        'curly' => ['label' => 'علامة كبيرة', 'open' => '❝', 'close' => '❞'],
+        'ornament' => ['label' => 'زخرفة ذهبية', 'open' => null, 'close' => null],
+        'arch' => ['label' => 'لوح رقيم', 'open' => null, 'close' => null],
+    ],
+
+    // Fonts offered for text-only quotes in the quick-share window (a subset of "fonts").
+    'text_fonts' => ['amiri', 'naskh', 'thmanyah-text', 'ruqaa', 'messiri'],
+
     // Book shelves (رفوف القرّاء): reading statuses and genres a reader can pick.
     'reading_statuses' => [
         'reading' => 'أقرؤه الآن',

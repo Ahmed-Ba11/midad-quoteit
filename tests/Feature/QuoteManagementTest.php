@@ -104,6 +104,9 @@ test('deleting a user deletes their quotes', function () {
 test('only the owner sees edit and delete controls', function () {
     $quote = Quote::factory()->create();
 
-    $this->actingAs($quote->user)->get(route('home'))->assertSee('aria-label="حذف"', false);
-    $this->actingAs(User::factory()->create())->get(route('home'))->assertDontSee('aria-label="حذف"', false);
+    // The owner's options sit in the card's "⋯" menu; everyone gets copy and "use the design".
+    $this->actingAs($quote->user)->get(route('home'))
+        ->assertSee('value="DELETE"', false)->assertSee('احذفه')->assertSee('استخدم التصميم لنصّك');
+    $this->actingAs(User::factory()->create())->get(route('home'))
+        ->assertDontSee('value="DELETE"', false)->assertDontSee('احذفه')->assertSee('استخدم التصميم لنصّك');
 });

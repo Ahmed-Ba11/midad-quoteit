@@ -8,7 +8,7 @@
     "scope": "/",
     "display": "standalone",
     "background_color": "#F5EFE4",
-    "theme_color": "#8A3324",
+    "theme_color": "#F5EFE4",
     "icons": [
         { "src": "/icons/raqeem-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
         { "src": "/icons/raqeem-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },

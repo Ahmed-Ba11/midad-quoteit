@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/', [QuoteController::class, 'store'])->name('store_quote');
     Route::get('/quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
+    Route::post('/quotes/draft', [QuoteController::class, 'draft'])->name('quotes.draft');
     Route::get('/quote/{quote}/edit', [QuoteController::class, 'edit'])->name('quotes.edit')->can('update', 'quote');
     Route::put('/quote/{quote}', [QuoteController::class, 'update'])->name('edit_quote')->can('update', 'quote');
     Route::delete('/quote/{quote}', [QuoteController::class, 'destroy'])->name('delete_quote')->can('delete', 'quote');

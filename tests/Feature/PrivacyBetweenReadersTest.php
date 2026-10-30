@@ -143,7 +143,7 @@ test('the quick-share form publishes privately when asked, and as words only', f
     expect($quote->is_public)->toBeFalse()->and($quote->presentation)->toBe('text');
 
     $this->actingAs($this->other)->get(route('profile.show', $this->other))
-        ->assertSee('quote-text-mark', false)->assertSee('الصبر مفتاح الفرج');
+        ->assertSee('data-mark="guillemets"', false)->assertSee('الصبر مفتاح الفرج');
 });
 
 test('quoting a named poet without a source is refused, whichever form is used', function () {
@@ -156,4 +156,29 @@ test('quoting a named poet without a source is refused, whichever form is used',
     ])->assertSessionHasErrors('source');
 
     expect(Quote::where('content', 'بيت لشاعر معاصر')->exists())->toBeFalse();
+});
+
+test('nobody can reach a private-only book by putting it on their own shelf', function () {
+    $book = Book::where('title', 'كتاب سري')->sole();
+
+    $this->actingAs($this->other)->post(route('books.shelf', $book), ['status' => 'reading'])->assertNotFound();
+    $this->actingAs($this->other)->get(route('books.show', $book))->assertNotFound();
+    expect($this->other->books()->count())->toBe(0);
+});
+
+test('a refused "new anthology with this quote" leaves no anthology behind', function () {
+    $this->actingAs($this->other)
+        ->post(route('anthologies.store'), ['title' => 'محاولة', 'quote_id' => $this->secret->id])
+        ->assertForbidden();
+
+    expect(Anthology::count())->toBe(0);
+});
+
+test('back links never carry another scheme or host from a forged Referer', function () {
+    foreach (['javascript://127.0.0.1:8000/%0aalert(1)', 'https://evil.example/', '//evil.example/'] as $referer) {
+        $this->actingAs($this->other)->withHeader('referer', $referer)
+            ->get(route('quotes.create'))
+            ->assertDontSee('javascript:', false)
+            ->assertDontSee('evil.example');
+    }
 });

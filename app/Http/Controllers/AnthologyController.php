@@ -33,10 +33,16 @@ class AnthologyController extends Controller
      */
     public function store(AnthologyRequest $request): RedirectResponse
     {
+        // Check the quote first, so a refused request leaves nothing behind.
+        $quote = $request->filled('quote_id') ? Quote::findOrFail($request->integer('quote_id')) : null;
+
+        if ($quote) {
+            Gate::authorize('view', $quote);
+        }
+
         $anthology = $request->user()->anthologies()->create($request->safe()->except('quote_id'));
 
-        if ($request->filled('quote_id')) {
-            Gate::authorize('view', $quote = Quote::findOrFail($request->integer('quote_id')));
+        if ($quote) {
             $anthology->quotes()->attach($quote);
 
             return $this->backTo('#anthologies')->with('toast', 'أُنشئت المختارات وفيها هذا الاقتباس.');

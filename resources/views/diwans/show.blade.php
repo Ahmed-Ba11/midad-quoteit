@@ -76,7 +76,7 @@
                         @endif
                         <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
                             @auth
-                                <a href="{{ route('quotes.create', ['diwan_verse' => $verse->id]) }}" class="inline-flex items-center gap-1 text-[#8A3324] hover:underline">
+                                <a href="{{ route('quotes.create', ['diwan_verse' => $verse->id]) }}" class="inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-[#8A3324] hover:bg-[#8A3324]/10">
                                     <x-icon name="palette" class="size-4" /> صمّمه في مرسم الحروف
                                 </a>
                             @endauth
@@ -84,7 +84,7 @@
                                 <form method="POST" action="{{ route('diwans.verses.destroy', [$diwan, $verse]) }}">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="inline-flex items-center gap-1 text-[#7A7068] transition hover:text-[#8A3324]">
+                                    <button type="submit" class="inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-[#7A7068] transition hover:bg-[#8A3324]/10 hover:text-[#8A3324]">
                                         <x-icon name="trash" class="size-4" /> احذفه
                                     </button>
                                 </form>

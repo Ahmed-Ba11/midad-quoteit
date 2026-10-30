@@ -24,8 +24,7 @@
             <x-ornament name="star" class="mx-auto size-7 text-[#C9A45C]" />
             <h1 class="logo mt-4 font-display text-5xl font-black sm:text-7xl">خزانـــة الأدب</h1>
 
-            <x-verse class="mx-auto mt-8 max-w-2xl text-xl text-[#F2ECE2]/90 sm:text-2xl"
-                sadr="أعزُّ مكانٍ في الدُّنى سرجُ سابحٍ" ajuz="وخيرُ جليسٍ في الزمانِ كتابُ" poet="المتنبي" />
+            <x-epigraph context="library" layout="verse" class="mx-auto mt-8 max-w-2xl text-xl text-[#F2ECE2]/90 sm:text-2xl" />
 
             <form method="GET" action="{{ route('library.index') }}" role="search" class="relative mx-auto mt-10 max-w-xl">
                 <label for="library-q" class="sr-only">ابحث في المكتبة</label>

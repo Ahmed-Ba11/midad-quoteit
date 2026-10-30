@@ -114,3 +114,18 @@ test('error pages are in Arabic and use the site layout', function () {
         ->assertForbidden()
         ->assertSee('هذا الإجراء متاح لصاحب الاقتباس فقط.');
 });
+
+test('pages are sent gzip-compressed with their exact length when the browser accepts it', function () {
+    Quote::factory()->count(12)->create();
+
+    $plain = $this->get(route('home'));
+    expect($plain->headers->get('Content-Encoding'))->toBeNull()
+        ->and((int) $plain->headers->get('Content-Length'))->toBe(strlen($plain->getContent()));
+
+    $compressed = $this->get(route('home'), ['Accept-Encoding' => 'gzip, deflate, br']);
+    expect($compressed->headers->get('Content-Encoding'))->toBe('gzip')
+        ->and($compressed->headers->get('Vary'))->toContain('Accept-Encoding')
+        ->and((int) $compressed->headers->get('Content-Length'))->toBe(strlen($compressed->getContent()))
+        ->and(gzdecode($compressed->getContent()))->toContain('<html lang="ar" dir="rtl">')->toContain('</html>')
+        ->and(strlen($compressed->getContent()))->toBeLessThan(strlen($plain->getContent()) / 3);
+});

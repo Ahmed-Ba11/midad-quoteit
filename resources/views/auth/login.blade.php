@@ -24,6 +24,5 @@
 @endsection
 
 @section('verse')
-    <x-verse class="text-3xl" sadr="الخيلُ والليلُ والبيداءُ تعرفني" ajuz="والسيفُ والرمحُ والقرطاسُ والقلمُ"
-        poet="المتنبي" />
+    <x-epigraph context="return" layout="verse" class="text-3xl" />
 @endsection

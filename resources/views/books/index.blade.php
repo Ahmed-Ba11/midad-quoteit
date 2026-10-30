@@ -12,7 +12,7 @@
             <div class="max-w-2xl">
                 <h1 class="font-display text-4xl font-bold sm:text-5xl">رفوف القـــرّاء</h1>
                 <p class="mt-3 text-lg leading-relaxed text-muted">على هذه الرفوف كتبٌ وضعها قرّاءٌ مثلك، وترك كلٌّ منهم فيها جملةً لم تفارقه. تصفّح أجمل ما اقتُبس، أو ضع كتابك بينها.</p>
-                <x-epigraph occasion="ilm" class="mt-3" />
+                <x-epigraph context="knowledge" class="mt-3" />
             </div>
             @auth
                 <x-button :href="route('quotes.create')" icon="plus">اقتبس من كتاب تقرؤه</x-button>

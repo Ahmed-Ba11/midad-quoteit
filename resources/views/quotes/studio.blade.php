@@ -36,7 +36,7 @@
             <header class="px-6 pt-5">
                 <h1 class="font-display text-2xl font-bold">مرسم الحـــروف</h1>
                 <p class="mt-1 text-sm text-muted">{{ $isEditing ? 'أعد تصميم اقتباسك.' : 'اكتب، ثم اختر الخط واللون، وانشر.' }}</p>
-                <p class="mt-2 font-text text-xs leading-relaxed text-gold">وجلا السيولُ عن الطلولِ كأنَّها ◆ زُبُرٌ تُجِدُّ متونَها أقلامُها — لبيد</p>
+                <x-epigraph context="writing" class="mt-2 !text-xs" />
             </header>
 
             <div role="tablist" aria-label="أدوات التصميم" class="mt-4 grid grid-cols-5 border-b border-line px-2">

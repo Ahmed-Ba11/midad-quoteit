@@ -24,7 +24,7 @@
                     <p class="mx-auto mt-4 max-w-md text-lg leading-relaxed text-[#F2ECE2]/75 lg:mx-0">
                         اقتبس من كتاب تقرؤه أو بيتٍ تحفظه، صمّمه بخطٍّ يليق به، وشاركه مع من يقدّر الكلمة.
                     </p>
-                    <x-epigraph :occasion="['hikma', 'ilm', 'himma']" class="mx-auto mt-6 max-w-md text-base !text-[#E2C27E] lg:mx-0 [&_a]:!text-[#F2ECE2]/60" />
+                    <x-epigraph context="welcome" class="mx-auto mt-6 max-w-md text-base !text-[#E2C27E] lg:mx-0 [&_a]:!text-[#F2ECE2]/60" />
 
                     <div class="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
                         @auth
@@ -84,7 +84,7 @@
         <header class="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
                 <h2 class="font-display text-4xl font-bold">{{ $isFrontPage ? 'أحدث الاقتباســات' : 'الاقتباســات' }}</h2>
-                <x-epigraph class="mt-2 max-w-xl" />
+                <x-epigraph context="wisdom" class="mt-2 max-w-xl" />
             </div>
 
             @guest

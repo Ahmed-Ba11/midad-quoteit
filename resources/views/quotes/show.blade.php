@@ -140,7 +140,7 @@
 
             {{-- Replies --}}
             <section id="replies" class="mx-auto mt-10 scroll-mt-24" style="max-width: {{ $ratioWidth }}px">
-                <x-epigraph occasion="hikma" class="mb-3" />
+                <x-epigraph context="conversation" class="mb-3" />
                 <h2 class="font-display text-2xl font-bold">الردود <span class="text-base font-normal text-muted">({{ $quote->replies->count() }})</span></h2>
 
                 @auth

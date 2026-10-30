@@ -219,3 +219,27 @@ test('every verse has an explanation, and the diwan page shows it with Lisan al-
         ->assertSee('منقطعه حيث يدقّ')
         ->assertSee('https://ar.wikisource.org/w/index.php?search=', false);
 });
+
+test('every epigraph chosen for a page is exactly one verified verse from the library', function () {
+    $this->seed(LibrarySeeder::class);
+    $verses = Verse::pluck('sadr')->map(fn (string $sadr) => Verse::normalizeArabic($sadr));
+
+    foreach (config('library.epigraphs') as $page => $starts) {
+        foreach ($starts as $start) {
+            expect($verses->filter(fn (string $verse) => str_starts_with($verse, $start)))
+                ->toHaveCount(1, "«{$start}» on {$page}");
+        }
+    }
+});
+
+test('pages show an epigraph from the verses chosen for them', function () {
+    $this->seed(LibrarySeeder::class);
+    $chosen = fn (string $page) => Verse::get()->filter(fn (Verse $verse) => collect(config("library.epigraphs.$page"))
+        ->contains(fn (string $start) => str_starts_with(Verse::normalizeArabic($verse->sadr), $start)));
+
+    $login = $this->get(route('login'))->assertOk()->getContent();
+    expect($chosen('return')->contains(fn (Verse $verse) => str_contains($login, $verse->sadr)))->toBeTrue();
+
+    $signup = $this->get(route('signup'))->assertOk()->getContent();
+    expect($chosen('beginning')->contains(fn (Verse $verse) => str_contains($signup, $verse->sadr)))->toBeTrue();
+});

@@ -60,7 +60,7 @@ class LibrarySeeder extends Seeder
         }
 
         // The epigraphs read the verses from the cache; refresh it with the new text.
-        Cache::forget('epigraph-verses');
+        Cache::forget('epigraph-verses.v2');
     }
 
     /**

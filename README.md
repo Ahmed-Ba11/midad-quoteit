@@ -19,7 +19,7 @@ composer run dev
 ثم افتح http://localhost:8000
 
 `--seed` يضيف المكتبة (الشعراء والدواوين والأبيات) وبيانات تجريبية: 5 مستخدمين و20 اقتباساً مصمّماً مع إعجابات وردود.
-حسابات التجربة: `sara@midad.test` · `khalid@midad.test` · `noura@midad.test` · `fahad@midad.test` · `reem@midad.test`، وكلمة المرور لها جميعاً `password`.
+حسابات التجربة: `sara@midad.test` · `khalid@midad.test` · `noura@midad.test` · `fahad@midad.test` · `reem@midad.test`، وكلمة المرور لها جميعاً `Midad-Demo-2026`.
 
 الاختبارات: `php artisan test`
 

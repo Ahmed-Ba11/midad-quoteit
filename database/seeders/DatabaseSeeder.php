@@ -15,11 +15,16 @@ use Illuminate\Support\Collection;
 
 /**
  * Demo data for trying the app: 5 readers, ~20 designed quotes (some from the library),
- * likes, bookmarks and replies. Every demo account uses the password "password".
+ * likes, bookmarks and replies. Every demo account uses DEMO_PASSWORD.
  */
 class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
+
+    /**
+     * Unique and strong, so browsers do not flag it as a password seen in data breaches.
+     */
+    public const DEMO_PASSWORD = 'Midad-Demo-2026';
 
     /**
      * Seed the application's database.
@@ -34,7 +39,7 @@ class DatabaseSeeder extends Seeder
             ['name' => 'نورة', 'email' => 'noura@midad.test', 'bio' => 'المتنبي أولاً، ثم كل شيء.'],
             ['name' => 'Fahad', 'email' => 'fahad@midad.test', 'bio' => null],
             ['name' => 'ريم', 'email' => 'reem@midad.test', 'bio' => 'أحب الخطوط العربية والقهوة.'],
-        ])->map(fn (array $user) => User::factory()->create($user));
+        ])->map(fn (array $user) => User::factory()->create([...$user, 'password' => self::DEMO_PASSWORD]));
 
         $category = fn (string $slug) => Category::where('slug', $slug)->value('id');
         $palette = fn (string $key) => [

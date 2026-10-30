@@ -106,7 +106,7 @@ class QuoteController extends Controller
         $sameCategory = $quote->category_id && $sameAuthor->count() < $limit
             ? Quote::public()->withCardData($request->user())
                 ->where('category_id', $quote->category_id)
-                ->whereKeyNot([$quote->id, ...$sameAuthor->modelKeys()])
+                ->whereKeyNot([$quote->id, ...$sameAuthor->pluck('id')])
                 ->latest()->take($limit - $sameAuthor->count())->get()
             : collect();
 

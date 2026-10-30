@@ -126,3 +126,14 @@ test('a search with no results points to the other sections, trusted sites and q
         ->assertSee('وجدتَه في مكان آخر؟')
         ->assertSee('rel="noopener noreferrer external"', false);
 });
+
+test('a quote with no author still suggests others from its category', function () {
+    $category = Category::firstOrFail();
+    $quote = Quote::factory()->create(['author' => null, 'category_id' => $category->id, 'content' => 'سطر بلا قائل']);
+    Quote::factory()->create(['author' => null, 'category_id' => $category->id, 'content' => 'سطر آخر من التصنيف نفسه']);
+
+    $this->get(route('quotes.show', $quote))
+        ->assertOk()
+        ->assertSee('سطر آخر من التصنيف نفسه')
+        ->assertSee('من تصنيف '.$category->name);
+});

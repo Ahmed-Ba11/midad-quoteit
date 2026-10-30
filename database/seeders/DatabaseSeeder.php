@@ -148,8 +148,8 @@ class DatabaseSeeder extends Seeder
      */
     private function seedCorners($users, $quotes): void
     {
-        foreach (['navy', 'cocoa', 'mauve', null, 'sage'] as $index => $accent) {
-            $users[$index]->update(['accent' => $accent]);
+        foreach ([['navy', 'quill'], ['cocoa', 'palm'], ['mauve', 'star8'], [null, null], ['sage', 'dad']] as $index => [$accent, $badge]) {
+            $users[$index]->update(['accent' => $accent, 'badge' => $badge]);
         }
 
         // بقلمي: the demo quotes without an author are the readers' own lines.

@@ -24,55 +24,63 @@
         @endunless
         {{-- ركني: the reader's card in their own colour, beside the quote they pinned. --}}
         <div @class(['grid gap-6', 'lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]' => $pinned || $isOwner])>
-            <header class="relative isolate flex flex-col overflow-hidden rounded-3xl p-7 shadow-lg ring-1 ring-black/10 sm:p-9"
+            <header class="relative isolate flex flex-col overflow-hidden rounded-3xl p-6 shadow-lg ring-1 ring-black/10 sm:p-8"
                 style="background: {{ $colors['bg'] }}; color: {{ $colors['text'] }}">
                 <x-ornament name="girih" class="girih absolute inset-0 -z-10 h-full w-full" style="color: {{ $colors['highlight'] }}" />
 
-                <p class="flex items-center gap-2 text-xs opacity-75">
+                <p class="flex items-center gap-2 text-xs opacity-80">
                     <x-ornament name="star" class="size-3.5" style="color: {{ $colors['highlight'] }}" />
                     {{ $isOwner ? 'ركنك في رقيم: ما كتبتَ، وما جمعتَ، وما بقي معك' : 'ركنٌ من أركان رقيم' }}
                 </p>
 
+                {{-- The reader's emblem set in an arched tablet — the رقيم of their corner. --}}
                 <div class="mt-6 flex items-center gap-5">
-                    <span class="grid size-20 shrink-0 place-items-center rounded-full font-display text-4xl font-bold ring-2 ring-current/20"
-                        style="background: {{ $colors['text'] }}; color: {{ $colors['bg'] }}">
-                        {{ mb_substr($user->name, 0, 1) }}
+                    <span class="relative grid h-28 w-24 shrink-0 place-items-end justify-center rounded-t-full border-2 pb-3"
+                        style="border-color: {{ $colors['highlight'] }}66; background: {{ $colors['text'] }}14">
+                        <x-avatar :user="$user" size="size-16" class="text-3xl shadow-lg ring-2" />
+                        <span aria-hidden="true" class="absolute -top-1.5 left-1/2 size-3 -translate-x-1/2 rotate-45" style="background: {{ $colors['highlight'] }}"></span>
                     </span>
                     <div class="min-w-0">
-                        <h1 class="truncate font-display text-4xl font-black" style="color: {{ $colors['highlight'] }}">{{ $user->name }}</h1>
+                        <h1 class="truncate font-display text-3xl font-black sm:text-4xl" style="color: {{ $colors['highlight'] }}">{{ $user->name }}</h1>
                         @if ($user->bio)
                             <p class="mt-1 font-text text-lg leading-relaxed opacity-90">{{ $user->bio }}</p>
                         @elseif ($isOwner)
-                            <p class="mt-1 text-sm opacity-70">أضف نبذة تعرّف القرّاء بك.</p>
+                            <p class="mt-1 text-sm opacity-75">أضف نبذة تعرّف القرّاء بك، من «خصّص ركنك».</p>
+                        @endif
+                        @if ($user->badge && $badge = config('quotes.badges.'.$user->badge))
+                            <p class="mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs" style="background: {{ $colors['text'] }}1f">
+                                <x-badge :name="$user->badge" class="size-3.5" /> شارة {{ $badge['label'] }}
+                            </p>
                         @endif
                     </div>
                 </div>
 
-                <div class="min-h-8 flex-1"></div>
-                <dl class="grid grid-cols-4 gap-2 border-t pt-5 sm:gap-4" style="border-color: {{ $colors['text'] }}26">
+                <div class="min-h-6 flex-1"></div>
+                <dl class="mt-6 grid grid-cols-4 gap-2 rounded-2xl p-3 sm:gap-4" style="background: {{ $colors['text'] }}12">
                     @foreach ($stats as $label => $value)
                         <div class="flex flex-col-reverse text-center">
-                            <dt class="text-xs opacity-75">{{ $label }}</dt>
-                            <dd class="font-display text-3xl font-bold">{{ $value }}</dd>
+                            <dt class="text-xs opacity-80">{{ $label }}</dt>
+                            <dd class="font-display text-2xl font-bold sm:text-3xl">{{ $value }}</dd>
                         </div>
                     @endforeach
                 </dl>
 
                 @if ($isOwner)
-                    {{-- Customise: bio and the corner's colour. --}}
-                    <details class="group mt-5 rounded-2xl bg-paper text-ink open:shadow-lg" @if ($errors->has('bio') || $errors->has('accent')) open @endif>
-                        <summary class="flex cursor-pointer list-none items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium [&::-webkit-details-marker]:hidden">
+                    {{-- Customise: badge, colour, bio, and what visitors may see. --}}
+                    <details class="group mt-4 rounded-2xl bg-paper text-ink open:shadow-lg" @if ($errors->hasAny(['bio', 'accent', 'badge'])) open @endif>
+                        <summary class="flex min-h-12 cursor-pointer list-none items-center justify-center gap-2 px-4 text-sm font-medium [&::-webkit-details-marker]:hidden">
                             <x-icon name="palette" class="size-4" />
                             <span class="group-open:hidden">خصّص ركنك</span>
                             <span class="hidden group-open:inline">إغلاق</span>
                         </summary>
-                        <form method="POST" action="{{ route('profile.bio') }}" class="space-y-5 border-t border-line p-5">
+                        <form method="POST" action="{{ route('profile.bio') }}" class="space-y-6 border-t border-line p-5">
                             @csrf
                             @method('PATCH')
+                            <x-badge-picker :user="$user" />
+                            <x-palette-picker name="accent" label="لون ركنك" :selected="$user->accent ?? 'sand'"
+                                hint="يظهر في بطاقتك هذه وخلف شارتك لكل من يزور ركنك" />
                             <x-input name="bio" label="نبذة عنك" hint="اختياري، حتى ١٦٠ حرفاً" maxlength="160"
                                 :value="$user->bio" placeholder="قارئ يحب الشعر الجاهلي…" />
-                            <x-palette-picker name="accent" label="لون ركنك" :selected="$user->accent ?? 'sand'"
-                                hint="يظهر في بطاقتك هذه لكل من يزور ركنك" />
                             <input type="hidden" name="show_poets" value="0">
                             <label class="flex cursor-pointer items-start gap-3">
                                 <input type="checkbox" name="show_poets" value="1" @checked($user->show_poets)
@@ -84,7 +92,7 @@
                             </label>
                             <p class="rounded-xl bg-surface p-3 text-xs leading-relaxed text-muted">
                                 <x-icon name="lock" class="inline size-3.5" />
-                                يرى زوّارك ما جعلته عاماً فقط: اقتباساتك العامة، ومختاراتك العامة، ودواوينك المنشورة. المحفوظات و«كتبي» وكل ما هو خاص لك وحدك، وبريدك لا يظهر لأحد.
+                                يرى زوّارك ما جعلته عاماً فقط: اقتباساتك العامة، ومختاراتك العامة، ودواوينك المنشورة. «أعجبني» والمحفوظات و«كتبي» وكل ما هو خاص لك وحدك، وبريدك لا يظهر لأحد.
                             </p>
                             <x-button type="submit" class="w-full">حفظ</x-button>
                         </form>

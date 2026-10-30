@@ -26,6 +26,7 @@ class BioRequest extends FormRequest
         return [
             'bio' => ['nullable', 'string', 'max:160'],
             'accent' => ['sometimes', 'nullable', Rule::in(array_keys(config('quotes.palettes')))],
+            'badge' => ['sometimes', 'nullable', Rule::in(array_keys(config('quotes.badges')))],
             'show_poets' => ['sometimes', 'boolean'],
         ];
     }
@@ -38,6 +39,7 @@ class BioRequest extends FormRequest
         return [
             'bio.max' => 'النبذة حتى ١٦٠ حرفاً.',
             'accent.in' => 'اختر لوناً من القائمة.',
+            'badge.in' => 'اختر شارة من القائمة.',
         ];
     }
 }

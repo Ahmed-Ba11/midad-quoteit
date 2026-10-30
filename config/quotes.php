@@ -52,6 +52,22 @@ return [
         'arch' => ['label' => 'لوح رقيم', 'open' => null, 'close' => null],
     ],
 
+    // شارتي: emblems a reader can wear instead of their initial (drawn in resources/views/components/badge.blade.php).
+    'badges' => [
+        'star8' => ['label' => 'النجمة الثمانية', 'group' => 'هندسية'],
+        'shamsa' => ['label' => 'الشمسة', 'group' => 'هندسية'],
+        'girih' => ['label' => 'المثمّن', 'group' => 'هندسية'],
+        'dots' => ['label' => 'نقاط الإعجام', 'group' => 'هندسية'],
+        'arch' => ['label' => 'القوس', 'group' => 'هندسية'],
+        'crescent' => ['label' => 'الهلال', 'group' => 'هندسية'],
+        'quill' => ['label' => 'الريشة', 'group' => 'أدبية'],
+        'inkwell' => ['label' => 'الدواة', 'group' => 'أدبية'],
+        'book' => ['label' => 'الكتاب', 'group' => 'أدبية'],
+        'lamp' => ['label' => 'السراج', 'group' => 'أدبية'],
+        'palm' => ['label' => 'النخلة', 'group' => 'أدبية'],
+        'dad' => ['label' => 'حرف الضاد', 'group' => 'أدبية'],
+    ],
+
     // Fonts offered for text-only quotes in the quick-share window (a subset of "fonts").
     'text_fonts' => ['amiri', 'naskh', 'thmanyah-text', 'ruqaa', 'messiri'],
 

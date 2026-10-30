@@ -46,13 +46,9 @@
                     <x-button popovertarget="quote-popup" icon="quill">شارك اقتباساً</x-button>
                 </span>
 
-                @php $mine = $user->accentColors(); @endphp
                 <a href="{{ route('profile.show', $user) }}" aria-label="ركني: {{ $user->name }}" title="ركني"
                     class="hidden items-center gap-2 rounded-full border border-line py-1 pe-3 ps-1 transition hover:border-accent sm:flex">
-                    <span aria-hidden="true" class="grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold"
-                        style="background: {{ $mine['bg'] }}; color: {{ $mine['highlight'] }}">
-                        {{ mb_substr($user->name, 0, 1) }}
-                    </span>
+                    <x-avatar :user="$user" size="size-8" />
                     <span class="max-w-28 truncate text-sm font-medium">{{ $user->name }}</span>
                 </a>
 

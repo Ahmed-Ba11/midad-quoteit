@@ -139,3 +139,24 @@ test('library verses can never be marked as the reader\'s own writing', function
     $quote = Quote::sole();
     expect($quote->is_original)->toBeFalse()->and($quote->author)->toBe($verse->work->poet->name);
 });
+
+test('a reader picks a badge that then stands for them across the site', function () {
+    $reader = User::factory()->create(['name' => 'ريم']);
+    Quote::factory()->for($reader)->create();
+
+    $this->actingAs($reader)->patch(route('profile.bio'), ['badge' => 'palm'])->assertSessionHasNoErrors();
+    expect($reader->fresh()->badge)->toBe('palm');
+
+    $this->get(route('home'))->assertSee('M12 21v-9', false);
+    $this->get(route('profile.show', $reader))->assertSee('شارة النخلة');
+
+    // Back to the initial.
+    $this->actingAs($reader)->patch(route('profile.bio'), ['badge' => ''])->assertSessionHasNoErrors();
+    expect($reader->fresh()->badge)->toBeNull();
+});
+
+test('only the listed badges can be chosen', function () {
+    $this->actingAs(User::factory()->create())
+        ->patch(route('profile.bio'), ['badge' => '<svg onload=alert(1)>'])
+        ->assertSessionHasErrors('badge');
+});

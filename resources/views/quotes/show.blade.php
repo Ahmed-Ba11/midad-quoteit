@@ -7,7 +7,6 @@
         $ratioWidth = $quote->presentation === 'text' ? 760 : config('quotes.ratios.'.$quote->ratio.'.width', 760);
         $signature = $quote->is_original && blank($quote->author) ? 'بقلم '.$quote->user->name : $quote->author;
         $byline = collect([$signature, $quote->book])->filter()->implode(' · ');
-        $sharer = $quote->user->accentColors();
     @endphp
 
     <div class="mx-auto grid max-w-6xl gap-10 px-4 py-10 lg:grid-cols-[1fr_300px]">
@@ -27,10 +26,7 @@
 
                 <div class="mx-auto mt-5 flex flex-wrap items-center gap-x-4 gap-y-3" style="max-width: {{ $ratioWidth }}px">
                     <a href="{{ route('profile.show', $quote->user) }}" class="flex min-w-0 flex-1 items-center gap-3 hover:text-accent">
-                        <span class="grid size-10 shrink-0 place-items-center rounded-full font-bold"
-                            style="background: {{ $sharer['bg'] }}; color: {{ $sharer['highlight'] }}">
-                            {{ mb_substr($quote->user->name, 0, 1) }}
-                        </span>
+                        <x-avatar :user="$quote->user" size="size-10" />
                         <span class="min-w-0 leading-tight">
                             <span class="block font-medium">{{ $quote->user->name }}</span>
                             <time datetime="{{ $quote->created_at->toDateString() }}" class="text-sm text-muted">
@@ -155,9 +151,7 @@
                 <ol class="mt-6 space-y-4">
                     @forelse ($quote->replies as $reply)
                         <li class="flex gap-3 rounded-2xl border border-line bg-surface p-4">
-                            <span class="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-sm font-bold text-accent">
-                                {{ mb_substr($reply->user->name, 0, 1) }}
-                            </span>
+                            <x-avatar :user="$reply->user" size="size-9" />
                             <div class="min-w-0 flex-1">
                                 <p class="text-sm">
                                     <span class="font-medium">{{ $reply->user->name }}</span>

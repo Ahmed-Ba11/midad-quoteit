@@ -1,7 +1,6 @@
 @props(['quote'])
 
 @php
-    $sharer = $quote->user->accentColors();
     // Where the words come from, in one quiet line: the library, the writer, or the named source.
     $origin = match (true) {
         $quote->isFromLibrary() => ['icon' => 'book-open', 'text' => 'من خزانة الأدب'.($quote->book ? ' · '.$quote->book : '')],
@@ -22,10 +21,8 @@
     </a>
 
     <div class="flex items-center gap-3 px-5 pt-4">
-        <a href="{{ route('profile.show', $quote->user) }}" aria-hidden="true" tabindex="-1"
-            class="grid size-9 shrink-0 place-items-center rounded-full text-sm font-bold ring-2 ring-surface transition group-hover/card:ring-line"
-            style="background: {{ $sharer['bg'] }}; color: {{ $sharer['highlight'] }}">
-            {{ mb_substr($quote->user->name, 0, 1) }}
+        <a href="{{ route('profile.show', $quote->user) }}" aria-hidden="true" tabindex="-1" class="shrink-0 rounded-full">
+            <x-avatar :user="$quote->user" size="size-9" class="text-sm" />
         </a>
 
         <div class="min-w-0 flex-1 leading-tight">

@@ -61,12 +61,10 @@
                     </div>
                     <ul class="-mx-4 mt-5 flex snap-x gap-3 overflow-x-auto px-4 pb-2">
                         @foreach ($pens as $pen)
-                            @php $penColors = $pen->accentColors(); @endphp
                             <li class="snap-start">
                                 <a href="{{ route('profile.show', $pen) }}"
                                     class="flex w-52 items-center gap-3 rounded-2xl border border-line bg-paper p-3 transition hover:-translate-y-0.5 hover:border-accent hover:shadow-md">
-                                    <span class="grid size-12 shrink-0 place-items-center rounded-full font-display text-xl font-bold"
-                                        style="background: {{ $penColors['bg'] }}; color: {{ $penColors['highlight'] }}">{{ mb_substr($pen->name, 0, 1) }}</span>
+                                    <x-avatar :user="$pen" size="size-12" />
                                     <span class="min-w-0">
                                         <span class="block truncate font-medium">{{ $pen->name }}</span>
                                         <span class="block truncate text-xs text-muted">{{ $pen->public_quotes_count }} اقتباس{{ $pen->bio ? ' · '.$pen->bio : '' }}</span>

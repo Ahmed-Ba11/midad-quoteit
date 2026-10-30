@@ -55,7 +55,7 @@ class QuoteController extends Controller
             'pens' => $isFrontPage
                 ? User::whereHas('quotes', fn ($quotes) => $quotes->public())
                     ->withCount(['quotes as public_quotes_count' => fn ($quotes) => $quotes->public()])
-                    ->orderByDesc('public_quotes_count')->take(8)->get(['id', 'name', 'accent', 'bio'])
+                    ->orderByDesc('public_quotes_count')->take(8)->get(['id', 'name', 'accent', 'badge', 'bio'])
                 : collect(),
             // The hero's numbers move slowly; counting them once every few minutes is plenty.
             'counts' => $isFrontPage ? Cache::remember('home-counts', now()->addMinutes(5), fn () => [

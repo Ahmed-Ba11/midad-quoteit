@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'رواق الحرف')
+@section('title', 'مرسم الحروف')
 
 @section('content')
     @php
@@ -34,7 +34,7 @@
         {{-- Tools panel --}}
         <section class="flex flex-col overflow-hidden rounded-3xl border border-line bg-surface lg:min-h-0">
             <header class="px-6 pt-5">
-                <h1 class="font-display text-2xl font-bold">رواق الحـــرف</h1>
+                <h1 class="font-display text-2xl font-bold">مرسم الحـــروف</h1>
                 <p class="mt-1 text-sm text-muted">{{ $isEditing ? 'أعد تصميم اقتباسك.' : 'اكتب، ثم اختر الخط واللون، وانشر.' }}</p>
                 <p class="mt-2 font-text text-xs leading-relaxed text-gold">وجلا السيولُ عن الطلولِ كأنَّها ◆ زُبُرٌ تُجِدُّ متونَها أقلامُها — لبيد</p>
             </header>
@@ -89,51 +89,7 @@
                         <x-textarea name="content" label="نص الاقتباس" hint="من ٣ إلى ١٥٥ حرفاً" rows="4" minlength="3"
                             maxlength="155" required :value="old('content', $quote->content)" />
 
-                        {{-- بقلمي: the reader's own writing — no other author, no source; the card is signed with their name. --}}
-                        <input type="hidden" name="is_original" value="0">
-                        <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-paper p-4 transition hover:border-accent has-[:checked]:border-accent has-[:checked]:bg-accent-soft">
-                            <input type="checkbox" name="is_original" value="1" data-original-toggle @checked(old('is_original', $quote->is_original))
-                                class="mt-1 size-4 accent-[var(--color-accent)]">
-                            <span>
-                                <span class="flex items-center gap-1.5 font-medium"><x-icon name="feather" class="size-4" /> النص من تأليفي</span>
-                                <span class="mt-0.5 block text-xs text-muted">يُوقَّع باسمك «بقلم {{ auth()->user()->name }}» ويظهر في «بقلمي» بركنك وفي «بأقلام القرّاء».</span>
-                            </span>
-                        </label>
-
-                        <div data-attribution>
-                            <x-input name="author" label="القائل" hint="اختياري، حتى ١٠٠ حرف" maxlength="100"
-                                :value="$quote->author" />
-                        </div>
-
-                        <x-input name="book" label="الكتاب أو الديوان" maxlength="150" :value="$quote->book" list="book-titles"
-                            hint="اختياري، حتى ١٥٠ حرفاً؛ اختر من الكتب المقترحة إن وُجد، ليجتمع مع اقتباسات القرّاء الآخرين" />
-                        <datalist id="book-titles">
-                            @foreach ($bookTitles as $title)
-                                <option value="{{ $title }}"></option>
-                            @endforeach
-                        </datalist>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <x-input name="page" type="number" label="الصفحة" min="1" max="9999" inputmode="numeric"
-                                :value="$quote->page" hint="اختياري، رقم من ١ إلى ٩٩٩٩" />
-                            <div>
-                                <label for="book_genre" class="mb-1.5 block text-sm font-medium">نوع الكتاب</label>
-                                <select id="book_genre" name="book_genre"
-                                    class="block h-12 w-full rounded-xl border border-line bg-white px-3 text-ink focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/20 dark:bg-surface">
-                                    <option value="">—</option>
-                                    @foreach (config('quotes.book_genres') as $key => $label)
-                                        <option value="{{ $key }}" @selected(old('book_genre', $quote->bookRecord?->genre) === $key)>{{ $label }}</option>
-                                    @endforeach
-                                </select>
-                                <p class="mt-1.5 text-xs text-muted">اختياري، يرتّب الكتاب في رفوف القرّاء</p>
-                            </div>
-                        </div>
-
-                        <div data-attribution>
-                            <x-input name="source" label="المصدر" maxlength="200" :value="$quote->source"
-                                placeholder="مثل: صحيفة الجزيرة، أو رابط الصفحة"
-                                hint="مطلوب إذا نقلت كلام غيرك ولم تذكر الكتاب؛ اقتبس بيتاً أو بيتين فقط" />
-                        </div>
+                        @include('quotes.partials.text-origin', ['quote' => $quote, 'withBook' => true])
                     @endif
 
                     <div>

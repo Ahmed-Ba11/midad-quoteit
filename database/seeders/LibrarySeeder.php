@@ -6,6 +6,7 @@ use App\Models\Poet;
 use App\Models\Saying;
 use App\Models\Verse;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Loads خزانة الأدب from database/data/library.json.
@@ -57,6 +58,9 @@ class LibrarySeeder extends Seeder
         foreach ($library['sayings'] as [$text, $source]) {
             Saying::updateOrCreate(['text' => $text], ['source' => $source]);
         }
+
+        // The epigraphs read the verses from the cache; refresh it with the new text.
+        Cache::forget('epigraph-verses');
     }
 
     /**

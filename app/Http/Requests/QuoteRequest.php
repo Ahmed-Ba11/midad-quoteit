@@ -37,7 +37,7 @@ class QuoteRequest extends FormRequest
         $editing = $this->route('quote');
 
         if ($editing instanceof Quote && $editing->isFromLibrary()) {
-            $this->merge([...$editing->only(['content', 'author', 'book']), 'is_original' => false]);
+            $this->merge([...$editing->only(['content', 'author', 'book']), 'is_original' => false, 'kind' => null]);
 
             return;
         }
@@ -69,10 +69,34 @@ class QuoteRequest extends FormRequest
             return;
         }
 
-        // بقلمي: the reader's own words have no other author and need no source.
-        if ($this->boolean('is_original')) {
-            $this->merge(['author' => null, 'source' => null]);
+        $this->applyTextKind();
+    }
+
+    /**
+     * "ما نوع النص؟" decides who the author is and whether a source is needed:
+     * quoted — someone else's words: their name and where it came from are required;
+     * original — my own writing (بقلمي): signed with my signature, no source;
+     * anonymous — a proverb or saying with no known author: source optional.
+     */
+    private function applyTextKind(): void
+    {
+        // A link typed into the source's name goes to the link field; the name must be words.
+        $source = trim((string) $this->input('source'));
+
+        if (preg_match('#^https?://#i', $source)) {
+            $this->merge(['source' => null, 'source_url' => $this->filled('source_url') ? $this->input('source_url') : $source]);
         }
+
+        $kind = $this->input('kind') ?? ($this->boolean('is_original') ? 'original' : null);
+
+        match ($kind) {
+            'original' => $this->merge(['kind' => 'original', 'is_original' => true, 'source' => null,
+                'author' => mb_substr(trim((string) $this->input('signature')), 0, 100) ?: null]),
+            'anonymous' => $this->merge(['is_original' => false, 'author' => null]),
+            // Always present, so "required" below cannot be skipped by a missing field.
+            'quoted' => $this->merge(['is_original' => false, 'author' => $this->input('author')]),
+            default => null,
+        };
     }
 
     /**
@@ -84,7 +108,7 @@ class QuoteRequest extends FormRequest
     }
 
     /**
-     * The quick share/edit forms send only "content"; رواق الحرف sends the design fields too,
+     * The quick share/edit forms send only "content"; مرسم الحروف sends the design fields too,
      * so every design field is "sometimes" and falls back to the column default.
      *
      * @return array<string, ValidationRule|array<mixed>|string>
@@ -99,7 +123,11 @@ class QuoteRequest extends FormRequest
             'author' => ['sometimes', 'nullable', 'string', 'max:100'],
             'book' => ['sometimes', 'nullable', 'string', 'max:150'],
             'source' => ['nullable', 'string', 'max:200'],
+            'source_url' => ['sometimes', 'nullable', 'string', 'max:255', 'url:http,https'],
+            'kind' => ['sometimes', 'nullable', Rule::in(['quoted', 'original', 'anonymous'])],
             'is_original' => ['sometimes', 'boolean'],
+            'is_public' => ['sometimes', 'boolean'],
+            'presentation' => ['sometimes', 'required', Rule::in(['card', 'text'])],
             'page' => ['sometimes', 'nullable', 'integer', 'between:1,9999'],
             'book_genre' => ['sometimes', 'nullable', Rule::in(array_keys(config('quotes.book_genres')))],
             'story' => ['sometimes', 'nullable', 'string', 'max:500'],
@@ -120,17 +148,29 @@ class QuoteRequest extends FormRequest
     }
 
     /**
-     * Quoting someone else is allowed with their name and the source (Saudi copyright law, Art. 15):
-     * once "القائل" is filled, a book or a source is required. Library texts are exempt — their source
-     * is خزانة الأدب itself.
+     * Quoting someone else is allowed with their name and the source (Saudi copyright law, Art. 15).
+     * So "quoted" text needs the author, and the source's name — a book/diwan, or a newspaper, site
+     * or account. A link alone is not enough: readers see the name, the link only lets them read on.
+     * Library texts are exempt — their source is خزانة الأدب itself.
      */
     public function withValidator(Validator $validator): void
     {
         $editing = $this->route('quote');
         $isLibraryText = $this->libraryLink !== [] || ($editing instanceof Quote && $editing->isFromLibrary());
 
-        $validator->sometimes('source', 'required',
-            fn ($input) => ! $isLibraryText && filled($input->author) && blank($input->book));
+        if ($isLibraryText) {
+            return;
+        }
+
+        $validator->sometimes('author', 'required', fn ($input) => $input->kind === 'quoted');
+
+        $validator->after(function (Validator $validator) {
+            $quotesSomeone = $this->input('kind') === 'quoted' || ($this->input('kind') === null && $this->filled('author'));
+
+            if ($quotesSomeone && blank($this->input('book')) && blank($this->input('source'))) {
+                $validator->errors()->add('source', 'اذكر من أين نقلته: اسم الكتاب أو الديوان، أو المصدر (صحيفة، موقع، حساب…). الرابط وحده لا يكفي.');
+            }
+        });
     }
 
     /**
@@ -149,7 +189,11 @@ class QuoteRequest extends FormRequest
             'page.between' => 'رقم الصفحة من ١ إلى ٩٩٩٩.',
             'page.integer' => 'رقم الصفحة أرقام فقط.',
             'book_genre.in' => 'اختر نوع الكتاب من القائمة.',
-            'source.required' => 'اذكر مصدر الاقتباس (كتاباً أو صحيفة أو رابطاً) ما دمت تنقل كلام غيرك.',
+            'author.required' => 'اكتب اسم القائل: الشاعر أو الكاتب الذي تنقل كلامه.',
+            'source_url.url' => 'الرابط يبدأ بـ https:// ويكون عنوان صفحة صحيحاً.',
+            'source_url.max' => 'الرابط حتى ٢٥٥ حرفاً.',
+            'kind.in' => 'اختر نوع النص من الخيارات.',
+            'presentation.in' => 'اختر طريقة العرض من الخيارات.',
             'story.max' => 'الحكاية حتى ٥٠٠ حرف.',
             'font.in' => 'اختر خطاً من القائمة.',
             '*_color.regex' => 'اللون يجب أن يكون بصيغة ‎#RRGGBB.',

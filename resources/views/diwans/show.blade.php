@@ -85,7 +85,7 @@
                         <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-sm">
                             @auth
                                 <a href="{{ route('quotes.create', ['diwan_verse' => $verse->id]) }}" class="inline-flex items-center gap-1 text-[#8A3324] hover:underline">
-                                    <x-icon name="palette" class="size-4" /> صمّمه في رواق الحرف
+                                    <x-icon name="palette" class="size-4" /> صمّمه في مرسم الحروف
                                 </a>
                             @endauth
                             @can('update', $diwan)

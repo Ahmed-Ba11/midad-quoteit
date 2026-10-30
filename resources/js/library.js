@@ -131,7 +131,7 @@ function initSelection() {
         render();
     });
 
-    // The selection travels in the link to رواق الحرف; once used, start fresh next time.
+    // The selection travels in the link to مرسم الحروف; once used, start fresh next time.
     bar.querySelector('[data-selection-go]').addEventListener('click', () => {
         selection = [];
         save();

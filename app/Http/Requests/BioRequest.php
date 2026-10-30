@@ -26,6 +26,7 @@ class BioRequest extends FormRequest
         return [
             'bio' => ['nullable', 'string', 'max:160'],
             'accent' => ['sometimes', 'nullable', Rule::in(array_keys(config('quotes.palettes')))],
+            'show_poets' => ['sometimes', 'boolean'],
         ];
     }
 

@@ -2,7 +2,7 @@
 
 /*
 |--------------------------------------------------------------------------
-| رواق الحرف — quote card design options
+| مرسم الحروف — quote card design options
 |--------------------------------------------------------------------------
 |
 | The keys are what gets stored on the quote; validation and the live

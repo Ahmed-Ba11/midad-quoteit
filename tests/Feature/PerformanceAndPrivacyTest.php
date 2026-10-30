@@ -4,6 +4,7 @@ use App\Models\Quote;
 use App\Models\Reply;
 use App\Models\User;
 use Database\Seeders\LibrarySeeder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -26,13 +27,19 @@ test('the quotes page runs the same small number of queries however many quotes 
     $quotes->each(fn (Quote $quote) => $quote->likers()->attach($viewer));
     Reply::factory()->for($quotes->first())->count(5)->create();
 
+    // Measured with an empty cache each time (the hero's numbers and the epigraph verses are cached).
+    Cache::flush();
     $few = queriesFor(fn () => $this->actingAs($viewer)->get(route('home'))->assertOk());
 
     Quote::factory()->count(30)->create();
+    Cache::flush();
     $many = queriesFor(fn () => $this->actingAs($viewer)->get(route('home'))->assertOk());
 
+    $warm = queriesFor(fn () => $this->actingAs($viewer)->get(route('home'))->assertOk());
+
     expect($few)->toBeLessThanOrEqual(12)
-        ->and($many)->toBe($few);
+        ->and($many)->toBe($few)
+        ->and($warm)->toBeLessThan($few);
 });
 
 test('the quotes page renders well within the 3-second budget', function () {

@@ -36,7 +36,7 @@
                 </div>
                 @if ($mine->isEmpty())
                     <p class="mt-5 rounded-2xl border border-dashed border-line p-6 text-center text-muted">
-                        تحب شاعراً ليس في الخزانة؟ أنشئ له ديواناً وانقل أبياته مع مصدرها، ثم صمّم منها في رواق الحرف.
+                        تحب شاعراً ليس في الخزانة؟ أنشئ له ديواناً وانقل أبياته مع مصدرها، ثم صمّم منها في مرسم الحروف.
                     </p>
                 @else
                     <ul class="mt-6 grid grid-cols-2 gap-x-5 gap-y-8 sm:grid-cols-4 lg:grid-cols-6">

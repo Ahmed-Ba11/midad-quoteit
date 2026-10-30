@@ -23,7 +23,7 @@
             <a href="{{ route('library.index') }}#shelf" class="hover:text-accent">رفّ الدواوين</a>
         </nav>
 
-        <p class="mb-6 text-muted">{{ $work->verses->count() }} بيتاً مختاراً. اختر بيتاً أو بيتين لتصمّمهما في رواق الحرف.</p>
+        <p class="mb-6 text-muted">{{ $work->verses->count() }} بيتاً مختاراً. اختر بيتاً أو بيتين لتصمّمهما في مرسم الحروف.</p>
 
         {{-- Verses set as a printed diwan: صدر and عجز side by side, ruled like a manuscript page. --}}
         <ol class="manuscript-page divide-y divide-[#A8873F]/25 rounded-2xl px-5 py-8 sm:px-12">

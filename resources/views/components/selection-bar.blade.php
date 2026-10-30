@@ -12,7 +12,7 @@
         <a href="{{ route('quotes.create') }}" data-selection-go
             class="inline-flex h-11 items-center gap-2 rounded-full bg-[#C9A45C] px-5 font-medium text-[#1C1A18] transition hover:bg-[#E2C27E] aria-disabled:pointer-events-none aria-disabled:opacity-40">
             <x-icon name="feather" class="size-[18px]" />
-            صمّمه في رواق الحرف
+            صمّمه في مرسم الحروف
         </a>
     </div>
 </div>

@@ -29,24 +29,35 @@ class ProfileController extends Controller
         $viewer = $request->user();
         $isOwner = $viewer?->is($user) ?? false;
         $allowedTabs = $isOwner ? [...self::PUBLIC_TABS, ...self::OWNER_TABS] : self::PUBLIC_TABS;
+
+        // شعرائي is public unless its owner chose to keep it to themselves.
+        if (! $isOwner && ! $user->show_poets) {
+            $allowedTabs = array_values(array_diff($allowedTabs, ['poets']));
+        }
+
         $tab = in_array($request->query('tab'), $allowedTabs, true) ? $request->query('tab') : 'quotes';
 
+        // Visitors see only what the owner made public; the owner sees their private quotes too.
+        $myQuotes = fn () => $user->quotes()->visibleTo($viewer);
+
         $quotes = match ($tab) {
-            'quotes' => $user->quotes()->latest(),
-            'original' => $user->quotes()->where('is_original', true)->latest(),
-            'saved' => $user->bookmarkedQuotes()->orderByPivot('created_at', 'desc'),
+            'quotes' => $myQuotes()->latest(),
+            'original' => $myQuotes()->where('is_original', true)->latest(),
+            'saved' => $user->bookmarkedQuotes()->visibleTo($viewer)->orderByPivot('created_at', 'desc'),
             default => null,
         };
 
         return view('profile.show', [
             'user' => $user,
             'tab' => $tab,
+            'tabs' => $allowedTabs,
             'isOwner' => $isOwner,
             'quotes' => $quotes?->withCardData($viewer)->paginate(12)->withQueryString(),
-            'pinned' => $user->pinned_quote_id ? Quote::withCardData($viewer)->find($user->pinned_quote_id) : null,
+            'pinned' => $user->pinned_quote_id ? Quote::visibleTo($viewer)->withCardData($viewer)->find($user->pinned_quote_id) : null,
             'anthologies' => $tab === 'anthologies'
                 ? $user->anthologies()->when(! $isOwner, fn ($public) => $public->where('is_public', true))
-                    ->withCount('quotes')->with(['quotes' => fn ($quotes) => $quotes->latest('anthology_quote.created_at')->limit(3)])
+                    ->withCount(['quotes' => fn ($quotes) => $quotes->visibleTo($viewer)])
+                    ->with(['quotes' => fn ($quotes) => $quotes->visibleTo($viewer)->latest('anthology_quote.created_at')->limit(3)])
                     ->latest('updated_at')->get()
                 : collect(),
             'poets' => $tab === 'poets' ? $user->favoritePoets()->withCount('verses')->orderBy('sort_order')->get() : collect(),
@@ -58,11 +69,12 @@ class ProfileController extends Controller
             'shelf' => $tab === 'books'
                 ? $user->books()->withCount('quotes')->orderByPivot('updated_at', 'desc')->get()->groupBy('pivot.status')
                 : collect(),
+            // Counted over what this viewer may see, so private quotes leave no trace for visitors.
             'stats' => [
-                'اقتباس' => $user->quotes()->count(),
-                'بقلمه' => $user->quotes()->where('is_original', true)->count(),
-                'إعجاب' => DB::table('likes')->whereIn('quote_id', $user->quotes()->select('id'))->count(),
-                'رد' => Reply::whereIn('quote_id', $user->quotes()->select('id'))->count(),
+                'اقتباس' => $myQuotes()->count(),
+                'بقلمه' => $myQuotes()->where('is_original', true)->count(),
+                'إعجاب' => DB::table('likes')->whereIn('quote_id', $myQuotes()->select('quotes.id'))->count(),
+                'رد' => Reply::whereIn('quote_id', $myQuotes()->select('quotes.id'))->count(),
             ],
         ]);
     }

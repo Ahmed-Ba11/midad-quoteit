@@ -141,6 +141,18 @@
     box-decoration-break: clone;
 }
 
+/* نص مقتبس: a quote shown as words only — a page of a book with faint ruled lines and a large opening mark. */
+.quote-text {
+    container-type: inline-size;
+    background-image:
+        repeating-linear-gradient(180deg, transparent 0 31px, rgb(168 135 63 / 0.09) 31px 32px),
+        radial-gradient(ellipse at 50% 0%, rgb(168 135 63 / 0.1), transparent 60%);
+}
+
+.quote-text-mark {
+    opacity: 0.8;
+}
+
 /* Verses: balance the words of a hemistich so no single word drops to its own line. */
 .hemistich,
 .quote-art-line {
@@ -152,6 +164,54 @@
     .verse-paired .hemistich {
         text-align: center;
     }
+}
+
+/* Navbar hints: a small caption fades in under a place on hover or keyboard focus. */
+.nav-hint {
+    position: absolute;
+    inset-inline-start: 50%;
+    top: calc(100% + 10px);
+    translate: 50% -4px;
+    white-space: nowrap;
+    border-radius: 999px;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    padding: 0.3rem 0.75rem;
+    font-size: 0.75rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease, translate 180ms ease;
+}
+
+.nav-place:hover .nav-hint,
+.nav-place:focus-within .nav-hint {
+    opacity: 1;
+    translate: 50% 0;
+    transition-delay: 250ms;
+}
+
+@media (hover: none) {
+    .nav-hint {
+        display: none;
+    }
+}
+
+/* Home hero: ink-dark in both themes, a warm gold glow, the girih lattice faintly behind. */
+.hero-ink {
+    background:
+        radial-gradient(ellipse at 80% 10%, rgb(201 164 92 / 0.22), transparent 55%),
+        radial-gradient(ellipse at 10% 90%, rgb(138 51 36 / 0.28), transparent 50%),
+        linear-gradient(160deg, #221d19 0%, #17130f 100%);
+}
+
+/* اقتباس اليوم: the leaf tilts back a touch, and settles on hover. */
+.quote-leaf {
+    transform: rotate(-1.2deg);
+    transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.quote-leaf:hover {
+    transform: rotate(0deg) translateY(-2px);
 }
 
 /* ───────────── خزانة الأدب ───────────── */

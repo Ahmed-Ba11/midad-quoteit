@@ -23,7 +23,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="flex min-h-screen flex-col bg-paper font-sans text-ink antialiased">
+<body class="flex min-h-screen flex-col bg-paper pb-16 font-sans text-ink antialiased md:pb-0">
     <x-navbar />
 
     <main class="flex-1">
@@ -39,7 +39,7 @@
 
     @auth
         <div id="quote-popup" popover
-            class="m-auto w-[min(92vw,32rem)] rounded-3xl border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-sm">
+            class="m-auto max-h-[92dvh] w-[min(94vw,34rem)] overflow-y-auto rounded-3xl border border-line bg-surface p-0 text-ink shadow-2xl backdrop:bg-black/40 backdrop:backdrop-blur-sm">
             <form method="POST" action="{{ route('store_quote') }}" class="space-y-5 p-6 sm:p-8">
                 @csrf
                 <input type="hidden" name="_form" value="share">
@@ -57,11 +57,13 @@
                     :value="old('_form') === 'share' ? old('content') : ''"
                     :show-error="old('_form') === 'share'" />
 
+                @include("quotes.partials.text-origin", ["quote" => new \App\Models\Quote, "prefix" => "share-", "useOld" => old("_form") === "share"])
+
                 <x-button type="submit" class="w-full">انشر الاقتباس</x-button>
 
                 <p class="text-center text-sm text-muted">
                     تريد خطاً وألواناً خاصة؟
-                    <a href="{{ route('quotes.create') }}" class="font-medium text-accent hover:underline">صمّمه في رواق الحرف</a>
+                    <a href="{{ route('quotes.create') }}" class="font-medium text-accent hover:underline">صمّمه في مرسم الحروف</a>
                 </p>
             </form>
         </div>

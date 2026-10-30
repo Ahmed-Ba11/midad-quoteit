@@ -5,19 +5,16 @@
 @section('content')
     @php
         $colors = $user->accentColors();
-        $tabs = [
+        // Only the tabs this viewer may open (ProfileController decides which).
+        $tabItems = collect([
             'quotes' => ['label' => $isOwner ? 'اقتباساتي' : 'اقتباساته', 'icon' => 'type'],
             'original' => ['label' => $isOwner ? 'بقلمي' : 'بقلمه', 'icon' => 'feather'],
             'anthologies' => ['label' => $isOwner ? 'مختاراتي' : 'مختاراته', 'icon' => 'layers'],
             'poets' => ['label' => $isOwner ? 'شعرائي' : 'شعراؤه', 'icon' => 'user'],
             'diwans' => ['label' => $isOwner ? 'دواويني' : 'دواوينه', 'icon' => 'scroll'],
-        ];
-        if ($isOwner) {
-            $tabs += [
-                'saved' => ['label' => 'المحفوظات', 'icon' => 'bookmark', 'private' => true],
-                'books' => ['label' => 'كتبي', 'icon' => 'book-open', 'private' => true],
-            ];
-        }
+            'saved' => ['label' => 'المحفوظات', 'icon' => 'bookmark', 'private' => true],
+            'books' => ['label' => 'كتبي', 'icon' => 'book-open', 'private' => true],
+        ])->only($tabs);
     @endphp
 
     <div class="mx-auto max-w-6xl px-4 py-10">
@@ -29,7 +26,7 @@
 
                 <p class="flex items-center gap-2 text-xs opacity-75">
                     <x-ornament name="star" class="size-3.5" style="color: {{ $colors['highlight'] }}" />
-                    {{ $isOwner ? 'ركني في مِداد' : 'ركن قارئ في مِداد' }}
+                    {{ $isOwner ? 'ركنك في مِداد: ما كتبتَ، وما جمعتَ، وما بقي معك' : 'ركنٌ من أركان مِداد' }}
                 </p>
 
                 <div class="mt-6 flex items-center gap-5">
@@ -72,6 +69,19 @@
                                 :value="$user->bio" placeholder="قارئ يحب الشعر الجاهلي…" />
                             <x-palette-picker name="accent" label="لون ركنك" :selected="$user->accent ?? 'sand'"
                                 hint="يظهر في بطاقتك هذه لكل من يزور ركنك" />
+                            <input type="hidden" name="show_poets" value="0">
+                            <label class="flex cursor-pointer items-start gap-3">
+                                <input type="checkbox" name="show_poets" value="1" @checked($user->show_poets)
+                                    class="mt-1 size-4 accent-[var(--color-accent)]" aria-describedby="show_poets-hint">
+                                <span>
+                                    <span class="text-sm font-medium">أظهر «شعرائي» لزوّار ركني</span>
+                                    <span id="show_poets-hint" class="block text-xs text-muted">أزل العلامة لتبقى قائمة شعرائك لك وحدك.</span>
+                                </span>
+                            </label>
+                            <p class="rounded-xl bg-surface p-3 text-xs leading-relaxed text-muted">
+                                <x-icon name="lock" class="inline size-3.5" />
+                                يرى زوّارك ما جعلته عاماً فقط: اقتباساتك العامة، ومختاراتك العامة، ودواوينك المنشورة. المحفوظات و«كتبي» وكل ما هو خاص لك وحدك، وبريدك لا يظهر لأحد.
+                            </p>
                             <x-button type="submit" class="w-full">حفظ</x-button>
                         </form>
                     </details>
@@ -112,7 +122,7 @@
         {{-- Tabs: scroll sideways on small screens. --}}
         <nav aria-label="أقسام الركن" class="-mx-4 mt-10 overflow-x-auto px-4">
             <div class="flex min-w-max border-b border-line">
-                @foreach ($tabs as $key => $item)
+                @foreach ($tabItems as $key => $item)
                     <a href="{{ route('profile.show', $key === 'quotes' ? $user : [$user, 'tab' => $key]) }}"
                         @if ($tab === $key) aria-current="page" @endif
                         @class([
@@ -233,14 +243,14 @@
                         @php
                             $empty = match ($tab) {
                                 'saved' => ['لا محفوظات بعد', 'bookmark', 'احفظ ما يعجبك من الاقتباسات لتجده هنا.'],
-                                'original' => ['لا كتابات بعد', 'feather', $isOwner ? 'اكتب نصاً من تأليفك في رواق الحرف، وفعّل «النص من تأليفي».' : 'لم ينشر شيئاً من تأليفه بعد.'],
+                                'original' => ['لا كتابات بعد', 'feather', $isOwner ? 'اكتب نصاً من تأليفك في مرسم الحروف، وفعّل «النص من تأليفي».' : 'لم ينشر شيئاً من تأليفه بعد.'],
                                 default => ['لا اقتباسات بعد', 'feather', $isOwner ? 'شارك أول اقتباس لك من زر «شارك اقتباساً».' : 'لم يشارك اقتباسات بعد.'],
                             };
                         @endphp
                         <x-empty-state :title="$empty[0]" :icon="$empty[1]">
                             {{ $empty[2] }}
                             @if ($isOwner && $tab === 'original')
-                                <a href="{{ route('quotes.create') }}" class="mt-3 block text-accent hover:underline">افتح رواق الحرف</a>
+                                <a href="{{ route('quotes.create') }}" class="mt-3 block text-accent hover:underline">افتح مرسم الحروف</a>
                             @endif
                         </x-empty-state>
                     @else

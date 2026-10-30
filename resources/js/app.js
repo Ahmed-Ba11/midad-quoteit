@@ -1,7 +1,9 @@
 import { initLibrary } from './library';
 import { initStudio } from './studio';
+import { initTextOrigin } from './text-origin';
 
 initLibrary();
+initTextOrigin();
 
 const studio = document.getElementById('studio');
 if (studio) {

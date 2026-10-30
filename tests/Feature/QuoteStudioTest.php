@@ -28,14 +28,14 @@ test('the five categories exist after migrating', function () {
     expect(Category::orderBy('id')->pluck('name')->all())->toBe(['حكمة', 'شعر', 'أدب', 'فلسفة', 'تأمل']);
 });
 
-test('logged-in users can open رواق الحرف', function () {
+test('logged-in users can open مرسم الحروف', function () {
     $this->actingAs(User::factory()->create())
         ->get(route('quotes.create'))
         ->assertOk()
-        ->assertSee('رواق الحـــرف');
+        ->assertSee('مرسم الحـــروف');
 });
 
-test('guests are sent to log in from رواق الحرف', function () {
+test('guests are sent to log in from مرسم الحروف', function () {
     $this->get(route('quotes.create'))->assertRedirect(route('login'));
 });
 
@@ -114,7 +114,7 @@ test('the home page renders the design and one continuous highlight', function (
         ->assertSee('--bg: #1E2533', false)
         ->assertSee('Aref Ruqaa')
         ->assertSee('حكمة')
-        ->assertSee('له حكاية');
+        ->assertSee('حكاية الاقتباس');
 });
 
 test('the owner can redesign their quote', function () {
@@ -156,7 +156,7 @@ test('quoting someone else requires a source or a book (Saudi copyright law, art
     $verse = ['content' => 'بيتٌ لشاعر معاصر أعجبني', 'author' => 'بدر بن عبدالمحسن'];
 
     $this->actingAs($user)->post(route('store_quote'), $verse)
-        ->assertSessionHasErrors(['source' => 'اذكر مصدر الاقتباس (كتاباً أو صحيفة أو رابطاً) ما دمت تنقل كلام غيرك.']);
+        ->assertSessionHasErrors(['source' => 'اذكر من أين نقلته: اسم الكتاب أو الديوان، أو المصدر (صحيفة، موقع، حساب…). الرابط وحده لا يكفي.']);
 
     $this->actingAs($user)->post(route('store_quote'), [...$verse, 'source' => 'صحيفة الجزيرة'])
         ->assertSessionHasNoErrors();
@@ -173,15 +173,57 @@ test('your own words need no source', function () {
         ->assertSessionHasNoErrors();
 });
 
-test('a web-address source becomes a safe external link; anything else stays plain text', function () {
-    $linked = Quote::factory()->create(['author' => 'شاعر', 'source' => 'https://www.al-jazirah.com/2020/poem']);
-    $plain = Quote::factory()->create(['author' => 'شاعر', 'source' => 'javascript:alert(1)']);
+test('the read-on link is shown by the source name, never as a raw address', function () {
+    $linked = Quote::factory()->create(['author' => 'شاعر', 'source' => 'صحيفة الجزيرة', 'source_url' => 'https://www.al-jazirah.com/2020/poem']);
 
     $this->get(route('quotes.show', $linked))
         ->assertSee('href="https://www.al-jazirah.com/2020/poem"', false)
-        ->assertSee('rel="nofollow ugc noopener noreferrer"', false);
+        ->assertSee('rel="nofollow ugc noopener noreferrer"', false)
+        ->assertSee('صحيفة الجزيرة')
+        ->assertDontSee('>https://www.al-jazirah.com', false);
+});
 
-    $this->get(route('quotes.show', $plain))
-        ->assertDontSee('href="javascript:', false)
-        ->assertSee('javascript:alert(1)');
+test('only http and https links are accepted, and an unsafe stored link is never rendered', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->post(route('store_quote'), [
+        'content' => 'بيت جميل', 'kind' => 'quoted', 'author' => 'شاعر', 'source' => 'ديوانه', 'source_url' => 'javascript:alert(1)',
+    ])->assertSessionHasErrors('source_url');
+
+    $stored = Quote::factory()->create(['author' => 'شاعر', 'source' => 'ديوانه', 'source_url' => 'javascript:alert(1)']);
+    $this->get(route('quotes.show', $stored))->assertDontSee('href="javascript:', false);
+});
+
+test('a link pasted into the source name moves to the link field, and a name is still required', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->post(route('store_quote'), [
+        'content' => 'بيت جميل', 'kind' => 'quoted', 'author' => 'شاعر', 'source' => 'https://ar.wikisource.org/wiki/x',
+    ])->assertSessionHasErrors('source');
+
+    $this->actingAs($user)->post(route('store_quote'), [
+        'content' => 'بيت جميل', 'kind' => 'quoted', 'author' => 'شاعر', 'book' => 'ديوانه', 'source' => 'https://ar.wikisource.org/wiki/x',
+    ])->assertSessionHasNoErrors();
+
+    expect(Quote::sole())->source->toBeNull()->source_url->toBe('https://ar.wikisource.org/wiki/x');
+});
+
+test('the text kind decides what is required', function () {
+    $user = User::factory()->create(['name' => 'أحمد']);
+
+    // نقلته عن غيري: the poet's name and a source are both required.
+    $this->actingAs($user)->post(route('store_quote'), ['content' => 'بيت لشاعر', 'kind' => 'quoted'])
+        ->assertSessionHasErrors(['author', 'source']);
+
+    // من تأليفي: no source; the signature is mine to word.
+    $this->actingAs($user)->post(route('store_quote'), ['content' => 'سطر كتبته', 'kind' => 'original', 'signature' => 'أحمد · الرياض'])
+        ->assertSessionHasNoErrors();
+
+    // مأثور: no author, source optional.
+    $this->actingAs($user)->post(route('store_quote'), ['content' => 'الصبر مفتاح الفرج', 'kind' => 'anonymous', 'author' => 'يُحذف'])
+        ->assertSessionHasNoErrors();
+
+    [$original, $proverb] = Quote::orderBy('id')->get()->all();
+    expect($original->is_original)->toBeTrue()->and($original->author)->toBe('أحمد · الرياض')
+        ->and($proverb->author)->toBeNull()->and($proverb->is_original)->toBeFalse();
 });

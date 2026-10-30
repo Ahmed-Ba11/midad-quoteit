@@ -74,7 +74,7 @@ test('work and poet pages list their verses', function () {
     $this->get('/library/poets/nobody')->assertNotFound();
 });
 
-test('رواق الحرف opens with the chosen verses locked and attributed', function () {
+test('مرسم الحروف opens with the chosen verses locked and attributed', function () {
     $verse = Verse::where('sadr', 'like', 'على قدرِ أهلِ العزمِ%')->first();
 
     $this->actingAs(User::factory()->create())

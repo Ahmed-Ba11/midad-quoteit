@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'content', 'category_id', 'verse_id', 'saying_id', 'author', 'book', 'page', 'source', 'source_url', 'is_original', 'is_public', 'story',
+    'content', 'category_id', 'verse_id', 'saying_id', 'author', 'book', 'page', 'source', 'source_url', 'is_original', 'is_public', 'presentation', 'story',
     'font', 'bg_color', 'text_color', 'highlight_color', 'highlight_style', 'highlights',
     'texture', 'ratio', 'font_size',
 ])]
@@ -36,7 +36,7 @@ class Quote extends Model
     }
 
     /**
-     * Same defaults as the migration, so an unsaved quote (e.g. in رواق الحرف) renders correctly.
+     * Same defaults as the migration, so an unsaved quote (e.g. in مرسم الحروف) renders correctly.
      *
      * @var array<string, mixed>
      */
@@ -51,6 +51,7 @@ class Quote extends Model
         'font_size' => 34,
         'is_public' => true,
         'is_original' => false,
+        'presentation' => 'card',
     ];
 
     /**

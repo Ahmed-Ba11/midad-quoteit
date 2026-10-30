@@ -151,6 +151,11 @@ class DatabaseSeeder extends Seeder
         $quotes->whereNull('author')->whereNull('verse_id')->whereNull('saying_id')
             ->each(fn (Quote $quote) => $quote->update(['is_original' => true]));
 
+        // Words only, between quotation marks; one private line that only its owner sees.
+        $quotes->firstWhere('content', 'كل كتابٍ نقرؤه يترك فينا رفّاً جديداً.')?->update(['presentation' => 'text']);
+        $quotes->firstWhere('content', 'الفجر لا يتأخر عن موعده، نحن من نتأخر عن رؤيته.')?->update(['presentation' => 'text']);
+        $quotes->firstWhere('content', 'الصمت أحياناً أبلغ جوابٍ عن سؤالٍ لا يستحق.')?->update(['is_public' => false]);
+
         $users[0]->update(['pinned_quote_id' => $quotes->firstWhere('user_id', $users[0]->id)->id]);
         $users[2]->update(['pinned_quote_id' => $quotes->firstWhere('user_id', $users[2]->id)->id]);
 

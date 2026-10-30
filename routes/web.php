@@ -16,7 +16,7 @@ use App\Http\Controllers\SignupController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [QuoteController::class, 'index'])->name('home');
-Route::get('/quote/{quote}', [QuoteController::class, 'show'])->name('quotes.show');
+Route::get('/quote/{quote}', [QuoteController::class, 'show'])->name('quotes.show')->can('view', 'quote');
 Route::get('/users/{user}', [ProfileController::class, 'show'])->name('profile.show');
 
 Route::get('/library', [LibraryController::class, 'index'])->name('library.index');
@@ -47,9 +47,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/quote/{quote}', [QuoteController::class, 'update'])->name('edit_quote')->can('update', 'quote');
     Route::delete('/quote/{quote}', [QuoteController::class, 'destroy'])->name('delete_quote')->can('delete', 'quote');
 
-    Route::post('/quote/{quote}/like', [LikeController::class, 'toggle'])->name('quotes.like');
-    Route::post('/quote/{quote}/bookmark', [BookmarkController::class, 'toggle'])->name('quotes.bookmark');
-    Route::post('/quote/{quote}/replies', [ReplyController::class, 'store'])->name('replies.store');
+    Route::post('/quote/{quote}/like', [LikeController::class, 'toggle'])->name('quotes.like')->can('view', 'quote');
+    Route::post('/quote/{quote}/bookmark', [BookmarkController::class, 'toggle'])->name('quotes.bookmark')->can('view', 'quote');
+    Route::post('/quote/{quote}/replies', [ReplyController::class, 'store'])->name('replies.store')->can('view', 'quote');
     Route::post('/books/{book}/shelf', [BookController::class, 'shelf'])->name('books.shelf');
 
     // ركني: pin a quote, keep favourite poets, build anthologies (مختاراتي).

@@ -42,7 +42,7 @@
 
     <div class="rounded-2xl border border-dashed border-line p-4">
         <p class="text-sm font-medium">وجدتَه في مكان آخر؟</p>
-        <p class="mt-1 text-sm text-muted">اقتبس بيتاً أو جملة منه في رواق الحرف، واذكر قائله ومصدره، فيصل إليه كل من يبحث عنه بعدك.</p>
+        <p class="mt-1 text-sm text-muted">اقتبس بيتاً أو جملة منه في مرسم الحروف، واذكر قائله ومصدره، فيصل إليه كل من يبحث عنه بعدك.</p>
         @auth
             <x-button :href="route('quotes.create')" variant="secondary" icon="feather" class="mt-3">اقتبسه بنفسك</x-button>
         @else

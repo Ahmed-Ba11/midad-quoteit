@@ -13,6 +13,7 @@ class BookController extends Controller
 {
     /**
      * رفوف القرّاء: the most-quoted books, the newest, and search / genre filter.
+     * A book appears only once someone quoted it publicly; private quotes never reveal a title.
      */
     public function index(Request $request): View
     {
@@ -20,8 +21,11 @@ class BookController extends Controller
         $genre = array_key_exists($request->query('genre'), config('quotes.book_genres')) ? $request->query('genre') : null;
         $isFiltering = $term !== '' || $genre !== null;
 
+        $shelfBooks = fn () => Book::whereHas('quotes', fn ($quotes) => $quotes->public())
+            ->withCount(['quotes' => fn ($quotes) => $quotes->public(), 'readers']);
+
         $results = $isFiltering
-            ? Book::withCount(['quotes', 'readers'])
+            ? $shelfBooks()
                 ->when($term !== '', fn ($query) => $query->where('match_key', 'like', '%'.trim(Book::matchKey($term, null), '|').'%'))
                 ->when($genre, fn ($query, string $key) => $query->where('genre', $key))
                 ->orderByDesc('quotes_count')->paginate(24)->withQueryString()
@@ -31,25 +35,29 @@ class BookController extends Controller
             'term' => $term,
             'genre' => $genre,
             'results' => $results,
-            'mostQuoted' => $isFiltering ? collect() : Book::withCount(['quotes', 'readers'])->has('quotes')
-                ->orderByDesc('quotes_count')->latest()->take(12)->get(),
-            'newest' => $isFiltering ? collect() : Book::withCount(['quotes', 'readers'])->latest()->take(12)->get(),
+            'mostQuoted' => $isFiltering ? collect() : $shelfBooks()->orderByDesc('quotes_count')->latest()->take(12)->get(),
+            'newest' => $isFiltering ? collect() : $shelfBooks()->latest()->take(12)->get(),
         ]);
     }
 
     /**
-     * One book: its generated cover, reader shelf counts, and the best quotes readers took from it.
+     * One book: its generated cover, reader shelf counts, and the best public quotes readers took from it.
+     * A book known only from private quotes is shown only to those who quoted it or shelved it.
      */
     public function show(Request $request, Book $book): View
     {
-        $book->loadCount(['quotes', 'readers']);
+        $viewer = $request->user();
+        $isKnownToViewer = $viewer && ($book->quotes()->whereBelongsTo($viewer)->exists() || $viewer->books()->whereKey($book->id)->exists());
+        abort_unless($book->quotes()->public()->exists() || $isKnownToViewer, 404);
+
+        $book->loadCount(['quotes' => fn ($quotes) => $quotes->public(), 'readers']);
 
         return view('books.show', [
             'book' => $book,
-            'quotes' => Quote::withCardData($request->user())->whereBelongsTo($book, 'bookRecord')
+            'quotes' => Quote::public()->withCardData($viewer)->whereBelongsTo($book, 'bookRecord')
                 ->orderByDesc('likes_count')->latest()->paginate(12),
             'shelfCounts' => $book->readers()->toBase()->selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status'),
-            'myStatus' => $request->user()?->books()->whereKey($book->id)->first()?->pivot->status,
+            'myStatus' => $viewer?->books()->whereKey($book->id)->first()?->pivot->status,
         ]);
     }
 

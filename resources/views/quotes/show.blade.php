@@ -4,34 +4,45 @@
 
 @section('content')
     @php
-        $ratioWidth = config('quotes.ratios.'.$quote->ratio.'.width', 760);
-        $byline = collect([$quote->author, $quote->book])->filter()->implode(' · ');
+        $ratioWidth = $quote->presentation === 'text' ? 760 : config('quotes.ratios.'.$quote->ratio.'.width', 760);
+        $signature = $quote->is_original && blank($quote->author) ? 'بقلم '.$quote->user->name : $quote->author;
+        $byline = collect([$signature, $quote->book])->filter()->implode(' · ');
+        $sharer = $quote->user->accentColors();
     @endphp
 
     <div class="mx-auto grid max-w-6xl gap-10 px-4 py-10 lg:grid-cols-[1fr_300px]">
         <div class="min-w-0">
             {{-- Big card --}}
             <article id="quote-{{ $quote->id }}" class="scroll-mt-24">
-                <div class="mx-auto shadow-xl" style="max-width: {{ $ratioWidth }}px">
-                    <x-quote-art :quote="$quote" class="rounded-3xl" />
+                @unless ($quote->is_public)
+                    <p class="mx-auto mb-4 flex items-center gap-2 rounded-2xl border border-line bg-surface px-4 py-3 text-sm text-muted" style="max-width: {{ $ratioWidth }}px">
+                        <x-icon name="lock" class="size-4 text-accent" /> اقتباس خاص: يظهر في ركنك وحدك، ولا يراه أحد غيرك.
+                    </p>
+                @endunless
+
+                <div class="mx-auto overflow-hidden rounded-3xl shadow-xl" style="max-width: {{ $ratioWidth }}px">
+                    <x-quote-art :quote="$quote" />
                 </div>
 
                 <div class="mx-auto mt-5 flex flex-wrap items-center gap-x-4 gap-y-3" style="max-width: {{ $ratioWidth }}px">
-                    <span class="grid size-10 shrink-0 place-items-center rounded-full bg-accent-soft font-bold text-accent">
-                        {{ mb_substr($quote->user->name, 0, 1) }}
-                    </span>
-                    <div class="min-w-0 flex-1 leading-tight">
-                        <p class="font-medium">{{ $quote->user->name }}</p>
-                        <time datetime="{{ $quote->created_at->toDateString() }}" class="text-sm text-muted">
-                            {{ $quote->created_at->translatedFormat('j F Y') }}
-                        </time>
-                    </div>
+                    <a href="{{ route('profile.show', $quote->user) }}" class="flex min-w-0 flex-1 items-center gap-3 hover:text-accent">
+                        <span class="grid size-10 shrink-0 place-items-center rounded-full font-bold"
+                            style="background: {{ $sharer['bg'] }}; color: {{ $sharer['highlight'] }}">
+                            {{ mb_substr($quote->user->name, 0, 1) }}
+                        </span>
+                        <span class="min-w-0 leading-tight">
+                            <span class="block font-medium">{{ $quote->user->name }}</span>
+                            <time datetime="{{ $quote->created_at->toDateString() }}" class="text-sm text-muted">
+                                {{ $quote->created_at->translatedFormat('j F Y') }}
+                            </time>
+                        </span>
+                    </a>
 
                     @if ($quote->category)
                         <x-chip>{{ $quote->category->name }}</x-chip>
                     @endif
 
-                    <div class="flex w-full items-center gap-1 border-y border-line py-1 sm:w-auto sm:border-0 sm:py-0">
+                    <div class="flex w-full flex-wrap items-center gap-1 border-y border-line py-1 sm:w-auto sm:border-0 sm:py-0">
                         <x-quote-actions :quote="$quote" :show-replies="false" />
 
                         <button type="button" data-copy="{{ $quote->content }}{{ $byline ? ' — '.$byline : '' }}{{ $quote->source ? ' (المصدر: '.$quote->source.')' : '' }}"
@@ -54,20 +65,33 @@
                     </div>
                 </div>
 
-                @if ($quote->source)
-                    <p class="mx-auto mt-4 text-sm text-muted" style="max-width: {{ $ratioWidth }}px">
-                        المصدر:
+                {{-- The source by its name; the link (if any) only lets the reader read on. --}}
+                @if ($quote->sourceLabel() && ! $quote->isFromLibrary())
+                    <div class="mx-auto mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl bg-surface px-4 py-3 text-sm" style="max-width: {{ $ratioWidth }}px">
+                        <x-icon name="book-open" class="size-4 text-gold" />
+                        <span class="text-muted">المصدر:</span>
+                        <span class="font-medium">{{ $quote->sourceLabel() }}</span>
                         @if ($quote->sourceUrl())
                             {{-- A user-supplied link: no ranking credit, no referrer, no opener. --}}
                             <a href="{{ $quote->sourceUrl() }}" target="_blank" rel="nofollow ugc noopener noreferrer"
-                                class="inline-flex items-center gap-1 text-accent hover:underline" dir="ltr">{{ \Illuminate\Support\Str::limit(rawurldecode(preg_replace('#^https?://(www\.)?#i', '', $quote->source)), 60) }}
-                                <x-icon name="external" class="size-3.5" /></a>
-                        @else
-                            {{ $quote->source }}
+                                class="ms-auto inline-flex items-center gap-1 rounded-full border border-line px-3 py-1 text-xs text-accent transition hover:border-accent">
+                                أكمل القراءة <x-icon name="external" class="size-3.5" /><span class="sr-only">(موقع خارجي)</span>
+                            </a>
                         @endif
-                    </p>
+                    </div>
                 @endif
             </article>
+
+            {{-- حكاية الاقتباس: the sharer's note, set as a handwritten page with their name at the foot. --}}
+            @if ($quote->story)
+                <section id="story" class="manuscript-page relative mx-auto mt-8 scroll-mt-24 rounded-3xl px-8 py-10 sm:px-12" style="max-width: {{ $ratioWidth }}px">
+                    <p class="flex items-center justify-center gap-2 text-sm font-medium text-[#A8873F]">
+                        <x-ornament name="star" class="size-4" /> حكاية الاقتباس <x-ornament name="star" class="size-4" />
+                    </p>
+                    <p class="mt-4 whitespace-pre-line text-center font-text text-xl leading-loose">{{ $quote->story }}</p>
+                    <p class="mt-5 text-center text-sm text-[#7A7068]">— {{ $quote->user->name }}</p>
+                </section>
+            @endif
 
             {{-- مختاراتي: add this quote to one of my anthologies, or start a new one with it. --}}
             @auth
@@ -114,17 +138,9 @@
                 </p>
             @endif
 
-            {{-- Story --}}
-            @if ($quote->story)
-                <section id="story" class="mx-auto mt-10 scroll-mt-24 rounded-3xl border border-line bg-surface p-6 sm:p-8" style="max-width: {{ $ratioWidth }}px">
-                    <h2 class="font-display text-2xl font-bold">حكايـــة الاقتباس</h2>
-                    <p class="mt-3 whitespace-pre-line font-text text-lg leading-loose">{{ $quote->story }}</p>
-                </section>
-            @endif
-
             {{-- Replies --}}
             <section id="replies" class="mx-auto mt-10 scroll-mt-24" style="max-width: {{ $ratioWidth }}px">
-                <p class="mb-2 font-text text-sm text-gold">«إنَّ من البيانِ لسحراً»</p>
+                <x-epigraph occasion="hikma" class="mb-3" />
                 <h2 class="font-display text-2xl font-bold">الردود <span class="text-base font-normal text-muted">({{ $quote->replies->count() }})</span></h2>
 
                 @auth

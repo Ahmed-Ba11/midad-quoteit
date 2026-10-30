@@ -55,7 +55,7 @@ test('the quote page shows the story and replies to guests', function () {
 
     $this->get(route('quotes.show', $quote))
         ->assertOk()
-        ->assertSee('حكايـــة الاقتباس')
+        ->assertSee('حكاية الاقتباس')
         ->assertSee('قرأته في مكتبة جدّي.')
         ->assertSee('اقتباس جميل جداً')
         ->assertSee('سجّل دخولك');

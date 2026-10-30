@@ -9,20 +9,86 @@
         $keep = array_filter(['q' => $filters['q'], 'sort' => $filters['sort'] === 'latest' ? null : $filters['sort'], 'original' => $filters['original'] ? '1' : null]);
     @endphp
 
-    <div class="mx-auto max-w-6xl px-4 py-10">
-        @if ($quoteOfTheDay)
-            <x-quote-of-the-day :quote="$quoteOfTheDay" class="mb-12" />
-        @endif
+    @if ($isFrontPage)
+        {{-- The front door: what مِداد is, today's quote, and a way in for everyone. --}}
+        <section class="hero-ink relative isolate overflow-hidden">
+            <x-ornament name="girih" class="girih absolute inset-0 -z-10 h-full w-full" />
+            <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:py-20">
+                <div class="text-center lg:text-start">
+                    <p class="inline-flex items-center gap-2 rounded-full border border-[#C9A45C]/40 px-3 py-1 text-xs text-[#E2C27E]">
+                        <x-ornament name="star" class="size-3" /> منصّة الاقتباس العربي
+                    </p>
+                    <h1 class="mt-5 font-display text-4xl font-black leading-tight text-[#F2ECE2] [text-wrap:balance] sm:text-5xl">
+                        لكلّ قارئٍ <span class="text-[#E2C27E]">جملةٌ</span> بقيت معه
+                    </h1>
+                    <p class="mx-auto mt-4 max-w-md text-lg leading-relaxed text-[#F2ECE2]/75 lg:mx-0">
+                        اقتبس من كتاب تقرؤه أو بيتٍ تحفظه، صمّمه بخطٍّ يليق به، وشاركه مع من يقدّر الكلمة.
+                    </p>
+                    <x-epigraph :occasion="['hikma', 'ilm', 'himma']" class="mx-auto mt-6 max-w-md text-base !text-[#E2C27E] lg:mx-0 [&_a]:!text-[#F2ECE2]/60" />
 
+                    <div class="mt-8 flex flex-wrap justify-center gap-3 lg:justify-start">
+                        @auth
+                            <x-button popovertarget="quote-popup" icon="plus" class="!bg-[#E2C27E] !text-[#1C1A18]">شارك اقتباساً</x-button>
+                        @else
+                            <x-button :href="route('signup')" icon="plus" class="!bg-[#E2C27E] !text-[#1C1A18]">انضم وشارك اقتباسك</x-button>
+                        @endauth
+                        <x-button :href="route('library.index')" variant="secondary" icon="book-open" class="!border-[#F2ECE2]/40 !text-[#F2ECE2] hover:!bg-[#F2ECE2]/10">خزانة الأدب</x-button>
+                    </div>
+
+                    <dl class="mt-10 flex justify-center gap-8 text-[#F2ECE2] lg:justify-start">
+                        @foreach (['quotes' => 'اقتباس', 'readers' => 'قارئ', 'verses' => 'بيتاً موثّقاً'] as $key => $label)
+                            <div class="flex flex-col-reverse">
+                                <dt class="text-xs text-[#F2ECE2]/60">{{ $label }}</dt>
+                                <dd class="font-display text-3xl font-bold text-[#E2C27E]">{{ number_format($counts[$key]) }}</dd>
+                            </div>
+                        @endforeach
+                    </dl>
+                </div>
+
+                @if ($quoteOfTheDay)
+                    <x-quote-of-the-day :quote="$quoteOfTheDay" />
+                @endif
+            </div>
+        </section>
+
+        {{-- أقلام مِداد: readers and what they chose to share publicly — a way to visit their corners. --}}
+        @if ($pens->isNotEmpty())
+            <section aria-labelledby="pens-title" class="border-b border-line bg-surface">
+                <div class="mx-auto max-w-6xl px-4 py-8">
+                    <div class="flex flex-wrap items-baseline justify-between gap-2">
+                        <h2 id="pens-title" class="font-display text-2xl font-bold">أقـــلام مِداد</h2>
+                        <p class="text-sm text-muted">قرّاء يشاركون ما بقي معهم؛ زُر أركانهم.</p>
+                    </div>
+                    <ul class="-mx-4 mt-5 flex snap-x gap-3 overflow-x-auto px-4 pb-2">
+                        @foreach ($pens as $pen)
+                            @php $penColors = $pen->accentColors(); @endphp
+                            <li class="snap-start">
+                                <a href="{{ route('profile.show', $pen) }}"
+                                    class="flex w-52 items-center gap-3 rounded-2xl border border-line bg-paper p-3 transition hover:-translate-y-0.5 hover:border-accent hover:shadow-md">
+                                    <span class="grid size-12 shrink-0 place-items-center rounded-full font-display text-xl font-bold"
+                                        style="background: {{ $penColors['bg'] }}; color: {{ $penColors['highlight'] }}">{{ mb_substr($pen->name, 0, 1) }}</span>
+                                    <span class="min-w-0">
+                                        <span class="block truncate font-medium">{{ $pen->name }}</span>
+                                        <span class="block truncate text-xs text-muted">{{ $pen->public_quotes_count }} اقتباس{{ $pen->bio ? ' · '.$pen->bio : '' }}</span>
+                                    </span>
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+            </section>
+        @endif
+    @endif
+
+    <div class="mx-auto max-w-6xl px-4 py-10">
         <header class="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
-                <h1 class="font-display text-4xl font-bold">أحدث الاقتباســات</h1>
-                <x-verse layout="paired" class="mt-3 max-w-xl text-muted" sadr="لسانُ الفتى نصفٌ ونصفٌ فؤادُه"
-                    ajuz="فلم يبقَ إلا صورةُ اللحمِ والدمِ" />
+                <h2 class="font-display text-4xl font-bold">{{ $isFrontPage ? 'أحدث الاقتباســات' : 'الاقتباســات' }}</h2>
+                <x-epigraph class="mt-2 max-w-xl" />
             </div>
 
             @guest
-                <x-button :href="route('login')" icon="plus">سجّل دخولك لتشارك اقتباساً</x-button>
+                <x-button :href="route('login')" variant="ghost" icon="plus">سجّل دخولك لتشارك اقتباساً</x-button>
             @endguest
         </header>
 

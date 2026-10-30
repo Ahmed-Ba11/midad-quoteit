@@ -8,10 +8,12 @@ use App\Models\Category;
 use App\Models\DiwanVerse;
 use App\Models\Quote;
 use App\Models\Saying;
+use App\Models\User;
 use App\Models\Verse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
@@ -32,7 +34,7 @@ class QuoteController extends Controller
             'original' => $request->query('original') === '1',
         ];
 
-        $quotes = Quote::withCardData($request->user())
+        $quotes = Quote::public()->withCardData($request->user())
             ->search($filters['q'])
             ->when($filters['category'], fn ($query, string $slug) => $query->whereRelation('category', 'slug', $slug))
             ->when($filters['original'], fn ($query) => $query->where('is_original', true))
@@ -41,12 +43,26 @@ class QuoteController extends Controller
             ->withQueryString();
 
         $isFiltering = $filters['q'] !== '' || $filters['category'] !== null || $filters['original'];
+        $isFrontPage = ! $isFiltering && $quotes->onFirstPage();
 
         return view('quotes.index', [
             'quotes' => $quotes,
             'categories' => $categories,
             'filters' => $filters,
-            'quoteOfTheDay' => ! $isFiltering && $quotes->onFirstPage() ? Quote::ofTheDay() : null,
+            'isFrontPage' => $isFrontPage,
+            'quoteOfTheDay' => $isFrontPage ? Quote::ofTheDay() : null,
+            // أقلام مِداد: readers with the most public quotes — only what they chose to make public.
+            'pens' => $isFrontPage
+                ? User::whereHas('quotes', fn ($quotes) => $quotes->public())
+                    ->withCount(['quotes as public_quotes_count' => fn ($quotes) => $quotes->public()])
+                    ->orderByDesc('public_quotes_count')->take(8)->get(['id', 'name', 'accent', 'bio'])
+                : collect(),
+            // The hero's numbers move slowly; counting them once every few minutes is plenty.
+            'counts' => $isFrontPage ? Cache::remember('home-counts', now()->addMinutes(5), fn () => [
+                'quotes' => Quote::public()->count(),
+                'readers' => User::whereHas('quotes', fn ($quotes) => $quotes->public())->count(),
+                'verses' => Verse::count(),
+            ]) : [],
         ]);
     }
 
@@ -81,14 +97,14 @@ class QuoteController extends Controller
     {
         $limit = 4;
         $sameAuthor = $quote->author
-            ? Quote::withCardData($request->user())
+            ? Quote::public()->withCardData($request->user())
                 ->where('author', $quote->author)
                 ->whereKeyNot($quote->id)
                 ->latest()->take($limit)->get()
             : collect();
 
         $sameCategory = $quote->category_id && $sameAuthor->count() < $limit
-            ? Quote::withCardData($request->user())
+            ? Quote::public()->withCardData($request->user())
                 ->where('category_id', $quote->category_id)
                 ->whereKeyNot([$quote->id, ...$sameAuthor->modelKeys()])
                 ->latest()->take($limit - $sameAuthor->count())->get()
@@ -102,14 +118,14 @@ class QuoteController extends Controller
     }
 
     /**
-     * رواق الحرف — design a new quote.
+     * مرسم الحروف — design a new quote.
      */
     public function create(Request $request): View
     {
         return view('quotes.studio', [
             'quote' => $this->draftFromLibrary($request),
             'categories' => Category::orderBy('id')->get(),
-            'bookTitles' => Book::latest()->limit(300)->pluck('title'),
+            'bookTitles' => Book::whereHas('quotes', fn ($quotes) => $quotes->public())->latest()->limit(300)->pluck('title'),
         ]);
     }
 
@@ -172,14 +188,14 @@ class QuoteController extends Controller
     }
 
     /**
-     * رواق الحرف — redesign an existing quote (authorized by QuotePolicy@update on the route).
+     * مرسم الحروف — redesign an existing quote (authorized by QuotePolicy@update on the route).
      */
     public function edit(Quote $quote): View
     {
         return view('quotes.studio', [
             'quote' => $quote,
             'categories' => Category::orderBy('id')->get(),
-            'bookTitles' => Book::latest()->limit(300)->pluck('title'),
+            'bookTitles' => Book::whereHas('quotes', fn ($quotes) => $quotes->public())->latest()->limit(300)->pluck('title'),
         ]);
     }
 
@@ -242,7 +258,7 @@ class QuoteController extends Controller
 
     private function validatedWithHighlights(QuoteRequest $request): array
     {
-        $data = collect($request->validated())->except('book_genre')->all();
+        $data = collect($request->validated())->except(['book_genre', 'kind', 'signature'])->all();
 
         if ($request->has('highlights')) {
             $data['highlights'] = $request->input('highlights');

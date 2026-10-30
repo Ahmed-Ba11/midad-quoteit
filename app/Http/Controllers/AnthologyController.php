@@ -7,6 +7,7 @@ use App\Models\Anthology;
 use App\Models\Quote;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class AnthologyController extends Controller
@@ -16,11 +17,13 @@ class AnthologyController extends Controller
      */
     public function show(Request $request, Anthology $anthology): View
     {
-        $anthology->load('user')->loadCount('quotes');
+        $viewer = $request->user();
+        $anthology->load('user')->loadCount(['quotes' => fn ($quotes) => $quotes->visibleTo($viewer)]);
 
         return view('anthologies.show', [
             'anthology' => $anthology,
-            'quotes' => $anthology->quotes()->withCardData($request->user())
+            // A quote its owner later made private drops out of everyone else's anthologies.
+            'quotes' => $anthology->quotes()->visibleTo($viewer)->withCardData($viewer)
                 ->orderByPivot('created_at', 'desc')->paginate(12),
         ]);
     }
@@ -33,7 +36,8 @@ class AnthologyController extends Controller
         $anthology = $request->user()->anthologies()->create($request->safe()->except('quote_id'));
 
         if ($request->filled('quote_id')) {
-            $anthology->quotes()->attach($request->integer('quote_id'));
+            Gate::authorize('view', $quote = Quote::findOrFail($request->integer('quote_id')));
+            $anthology->quotes()->attach($quote);
 
             return $this->backTo('#anthologies');
         }
@@ -66,6 +70,11 @@ class AnthologyController extends Controller
      */
     public function toggle(Anthology $anthology, Quote $quote): RedirectResponse
     {
+        // Taking a quote out is always allowed; putting one in needs it to be visible to me.
+        if (! $anthology->quotes()->whereKey($quote->id)->exists()) {
+            Gate::authorize('view', $quote);
+        }
+
         $anthology->quotes()->toggle($quote);
         $anthology->touch();
 

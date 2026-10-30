@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'bio', 'accent', 'badge', 'show_poets'])]
+#[Fillable(['name', 'email', 'password', 'bio', 'accent', 'badge', 'show_poets', 'show_wall'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -31,6 +31,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'show_poets' => 'boolean',
+            'show_wall' => 'boolean',
         ];
     }
 
@@ -84,6 +85,14 @@ class User extends Authenticatable
     public function favoritePoets(): BelongsToMany
     {
         return $this->belongsToMany(Poet::class)->withTimestamps();
+    }
+
+    /**
+     * جداري: sayings the reader hung on their wall, newest first.
+     */
+    public function wallSayings(): BelongsToMany
+    {
+        return $this->belongsToMany(Saying::class)->withTimestamps();
     }
 
     /**

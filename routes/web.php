@@ -13,6 +13,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\SignupController;
+use App\Http\Controllers\WallController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [QuoteController::class, 'index'])->name('home');
@@ -56,6 +57,7 @@ Route::middleware('auth')->group(function () {
     // ركني: pin a quote, keep favourite poets, build anthologies (مختاراتي).
     Route::post('/quote/{quote}/pin', [ProfileController::class, 'pin'])->name('profile.pin')->can('update', 'quote');
     Route::post('/library/poets/{poet}/favorite', [FavoritePoetController::class, 'toggle'])->name('poets.favorite');
+    Route::post('/library/sayings/{saying}/wall', [WallController::class, 'toggle'])->name('sayings.wall');
     Route::post('/anthologies', [AnthologyController::class, 'store'])->name('anthologies.store');
     Route::put('/anthologies/{anthology}', [AnthologyController::class, 'update'])->name('anthologies.update')->can('update', 'anthology');
     Route::delete('/anthologies/{anthology}', [AnthologyController::class, 'destroy'])->name('anthologies.destroy')->can('delete', 'anthology');

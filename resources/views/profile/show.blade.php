@@ -10,6 +10,7 @@
             'quotes' => ['label' => $isOwner ? 'اقتباساتي' : 'اقتباساته', 'icon' => 'type'],
             'original' => ['label' => $isOwner ? 'بقلمي' : 'بقلمه', 'icon' => 'feather'],
             'anthologies' => ['label' => $isOwner ? 'مختاراتي' : 'مختاراته', 'icon' => 'layers'],
+            'wall' => ['label' => $isOwner ? 'جداري' : 'جداره', 'icon' => 'pin'],
             'poets' => ['label' => $isOwner ? 'شعرائي' : 'شعراؤه', 'icon' => 'user'],
             'diwans' => ['label' => $isOwner ? 'دواويني' : 'دواوينه', 'icon' => 'scroll'],
             'liked' => ['label' => 'أعجبني', 'icon' => 'heart', 'private' => true],
@@ -88,6 +89,15 @@
                                 <span>
                                     <span class="text-sm font-medium">أظهر «شعرائي» لزوّار ركني</span>
                                     <span id="show_poets-hint" class="block text-xs text-muted">أزل العلامة لتبقى قائمة شعرائك لك وحدك.</span>
+                                </span>
+                            </label>
+                            <input type="hidden" name="show_wall" value="0">
+                            <label class="flex cursor-pointer items-start gap-3">
+                                <input type="checkbox" name="show_wall" value="1" @checked($user->show_wall)
+                                    class="mt-1 size-4 accent-[var(--color-accent)]" aria-describedby="show_wall-hint">
+                                <span>
+                                    <span class="text-sm font-medium">أظهر «جداري» لزوّار ركني</span>
+                                    <span id="show_wall-hint" class="block text-xs text-muted">المأثورات التي علّقتها؛ أزل العلامة ليبقى جدارك لك وحدك.</span>
                                 </span>
                             </label>
                             <p class="rounded-xl bg-surface p-3 text-xs leading-relaxed text-muted">
@@ -174,6 +184,36 @@
                         <ul class="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
                             @foreach ($anthologies as $anthology)
                                 <li><x-anthology-tile :anthology="$anthology" /></li>
+                            @endforeach
+                        </ul>
+                    @endif
+                    @break
+
+                @case('wall')
+                    {{-- جداري: the sayings this reader hung, as plaques on their own wall. --}}
+                    @if ($wall->isEmpty())
+                        <x-empty-state :title="$isOwner ? 'جدارك فارغ' : 'لا مأثورات بعد'" icon="pin">
+                            @if ($isOwner)
+                                علّق ما يعجبك من <a href="{{ route('library.index') }}#sayings" class="text-accent hover:underline">جدار المأثورات</a> بزر «علّقه على جداري».
+                            @else
+                                لم يعلّق مأثورات بعد.
+                            @endif
+                        </x-empty-state>
+                    @else
+                        <ul class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                            @foreach ($wall as $saying)
+                                @php $plaque = array_values(config('quotes.palettes'))[$loop->index % count(config('quotes.palettes'))]; @endphp
+                                <li class="relative overflow-hidden rounded-2xl px-6 py-7 text-center shadow-md" style="background: {{ $plaque['bg'] }}; color: {{ $plaque['text'] }}">
+                                    <x-paper-texture />
+                                    <blockquote class="relative font-text text-2xl leading-relaxed">{{ $saying->text }}</blockquote>
+                                    <p class="relative mt-2 text-sm opacity-75">— {{ $saying->source }}</p>
+                                    @if ($isOwner)
+                                        <form method="POST" action="{{ route('sayings.wall', $saying) }}" class="relative mt-3">
+                                            @csrf
+                                            <button type="submit" class="inline-flex min-h-11 items-center text-sm opacity-80 hover:opacity-100">أنزله من جداري</button>
+                                        </form>
+                                    @endif
+                                </li>
                             @endforeach
                         </ul>
                     @endif

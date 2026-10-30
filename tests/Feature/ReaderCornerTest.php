@@ -3,6 +3,7 @@
 use App\Models\Anthology;
 use App\Models\Poet;
 use App\Models\Quote;
+use App\Models\Saying;
 use App\Models\User;
 use App\Models\Verse;
 use Database\Seeders\LibrarySeeder;
@@ -159,4 +160,21 @@ test('only the listed badges can be chosen', function () {
     $this->actingAs(User::factory()->create())
         ->patch(route('profile.bio'), ['badge' => '<svg onload=alert(1)>'])
         ->assertSessionHasErrors('badge');
+});
+
+test('a reader hangs sayings on their wall, and can keep the wall private', function () {
+    $this->seed(LibrarySeeder::class);
+    $reader = User::factory()->create();
+    $saying = Saying::first();
+
+    $this->actingAs($reader)->post(route('sayings.wall', $saying))->assertSessionHas('toast');
+    $this->get(route('library.index'))->assertSee('على جداري');
+    auth()->logout();
+    $this->get(route('profile.show', [$reader, 'tab' => 'wall']))->assertSee($saying->text);
+
+    $this->actingAs($reader)->patch(route('profile.bio'), ['show_wall' => '0']);
+    auth()->logout();
+    $this->get(route('profile.show', [$reader, 'tab' => 'wall']))->assertDontSee('أنزله من جداري')->assertDontSee('tab=wall');
+
+    $this->post(route('sayings.wall', $saying))->assertRedirect(route('login'));
 });

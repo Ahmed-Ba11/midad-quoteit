@@ -51,6 +51,7 @@
         </nav>
     </section>
 
+    <div class="library-paper">
     <div class="mx-auto max-w-6xl px-4">
         {{-- Search results --}}
         @if ($results !== null)
@@ -69,10 +70,7 @@
                 @endif
 
                 @if ($results->isEmpty())
-                    <x-empty-state title="لا أبيات تطابق بحثك" icon="search" class="mt-6">
-                        جرّب كلمة من البيت، أو اسم الشاعر، أو تصفّح الرفوف أدناه. المكتبة تضم عيون الأبيات فقط، وقد تجده في مكان آخر:
-                    </x-empty-state>
-                    <x-search-elsewhere :term="$term" here="library" class="mt-8" />
+                    <x-library-miss :term="$term" class="mt-6" />
                 @else
                     <ol class="mt-6 divide-y divide-line overflow-hidden rounded-3xl border border-line bg-surface">
                         @foreach ($results as $verse)
@@ -121,7 +119,11 @@
                             <span aria-hidden="true" class="mb-0 h-28 w-2.5 shrink-0 rounded-t-sm bg-gradient-to-b from-[#c9a45c] to-[#7d6229]"></span>
                         </div>
                         <div class="shelf-plank mx-2"></div>
-                        <p class="brass-plaque mx-auto -mt-1 w-fit rounded px-4 py-1 font-display text-sm font-bold">{{ $plaque }}</p>
+                        <p class="shelf-label mx-auto mt-3 flex w-fit items-center gap-3 font-display text-base font-bold text-[#E2C27E]">
+                            <span aria-hidden="true" class="h-px w-10 bg-gradient-to-l from-[#C9A45C] to-transparent sm:w-16"></span>
+                            <x-ornament name="star" class="size-3" />{{ $plaque }}<x-ornament name="star" class="size-3" />
+                            <span aria-hidden="true" class="h-px w-10 bg-gradient-to-r from-[#C9A45C] to-transparent sm:w-16"></span>
+                        </p>
                     </div>
                 @endforeach
             </div>
@@ -171,31 +173,21 @@
         <section id="poets" aria-labelledby="poets-title" class="scroll-mt-20 border-t border-line py-16">
             <header class="mx-auto max-w-2xl text-center">
                 <h2 id="poets-title" class="font-display text-4xl font-bold">رواق الشعـــراء</h2>
-                <p class="mt-3 text-muted">من الجاهلية إلى العصر العباسي؛ اختر شاعراً لتقرأ سيرته وأشهر أبياته.</p>
+                <p class="mt-3 text-muted">أشهر الأصوات أولاً، من الجاهلية إلى العصر العباسي؛ اختر شاعراً لتقرأ سيرته وعيون أبياته.</p>
             </header>
 
-            <div class="mt-10 flex gap-10 overflow-x-auto pb-6 pt-4" data-arcade>
-                @foreach ($poets->groupBy('era') as $era => $eraPoets)
-                    <div class="shrink-0">
-                        <p class="flex items-center gap-3 text-sm font-medium text-gold">
-                            <x-ornament name="star" class="size-3" />{{ config('library.eras.'.$era) }}
-                            <span class="h-px flex-1 bg-gold/30"></span>
-                        </p>
-                        <div class="mt-5 flex gap-4">
-                            @foreach ($eraPoets as $poet)
-                                <button type="button" data-poet="{{ $poet->slug }}" aria-pressed="{{ $loop->parent->first && $loop->first ? 'true' : 'false' }}"
-                                    style="--poet: {{ $poet->color }}"
-                                    class="arch relative flex shrink-0 flex-col items-center border border-line bg-surface px-3 pb-6 pt-10 text-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
-                                    <x-ornament name="star" class="size-9 text-gold" />
-                                    <span class="mt-auto font-display text-lg font-bold leading-snug">{{ $poet->name }}</span>
-                                    <span class="mt-1 text-xs opacity-70">{{ $poet->years }}</span>
-                                    @if ($poet->is_peninsula)
-                                        <span class="mt-3 rounded-full border border-current/30 px-2.5 py-0.5 text-xs opacity-80">{{ $poet->region }}</span>
-                                    @endif
-                                </button>
-                            @endforeach
-                        </div>
-                    </div>
+            <div class="no-scrollbar -mx-4 mt-10 flex gap-4 overflow-x-auto px-4 pb-6 pt-4 sm:justify-center" data-arcade>
+                @foreach ($poets as $poet)
+                    <button type="button" data-poet="{{ $poet->slug }}" aria-pressed="{{ $loop->first ? 'true' : 'false' }}"
+                        style="--poet: {{ $poet->color }}"
+                        class="arch relative flex shrink-0 flex-col items-center border border-line bg-surface px-3 pb-6 pt-10 text-center focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent">
+                        <x-ornament name="star" class="size-9 text-gold" />
+                        <span class="mt-auto font-display text-lg font-bold leading-snug">{{ $poet->name }}</span>
+                        <span class="mt-1 text-xs opacity-75">{{ $poet->eraLabel() }}</span>
+                        @if ($poet->is_peninsula)
+                            <span class="mt-3 rounded-full border border-current/30 px-2.5 py-0.5 text-xs opacity-80">{{ $poet->region }}</span>
+                        @endif
+                    </button>
                 @endforeach
             </div>
 
@@ -293,7 +285,7 @@
             <ul class="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($sayings as $saying)
                     @php $palette = $palettes[$loop->index % count($palettes)]; @endphp
-                    <li class="relative pt-12">
+                    <li id="saying-{{ $saying->id }}" class="relative scroll-mt-24 pt-12">
                         <svg aria-hidden="true" viewBox="0 0 200 48" preserveAspectRatio="none" class="absolute inset-x-[18%] top-0 h-12 w-[64%] text-muted">
                             <path d="M100 6 4 48M100 6l96 42" fill="none" stroke="currentColor" stroke-width="1.2" vector-effect="non-scaling-stroke" />
                         </svg>
@@ -304,7 +296,20 @@
                             <x-paper-texture />
                             <blockquote class="relative font-text text-2xl leading-relaxed">{{ $saying->text }}</blockquote>
                             <figcaption class="relative mt-3 text-sm opacity-75">— {{ $saying->source }}</figcaption>
-                            <x-pick-button type="saying" :id="$saying->id" :text="$saying->text" class="relative mt-4 h-9" />
+                            <div class="relative mt-4 flex flex-wrap items-center justify-center gap-2">
+                                <x-pick-button type="saying" :id="$saying->id" :text="$saying->text" class="h-9" />
+                                @auth
+                                    @php $onWall = in_array($saying->id, $myWall, true); @endphp
+                                    <form method="POST" action="{{ route('sayings.wall', $saying) }}">
+                                        @csrf
+                                        <button type="submit" aria-pressed="{{ $onWall ? 'true' : 'false' }}"
+                                            class="inline-flex h-9 items-center gap-1.5 rounded-full border border-current/25 px-3 text-sm transition hover:border-current aria-pressed:bg-current/15">
+                                            <x-icon name="pin" @class(['size-4', 'fill-current' => $onWall]) />
+                                            {{ $onWall ? 'على جداري' : 'علّقه على جداري' }}
+                                        </button>
+                                    </form>
+                                @endauth
+                            </div>
                         </figure>
                     </li>
                 @endforeach
@@ -341,6 +346,7 @@
         <p class="border-t border-line py-8 text-center text-xs text-muted">
             النصوص من ويكي مصدر وويكي الاقتباس، ومتاحة بترخيص المشاع الإبداعي (CC BY-SA).
         </p>
+    </div>
     </div>
 
     <x-selection-bar />

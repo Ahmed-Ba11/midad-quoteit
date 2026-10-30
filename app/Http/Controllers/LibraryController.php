@@ -19,21 +19,31 @@ class LibraryController extends Controller
     {
         $term = mb_substr(trim($request->string('q')), 0, 60);
 
-        $poets = Poet::with(['works' => fn ($works) => $works->withCount('verses')->with('verses')])
-            ->withCount('verses')
-            ->orderBy('sort_order')->get();
+        // Only the three sample verses each panel shows are loaded; totals come from counts.
+        $threeVerses = fn ($verses) => $verses->limit(3);
+        $fame = array_flip(config('library.featured_poets'));
 
-        $works = Work::with(['poet', 'verses'])->withCount('verses')->orderBy('poet_id')->orderBy('sort_order')->get();
+        $poets = Poet::with(['works' => fn ($works) => $works->with(['verses' => $threeVerses])])
+            ->withCount('verses')->get()
+            // رواق الشعراء opens with the names readers know best.
+            ->sortBy(fn (Poet $poet) => $fame[$poet->slug] ?? 100 + $poet->sort_order)->values();
+
+        $works = Work::with(['poet', 'verses' => $threeVerses])->withCount('verses')->orderBy('poet_id')->orderBy('sort_order')->get();
 
         return view('library.index', [
             'term' => $term,
             'results' => $term === '' ? null : Verse::with('work.poet')->search($term)->orderBy('work_id')->orderBy('sort_order')->limit(40)->get(),
-            'matchingPoets' => $term === '' ? collect() : $poets->filter(fn (Poet $poet) => str_contains($poet->name, $term)),
+            'matchingPoets' => $term === '' ? collect() : $poets->filter(
+                fn (Poet $poet) => str_contains(Verse::normalizeArabic($poet->name), Verse::normalizeArabic($term))
+            ),
             'poets' => $poets,
             'muallaqat' => $works->where('type', 'muallaqa')->sortBy(fn (Work $work) => $work->poet->sort_order)->values(),
             'diwans' => $works->where('type', '!=', 'muallaqa')->sortBy(fn (Work $work) => [$work->poet->sort_order, $work->sort_order])->values(),
-            'occasionVerses' => Verse::with('work.poet')->whereNotNull('occasion')->orderBy('id')->get()->groupBy('occasion'),
+            // Six verses per mood, a different six on each visit: fresh to come back to, light to load.
+            'occasionVerses' => Verse::with('work.poet')->whereNotNull('occasion')->get()
+                ->groupBy('occasion')->map(fn ($verses) => $verses->shuffle()->take(6)->values()),
             'sayings' => Saying::orderBy('id')->get(),
+            'myWall' => $request->user()?->wallSayings()->pluck('sayings.id')->all() ?? [],
             'readersDiwans' => Diwan::where('is_public', true)->latest('updated_at')->take(6)->get(),
             'counts' => [
                 'poets' => $poets->count(),

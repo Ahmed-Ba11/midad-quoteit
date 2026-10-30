@@ -28,6 +28,7 @@ class BioRequest extends FormRequest
             'accent' => ['sometimes', 'nullable', Rule::in(array_keys(config('quotes.palettes')))],
             'badge' => ['sometimes', 'nullable', Rule::in(array_keys(config('quotes.badges')))],
             'show_poets' => ['sometimes', 'boolean'],
+            'show_wall' => ['sometimes', 'boolean'],
         ];
     }
 

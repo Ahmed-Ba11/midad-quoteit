@@ -32,6 +32,12 @@ return [
         'collection' => 'مختارات',
     ],
 
+    // رواق الشعراء: the order readers meet the poets in — the best-known names first.
+    'featured_poets' => [
+        'al-mutanabbi', 'imru-al-qays', 'antara', 'al-shafii', 'zuhair', 'majnun-layla', 'al-khansa',
+        'abu-tammam', 'al-maarri', 'jarir', 'tarafa', 'labid', 'amr-ibn-kulthum', 'harith-ibn-hilliza',
+    ],
+
     // Library text in a quote is built from up to this many verses.
     'max_selection' => 2,
 

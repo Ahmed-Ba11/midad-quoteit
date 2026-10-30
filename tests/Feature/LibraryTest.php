@@ -57,7 +57,10 @@ test('library search finds verses by text and by poet', function () {
         ->assertSee('وإنَّ صخراً لتأتمُّ الهداةُ به');
 
     $this->get(route('library.index', ['q' => 'كلمة غير موجودة']))
-        ->assertSee('لا أبيات تطابق بحثك');
+        ->assertSee('لم نجد «كلمة غير موجودة» على رفوف الخزانة')
+        ->assertSee('https://www.aldiwan.net/search.php?q=', false)
+        ->assertSee('rel="noopener noreferrer external"', false)
+        ->assertSee('شاعرك ليس هنا؟');
 });
 
 test('work and poet pages list their verses', function () {

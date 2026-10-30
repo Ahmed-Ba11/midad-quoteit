@@ -555,3 +555,38 @@ html.dark body {
 .no-scrollbar::-webkit-scrollbar {
     display: none;
 }
+
+/* Pick button (library): one of two labels, by aria-pressed — no icons, since it repeats many times. */
+.pick .pick-on,
+.pick[aria-pressed='true'] .pick-off {
+    display: none;
+}
+
+.pick[aria-pressed='true'] .pick-on {
+    display: inline;
+}
+
+/*
+ * خزانة الأدب: everything under the hero sits on a quiet sheet of paper — a warm tint, the faint
+ * shadow of a page's edges at the sides, and a hairline double rule on wide screens. CSS only.
+ */
+.library-paper {
+    background:
+        linear-gradient(90deg, rgb(43 37 32 / 0.06), transparent 3.5%, transparent 96.5%, rgb(43 37 32 / 0.06)),
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgb(255 255 255 / 0.5), transparent 70%),
+        #F3ECDF;
+}
+
+.dark .library-paper {
+    background:
+        linear-gradient(90deg, rgb(0 0 0 / 0.25), transparent 3.5%, transparent 96.5%, rgb(0 0 0 / 0.25)),
+        radial-gradient(ellipse 80% 50% at 50% 0%, rgb(217 181 106 / 0.05), transparent 70%),
+        #201B17;
+}
+
+@media (min-width: 1024px) {
+    .library-paper > div {
+        border-inline: 1px solid rgb(168 135 63 / 0.18);
+        box-shadow: inset 6px 0 0 -5px rgb(168 135 63 / 0.18), inset -6px 0 0 -5px rgb(168 135 63 / 0.18);
+    }
+}

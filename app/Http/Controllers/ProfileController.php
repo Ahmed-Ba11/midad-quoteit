@@ -16,7 +16,7 @@ class ProfileController extends Controller
     /**
      * Tabs everyone can see, then the ones only the owner can (المحفوظات, كتبي).
      */
-    private const PUBLIC_TABS = ['quotes', 'original', 'anthologies', 'poets', 'diwans'];
+    private const PUBLIC_TABS = ['quotes', 'original', 'anthologies', 'wall', 'poets', 'diwans'];
 
     private const OWNER_TABS = ['liked', 'saved', 'books'];
 
@@ -33,6 +33,11 @@ class ProfileController extends Controller
         // شعرائي is public unless its owner chose to keep it to themselves.
         if (! $isOwner && ! $user->show_poets) {
             $allowedTabs = array_values(array_diff($allowedTabs, ['poets']));
+        }
+
+        // جداري likewise, unless its owner keeps it to themselves.
+        if (! $isOwner && ! $user->show_wall) {
+            $allowedTabs = array_values(array_diff($allowedTabs, ['wall']));
         }
 
         $tab = in_array($request->query('tab'), $allowedTabs, true) ? $request->query('tab') : 'quotes';
@@ -61,6 +66,7 @@ class ProfileController extends Controller
                     ->with(['quotes' => fn ($quotes) => $quotes->visibleTo($viewer)->latest('anthology_quote.created_at')->limit(3)])
                     ->latest('updated_at')->get()
                 : collect(),
+            'wall' => $tab === 'wall' ? $user->wallSayings()->orderByPivot('created_at', 'desc')->get() : collect(),
             'poets' => $tab === 'poets' ? $user->favoritePoets()->withCount('verses')->orderBy('sort_order')->get() : collect(),
             'diwans' => $tab === 'diwans'
                 ? $user->diwans()->when(! $isOwner, fn ($public) => $public->where('is_public', true))

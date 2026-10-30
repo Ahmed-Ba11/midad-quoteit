@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'content', 'category_id', 'verse_id', 'saying_id', 'author', 'book', 'page', 'source', 'story',
+    'content', 'category_id', 'verse_id', 'saying_id', 'author', 'book', 'page', 'source', 'is_original', 'story',
     'font', 'bg_color', 'text_color', 'highlight_color', 'highlight_style', 'highlights',
     'texture', 'ratio', 'font_size',
 ])]
@@ -59,8 +59,17 @@ class Quote extends Model
         return [
             'highlights' => 'array',
             'texture' => 'boolean',
+            'is_original' => 'boolean',
             'font_size' => 'integer',
         ];
+    }
+
+    /**
+     * The anthologies (مختارات) this quote was added to.
+     */
+    public function anthologies(): BelongsToMany
+    {
+        return $this->belongsToMany(Anthology::class)->withTimestamps();
     }
 
     public function user(): BelongsTo

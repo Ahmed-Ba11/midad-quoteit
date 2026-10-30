@@ -6,7 +6,7 @@
     @php
         $editingId = request()->integer('edit') ?: null;
         $sorts = ['latest' => 'الأحدث', 'likes' => 'الأكثر إعجاباً', 'replies' => 'الأكثر نقاشاً'];
-        $keep = array_filter(['q' => $filters['q'], 'sort' => $filters['sort'] === 'latest' ? null : $filters['sort']]);
+        $keep = array_filter(['q' => $filters['q'], 'sort' => $filters['sort'] === 'latest' ? null : $filters['sort'], 'original' => $filters['original'] ? '1' : null]);
     @endphp
 
     <div class="mx-auto max-w-6xl px-4 py-10">
@@ -30,6 +30,9 @@
         <form method="GET" action="{{ route('home') }}" role="search" class="flex flex-col gap-3 sm:flex-row">
             @if ($filters['category'])
                 <input type="hidden" name="category" value="{{ $filters['category'] }}">
+            @endif
+            @if ($filters['original'])
+                <input type="hidden" name="original" value="1">
             @endif
 
             <div class="relative flex-1">
@@ -56,7 +59,11 @@
 
         {{-- Category chips --}}
         <nav aria-label="التصنيفات" class="mt-5 flex flex-wrap gap-2">
-            <x-chip :href="route('home', $keep)" :active="$filters['category'] === null">الكل</x-chip>
+            <x-chip :href="route('home', \Illuminate\Support\Arr::except($keep, 'original'))" :active="$filters['category'] === null && ! $filters['original']">الكل</x-chip>
+            <x-chip :href="route('home', [...$keep, 'original' => $filters['original'] ? null : '1'])" :active="$filters['original']">
+                <x-icon name="feather" class="size-4" /> بأقلام القرّاء
+            </x-chip>
+            <span aria-hidden="true" class="mx-1 h-6 w-px self-center bg-line"></span>
             @foreach ($categories as $category)
                 <x-chip :href="route('home', [...$keep, 'category' => $category->slug])"
                     :active="$filters['category'] === $category->slug">{{ $category->name }}</x-chip>
@@ -65,7 +72,7 @@
 
         <div class="mt-8">
             @if ($quotes->isEmpty())
-                @if ($filters['q'] !== '' || $filters['category'])
+                @if ($filters['q'] !== '' || $filters['category'] || $filters['original'])
                     <x-empty-state title="لا نتائج" icon="search">
                         لم نجد اقتباساً يطابق بحثك. جرّب كلمة أخرى أو
                         <a href="{{ route('home') }}" class="font-medium text-accent hover:underline">اعرض الكل</a>.

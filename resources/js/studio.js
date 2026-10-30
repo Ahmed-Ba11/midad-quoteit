@@ -15,6 +15,7 @@ export function initStudio(form) {
     const storyPreview = form.querySelector('[data-story-preview]');
     const storyText = form.querySelector('[data-story-text]');
     const fontSizeOutput = form.querySelector('[data-output="font_size"]');
+    const originalToggle = form.querySelector('[data-original-toggle]');
 
     let highlighted = new Set(
         [...highlightInputs.querySelectorAll('input')].map((input) => Number(input.value)),
@@ -166,8 +167,13 @@ export function initStudio(form) {
         artText.classList.toggle('hl-color', checkedValue('highlight_style') === 'color');
         artTexture.classList.toggle('hidden', !form.querySelector('input[type="checkbox"][name="texture"]').checked);
 
+        // بقلمي: own writing is signed with the writer's name; author and source are not asked for.
+        const isOriginal = Boolean(originalToggle?.checked);
+        form.querySelectorAll('[data-attribution]').forEach((wrapper) => wrapper.classList.toggle('hidden', isOriginal));
+
         const page = field('page')?.value.trim();
-        const byline = [field('author').value.trim(), field('book').value.trim(), page ? `ص ${page}` : '']
+        const author = isOriginal ? `بقلم ${config.writer}` : field('author').value.trim();
+        const byline = [author, field('book').value.trim(), page ? `ص ${page}` : '']
             .filter(Boolean)
             .join(' · ');
         artByline.textContent = `— ${byline}`;

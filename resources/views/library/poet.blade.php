@@ -23,6 +23,23 @@
                 <p class="text-sm text-gold">{{ $poet->eraLabel() }}@if ($poet->region) · {{ $poet->region }}@endif</p>
                 <h1 class="mt-1 font-display text-5xl font-black">{{ $poet->name }}</h1>
                 <p class="mt-4 max-w-2xl font-text text-lg leading-loose text-muted">{{ $poet->bio }}</p>
+
+                {{-- شعرائي: keep this poet in my corner. --}}
+                <div class="mt-5 flex flex-wrap items-center justify-center gap-3 sm:justify-start">
+                    @auth
+                        <form method="POST" action="{{ route('poets.favorite', $poet) }}">
+                            @csrf
+                            <x-button type="submit" :variant="$isFavorite ? 'secondary' : 'primary'" icon="heart" aria-pressed="{{ $isFavorite ? 'true' : 'false' }}">
+                                {{ $isFavorite ? 'في شعرائي' : 'أضف إلى شعرائي' }}
+                            </x-button>
+                        </form>
+                    @else
+                        <x-button :href="route('login')" variant="secondary" icon="heart">سجّل دخولك لتضيفه إلى شعرائك</x-button>
+                    @endauth
+                    @if ($poet->fans_count)
+                        <span class="text-sm text-muted">في ركن {{ $poet->fans_count }} من القرّاء</span>
+                    @endif
+                </div>
             </div>
         </header>
 

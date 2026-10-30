@@ -312,6 +312,33 @@
             </ul>
         </section>
 
+        {{-- دواوين القرّاء: poets the readers brought, kept apart from the verified shelves above. --}}
+        <section id="readers-diwans" aria-labelledby="readers-diwans-title" class="scroll-mt-20 border-t border-line py-16">
+            <div class="flex flex-col items-center gap-8 rounded-3xl border border-line bg-surface p-8 text-center md:flex-row md:text-start">
+                <x-ornament name="shamsa" class="size-20 shrink-0 text-gold" />
+                <div class="flex-1">
+                    <h2 id="readers-diwans-title" class="font-display text-3xl font-bold">شاعرك ليس هنا؟</h2>
+                    <p class="mt-2 text-muted">
+                        أنشئ له ديواناً في «دواوين القرّاء» وانقل أبياته مع مصدرها، ثم صمّم منها في رواق الحرف.
+                        يبقى دفترك خاصاً، ولا يُنشر للجميع إلا شعر من تُوفّي قبل أكثر من ٥٠ سنة.
+                    </p>
+                    @if ($readersDiwans->isNotEmpty())
+                        <p class="mt-3 flex flex-wrap justify-center gap-2 md:justify-start">
+                            @foreach ($readersDiwans as $diwan)
+                                <x-chip :href="route('diwans.show', $diwan)">{{ $diwan->poet_name }} · {{ $diwan->title }}</x-chip>
+                            @endforeach
+                        </p>
+                    @endif
+                </div>
+                <div class="flex shrink-0 flex-col gap-2">
+                    <x-button :href="route('diwans.index')" icon="scroll">تصفّح دواوين القرّاء</x-button>
+                    @auth
+                        <x-button :href="route('diwans.create')" variant="ghost" icon="plus">ديوان جديد</x-button>
+                    @endauth
+                </div>
+            </div>
+        </section>
+
         <p class="border-t border-line py-8 text-center text-xs text-muted">
             النصوص من ويكي مصدر وويكي الاقتباس، ومتاحة بترخيص المشاع الإبداعي (CC BY-SA).
         </p>

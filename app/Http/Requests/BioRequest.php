@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class BioRequest extends FormRequest
 {
@@ -24,6 +25,7 @@ class BioRequest extends FormRequest
     {
         return [
             'bio' => ['nullable', 'string', 'max:160'],
+            'accent' => ['sometimes', 'nullable', Rule::in(array_keys(config('quotes.palettes')))],
         ];
     }
 
@@ -34,6 +36,7 @@ class BioRequest extends FormRequest
     {
         return [
             'bio.max' => 'النبذة حتى ١٦٠ حرفاً.',
+            'accent.in' => 'اختر لوناً من القائمة.',
         ];
     }
 }

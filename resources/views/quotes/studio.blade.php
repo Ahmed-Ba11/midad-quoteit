@@ -23,7 +23,7 @@
 
     <form method="POST" id="studio" novalidate
         action="{{ $isEditing ? route('edit_quote', $quote) : route('store_quote') }}"
-        data-config="{{ json_encode(['fonts' => $fonts, 'ratios' => config('quotes.ratios'), 'palettes' => config('quotes.palettes')]) }}"
+        data-config="{{ json_encode(['fonts' => $fonts, 'ratios' => config('quotes.ratios'), 'palettes' => config('quotes.palettes'), 'writer' => auth()->user()->name]) }}"
         class="mx-auto grid max-w-7xl gap-6 px-4 py-6 lg:h-[calc(100dvh-4rem)] lg:grid-cols-[440px_1fr]">
         @csrf
         @if ($isEditing)
@@ -89,8 +89,21 @@
                         <x-textarea name="content" label="نص الاقتباس" hint="من ٣ إلى ١٥٥ حرفاً" rows="4" minlength="3"
                             maxlength="155" required :value="old('content', $quote->content)" />
 
-                        <x-input name="author" label="القائل" hint="اختياري، حتى ١٠٠ حرف" maxlength="100"
-                            :value="$quote->author" />
+                        {{-- بقلمي: the reader's own writing — no other author, no source; the card is signed with their name. --}}
+                        <input type="hidden" name="is_original" value="0">
+                        <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-line bg-paper p-4 transition hover:border-accent has-[:checked]:border-accent has-[:checked]:bg-accent-soft">
+                            <input type="checkbox" name="is_original" value="1" data-original-toggle @checked(old('is_original', $quote->is_original))
+                                class="mt-1 size-4 accent-[var(--color-accent)]">
+                            <span>
+                                <span class="flex items-center gap-1.5 font-medium"><x-icon name="feather" class="size-4" /> النص من تأليفي</span>
+                                <span class="mt-0.5 block text-xs text-muted">يُوقَّع باسمك «بقلم {{ auth()->user()->name }}» ويظهر في «بقلمي» بركنك وفي «بأقلام القرّاء».</span>
+                            </span>
+                        </label>
+
+                        <div data-attribution>
+                            <x-input name="author" label="القائل" hint="اختياري، حتى ١٠٠ حرف" maxlength="100"
+                                :value="$quote->author" />
+                        </div>
 
                         <x-input name="book" label="الكتاب أو الديوان" maxlength="150" :value="$quote->book" list="book-titles"
                             hint="اختياري، حتى ١٥٠ حرفاً؛ اختر من الكتب المقترحة إن وُجد، ليجتمع مع اقتباسات القرّاء الآخرين" />
@@ -116,9 +129,11 @@
                             </div>
                         </div>
 
-                        <x-input name="source" label="المصدر" maxlength="200" :value="$quote->source"
-                            placeholder="مثل: صحيفة الجزيرة، أو رابط الصفحة"
-                            hint="مطلوب إذا نقلت كلام غيرك ولم تذكر الكتاب؛ اقتبس بيتاً أو بيتين فقط" />
+                        <div data-attribution>
+                            <x-input name="source" label="المصدر" maxlength="200" :value="$quote->source"
+                                placeholder="مثل: صحيفة الجزيرة، أو رابط الصفحة"
+                                hint="مطلوب إذا نقلت كلام غيرك ولم تذكر الكتاب؛ اقتبس بيتاً أو بيتين فقط" />
+                        </div>
                     @endif
 
                     <div>

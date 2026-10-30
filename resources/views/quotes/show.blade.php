@@ -44,6 +44,12 @@
 
                         @can('update', $quote)
                             <x-button variant="ghost" :href="route('quotes.edit', $quote)" icon="palette">تصميم</x-button>
+                            <form method="POST" action="{{ route('profile.pin', $quote) }}">
+                                @csrf
+                                <x-button type="submit" variant="ghost" icon="pin">
+                                    {{ auth()->user()->pinned_quote_id === $quote->id ? 'مثبّت في ركني' : 'ثبّت في ركني' }}
+                                </x-button>
+                            </form>
                         @endcan
                     </div>
                 </div>
@@ -54,7 +60,7 @@
                         @if ($quote->sourceUrl())
                             {{-- A user-supplied link: no ranking credit, no referrer, no opener. --}}
                             <a href="{{ $quote->sourceUrl() }}" target="_blank" rel="nofollow ugc noopener noreferrer"
-                                class="inline-flex items-center gap-1 text-accent hover:underline" dir="ltr">{{ \Illuminate\Support\Str::limit(preg_replace('#^https?://(www\.)?#i', '', $quote->source), 60) }}
+                                class="inline-flex items-center gap-1 text-accent hover:underline" dir="ltr">{{ \Illuminate\Support\Str::limit(rawurldecode(preg_replace('#^https?://(www\.)?#i', '', $quote->source)), 60) }}
                                 <x-icon name="external" class="size-3.5" /></a>
                         @else
                             {{ $quote->source }}
@@ -62,6 +68,51 @@
                     </p>
                 @endif
             </article>
+
+            {{-- مختاراتي: add this quote to one of my anthologies, or start a new one with it. --}}
+            @auth
+                <section id="anthologies" class="mx-auto mt-8 scroll-mt-24 rounded-3xl border border-line bg-surface" style="max-width: {{ $ratioWidth }}px">
+                    <div class="flex flex-wrap items-center gap-2 p-5">
+                        <h2 class="me-2 flex items-center gap-2 font-medium"><x-icon name="layers" class="size-5 text-accent" /> أضف إلى مختاراتي</h2>
+                        @foreach ($myAnthologies as $anthology)
+                            <form method="POST" action="{{ route('anthologies.toggle', [$anthology, $quote]) }}">
+                                @csrf
+                                <button type="submit" aria-pressed="{{ $anthology->has_quote ? 'true' : 'false' }}"
+                                    @class([
+                                        'inline-flex h-9 items-center gap-1.5 rounded-full border px-4 text-sm transition',
+                                        'border-accent bg-accent-soft text-accent' => $anthology->has_quote,
+                                        'border-line hover:border-accent hover:text-accent' => ! $anthology->has_quote,
+                                    ])>
+                                    <span aria-hidden="true" class="size-2.5 rounded-full" style="background: {{ $anthology->colors()['bg'] }}"></span>
+                                    {{ $anthology->title }}
+                                    @if ($anthology->has_quote)
+                                        <x-icon name="check" class="size-4" />
+                                    @endif
+                                </button>
+                            </form>
+                        @endforeach
+                        @if ($myAnthologies->isEmpty())
+                            <p class="text-sm text-muted">اجمع ما يعجبك في مختارات باسمها: «أبيات الصبر»، «من رمضان»…</p>
+                        @endif
+                    </div>
+
+                    <details class="group border-t border-line" @if ($errors->hasAny(['title', 'description', 'palette'])) open @endif>
+                        <summary class="flex cursor-pointer list-none items-center gap-2 px-5 py-3 text-sm text-accent [&::-webkit-details-marker]:hidden">
+                            <x-icon name="plus" class="size-4" /> مختارات جديدة بهذا الاقتباس
+                        </summary>
+                        @include('anthologies.partials.form', ['anthology' => new \App\Models\Anthology, 'action' => route('anthologies.store'), 'quoteId' => $quote->id])
+                    </details>
+                </section>
+            @endauth
+
+            @if ($inAnthologies->isNotEmpty())
+                <p class="mx-auto mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted" style="max-width: {{ $ratioWidth }}px">
+                    <x-icon name="layers" class="size-4" /> في مختارات:
+                    @foreach ($inAnthologies as $anthology)
+                        <a href="{{ route('anthologies.show', $anthology) }}" class="text-accent hover:underline">«{{ $anthology->title }}» لـ{{ $anthology->user->name }}</a>@unless ($loop->last)<span>،</span>@endunless
+                    @endforeach
+                </p>
+            @endif
 
             {{-- Story --}}
             @if ($quote->story)

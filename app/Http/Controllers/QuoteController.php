@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use App\Http\Requests\QuoteRequest;
 use App\Models\Book;
 use App\Models\Category;
+use App\Models\DiwanVerse;
 use App\Models\Quote;
 use App\Models\Saying;
 use App\Models\Verse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class QuoteController extends Controller
@@ -27,16 +29,18 @@ class QuoteController extends Controller
             'q' => mb_substr(trim($request->string('q')), 0, 100),
             'sort' => in_array($request->query('sort'), ['likes', 'replies'], true) ? $request->query('sort') : 'latest',
             'category' => $categories->firstWhere('slug', $request->query('category'))?->slug,
+            'original' => $request->query('original') === '1',
         ];
 
         $quotes = Quote::withCardData($request->user())
             ->search($filters['q'])
             ->when($filters['category'], fn ($query, string $slug) => $query->whereRelation('category', 'slug', $slug))
+            ->when($filters['original'], fn ($query) => $query->where('is_original', true))
             ->sortBy($filters['sort'])
             ->paginate(12)
             ->withQueryString();
 
-        $isFiltering = $filters['q'] !== '' || $filters['category'] !== null;
+        $isFiltering = $filters['q'] !== '' || $filters['category'] !== null || $filters['original'];
 
         return view('quotes.index', [
             'quotes' => $quotes,
@@ -57,6 +61,14 @@ class QuoteController extends Controller
         return view('quotes.show', [
             'quote' => $quote,
             'related' => $this->relatedQuotes($quote, $request),
+            // مختاراتي: my anthologies, each marked if it already holds this quote.
+            'myAnthologies' => $request->user()?->anthologies()
+                ->withExists(['quotes as has_quote' => fn ($quotes) => $quotes->whereKey($quote->id)])
+                ->latest('updated_at')->get() ?? collect(),
+            // Public anthologies by other readers that include this quote.
+            'inAnthologies' => $quote->anthologies()->where('is_public', true)->with('user')
+                ->when($request->user(), fn ($others, $viewer) => $others->whereNot('anthologies.user_id', $viewer->id))
+                ->latest('anthologies.updated_at')->take(6)->get(),
         ]);
     }
 
@@ -126,6 +138,16 @@ class QuoteController extends Controller
         } elseif ($saying = Saying::find($request->query('saying'))) {
             $quote->fill(['content' => $saying->text, 'author' => $saying->source]);
             $quote->setRelation('saying', $saying);
+        } elseif (ctype_digit((string) $request->query('diwan_verse'))
+            && ($diwanVerse = DiwanVerse::with('diwan')->find((int) $request->query('diwan_verse')))
+            && Gate::allows('view', $diwanVerse->diwan)) {
+            // A verse from دواوين القرّاء: prefilled with its poet and source, but editable (not verified text).
+            $quote->fill([
+                'content' => $diwanVerse->asText(),
+                'author' => $diwanVerse->diwan->poet_name,
+                'source' => $diwanVerse->diwan->source,
+                'category_id' => Category::where('slug', 'shir')->value('id'),
+            ]);
         } elseif ($request->filled('book')) {
             // "أضف اقتباساً من هذا الكتاب" on a book page.
             $quote->fill([

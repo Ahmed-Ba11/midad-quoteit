@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Diwan;
 use App\Models\Poet;
 use App\Models\Saying;
 use App\Models\Verse;
@@ -33,6 +34,7 @@ class LibraryController extends Controller
             'diwans' => $works->where('type', '!=', 'muallaqa')->sortBy(fn (Work $work) => [$work->poet->sort_order, $work->sort_order])->values(),
             'occasionVerses' => Verse::with('work.poet')->whereNotNull('occasion')->orderBy('id')->get()->groupBy('occasion'),
             'sayings' => Saying::orderBy('id')->get(),
+            'readersDiwans' => Diwan::where('is_public', true)->latest('updated_at')->take(6)->get(),
             'counts' => [
                 'poets' => $poets->count(),
                 'works' => $works->count(),
@@ -54,10 +56,13 @@ class LibraryController extends Controller
     /**
      * One poet: biography, works and every verse in the library.
      */
-    public function poet(Poet $poet): View
+    public function poet(Request $request, Poet $poet): View
     {
-        $poet->load(['works.verses']);
+        $poet->load(['works.verses'])->loadCount('fans');
 
-        return view('library.poet', ['poet' => $poet]);
+        return view('library.poet', [
+            'poet' => $poet,
+            'isFavorite' => $request->user()?->favoritePoets()->whereKey($poet->id)->exists() ?? false,
+        ]);
     }
 }

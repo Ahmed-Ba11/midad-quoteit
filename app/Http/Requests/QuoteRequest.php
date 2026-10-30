@@ -37,7 +37,7 @@ class QuoteRequest extends FormRequest
         $editing = $this->route('quote');
 
         if ($editing instanceof Quote && $editing->isFromLibrary()) {
-            $this->merge($editing->only(['content', 'author', 'book']));
+            $this->merge([...$editing->only(['content', 'author', 'book']), 'is_original' => false]);
 
             return;
         }
@@ -53,6 +53,7 @@ class QuoteRequest extends FormRequest
                 'content' => $verses->map->asText()->implode("\n"),
                 'author' => $verses->pluck('work.poet.name')->unique()->implode(' و'),
                 'book' => $verses->pluck('work.title')->unique()->count() === 1 ? $verses->first()->work->title : null,
+                'is_original' => false,
             ]);
             $this->libraryLink = ['verse_id' => $verses->first()->id, 'saying_id' => null];
 
@@ -62,8 +63,15 @@ class QuoteRequest extends FormRequest
         $sayingId = $this->input('saying');
 
         if (ctype_digit((string) $sayingId) && $saying = Saying::find((int) $sayingId)) {
-            $this->merge(['content' => $saying->text, 'author' => $saying->source, 'book' => null]);
+            $this->merge(['content' => $saying->text, 'author' => $saying->source, 'book' => null, 'is_original' => false]);
             $this->libraryLink = ['verse_id' => null, 'saying_id' => $saying->id];
+
+            return;
+        }
+
+        // بقلمي: the reader's own words have no other author and need no source.
+        if ($this->boolean('is_original')) {
+            $this->merge(['author' => null, 'source' => null]);
         }
     }
 
@@ -91,6 +99,7 @@ class QuoteRequest extends FormRequest
             'author' => ['sometimes', 'nullable', 'string', 'max:100'],
             'book' => ['sometimes', 'nullable', 'string', 'max:150'],
             'source' => ['nullable', 'string', 'max:200'],
+            'is_original' => ['sometimes', 'boolean'],
             'page' => ['sometimes', 'nullable', 'integer', 'between:1,9999'],
             'book_genre' => ['sometimes', 'nullable', Rule::in(array_keys(config('quotes.book_genres')))],
             'story' => ['sometimes', 'nullable', 'string', 'max:500'],

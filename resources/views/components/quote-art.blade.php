@@ -3,7 +3,9 @@
 @php
     $font = config('quotes.fonts.'.$quote->font, config('quotes.fonts.amiri'));
     $ratio = config('quotes.ratios.'.$quote->ratio, config('quotes.ratios.wide'));
-    $byline = collect([$quote->author, $quote->book, $quote->page ? 'ص '.$quote->page : null])->filter()->implode(' · ');
+    // بقلمي: the sharer wrote it, so the byline is their own name.
+    $writer = $quote->is_original && $quote->relationLoaded('user') ? 'بقلم '.$quote->user->name : null;
+    $byline = collect([$writer ?? $quote->author, $quote->book, $quote->page ? 'ص '.$quote->page : null])->filter()->implode(' · ');
 @endphp
 
 {{-- The same markup is rebuilt by resources/js/studio.js for the live preview in رواق الحرف. --}}

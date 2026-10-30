@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
@@ -26,6 +27,14 @@ class Poet extends Model
     public function works(): HasMany
     {
         return $this->hasMany(Work::class)->orderBy('sort_order');
+    }
+
+    /**
+     * Readers who added this poet to شعرائي.
+     */
+    public function fans(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class)->withTimestamps();
     }
 
     public function verses(): HasManyThrough

@@ -38,6 +38,16 @@
         <x-quote-actions :quote="$quote" class="flex-1" />
 
         @can('update', $quote)
+            @php $isPinned = auth()->user()->pinned_quote_id === $quote->id; @endphp
+            {{-- Pinning lives in ركني (and on the quote page), to keep the card footer light elsewhere. --}}
+            <form method="POST" action="{{ route('profile.pin', $quote) }}" @class(['hidden' => ! request()->routeIs('profile.show')])>
+                @csrf
+                <button type="submit" aria-pressed="{{ $isPinned ? 'true' : 'false' }}"
+                    aria-label="{{ $isPinned ? 'إلغاء التثبيت من ركني' : 'ثبّت في ركني' }}" title="{{ $isPinned ? 'مثبّت في ركنك' : 'ثبّت في ركني' }}"
+                    @class(['grid size-11 place-items-center rounded-full transition hover:bg-accent-soft hover:text-accent', 'text-accent' => $isPinned, 'text-muted' => ! $isPinned])>
+                    <x-icon name="pin" @class(['size-[18px]', 'fill-current' => $isPinned]) />
+                </button>
+            </form>
             @unless ($quote->isFromLibrary())
                 <a href="{{ request()->fullUrlWithQuery(['edit' => $quote->id]) }}" aria-label="تعديل" title="تعديل النص"
                     class="grid size-11 place-items-center rounded-full text-muted transition hover:bg-accent-soft hover:text-accent">

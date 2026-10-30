@@ -4,12 +4,14 @@ namespace Database\Seeders;
 
 use App\Models\Book;
 use App\Models\Category;
+use App\Models\Poet;
 use App\Models\Quote;
 use App\Models\Saying;
 use App\Models\User;
 use App\Models\Verse;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 /**
  * Demo data for trying the app: 5 readers, ~20 designed quotes (some from the library),
@@ -129,5 +131,48 @@ class DatabaseSeeder extends Seeder
         $users[1]->books()->attach($muqaddimah, ['status' => 'read']);
         $users[3]->books()->attach($muqaddimah, ['status' => 'reading']);
         $users[0]->books()->attach($muqaddimah, ['status' => 'want']);
+
+        $this->seedCorners($users, $created);
+    }
+
+    /**
+     * ركني: colours, a pinned quote, favourite poets, anthologies, own writing and a reader's diwan.
+     *
+     * @param  Collection<int, User>  $users
+     * @param  Collection<int, Quote>  $quotes
+     */
+    private function seedCorners($users, $quotes): void
+    {
+        foreach (['navy', 'cocoa', 'mauve', null, 'sage'] as $index => $accent) {
+            $users[$index]->update(['accent' => $accent]);
+        }
+
+        // بقلمي: the demo quotes without an author are the readers' own lines.
+        $quotes->whereNull('author')->whereNull('verse_id')->whereNull('saying_id')
+            ->each(fn (Quote $quote) => $quote->update(['is_original' => true]));
+
+        $users[0]->update(['pinned_quote_id' => $quotes->firstWhere('user_id', $users[0]->id)->id]);
+        $users[2]->update(['pinned_quote_id' => $quotes->firstWhere('user_id', $users[2]->id)->id]);
+
+        $poets = Poet::pluck('id', 'slug');
+        $users[0]->favoritePoets()->attach($poets->only(['imru-al-qays', 'zuhair', 'antara'])->values());
+        $users[2]->favoritePoets()->attach($poets->only(['al-mutanabbi', 'al-maarri', 'abu-tammam'])->values());
+
+        $wisdom = $users[0]->anthologies()->create(['title' => 'أبيات الحكمة', 'description' => 'ما أعود إليه حين أحتاج نصيحة.', 'palette' => 'navy']);
+        $wisdom->quotes()->attach($quotes->whereNotNull('verse_id')->take(4)->pluck('id'));
+        $reading = $users[2]->anthologies()->create(['title' => 'عن القراءة', 'description' => 'كل ما قيل في الكتب والقراءة.', 'palette' => 'sand']);
+        $reading->quotes()->attach($quotes->filter(fn (Quote $quote) => str_contains($quote->content, 'كتاب') || str_contains($quote->content, 'القراءة'))->pluck('id'));
+        $users[2]->anthologies()->create(['title' => 'مسودّات', 'palette' => 'ink', 'is_public' => false]);
+
+        // دواوين القرّاء: two verses checked against نونية ابن زيدون on Wikisource (ابن زيدون died 1071, public domain).
+        $diwan = $users[4]->diwans()->create([
+            'poet_name' => 'ابن زيدون', 'poet_death_year' => 1071, 'title' => 'من نونيّة ابن زيدون', 'color' => 'mauve', 'is_public' => true,
+            'about' => 'قالها في ولّادة بنت المستكفي بعد الفراق، وهي من أشهر قصائد الأندلس.',
+            'source' => 'https://ar.wikisource.org/wiki/'.rawurlencode('أضحى التنائي بديلا عن تدانينا'),
+        ]);
+        $diwan->verses()->createMany([
+            ['sadr' => 'أضْحَى التّنائي بَديلاً عنْ تَدانِينَا', 'ajuz' => 'وَنَابَ عَنْ طيبِ لُقْيانَا تجافينَا', 'note' => 'مطلع القصيدة'],
+            ['sadr' => 'أَنَّ الزَمانَ الَّذي مازالَ يُضحِكُنا', 'ajuz' => 'أُنساً بِقُربِهِمُ قَد عادَ يُبكينا'],
+        ]);
     }
 }

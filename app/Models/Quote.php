@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'content', 'category_id', 'verse_id', 'saying_id', 'author', 'book', 'page', 'source', 'is_original', 'story',
+    'content', 'category_id', 'verse_id', 'saying_id', 'author', 'book', 'page', 'source', 'source_url', 'is_original', 'is_public', 'story',
     'font', 'bg_color', 'text_color', 'highlight_color', 'highlight_style', 'highlights',
     'texture', 'ratio', 'font_size',
 ])]
@@ -49,6 +49,8 @@ class Quote extends Model
         'texture' => true,
         'ratio' => 'wide',
         'font_size' => 34,
+        'is_public' => true,
+        'is_original' => false,
     ];
 
     /**
@@ -60,6 +62,7 @@ class Quote extends Model
             'highlights' => 'array',
             'texture' => 'boolean',
             'is_original' => 'boolean',
+            'is_public' => 'boolean',
             'font_size' => 'integer',
         ];
     }
@@ -98,13 +101,52 @@ class Quote extends Model
     }
 
     /**
-     * The source as a safe link when it is a web address (http/https only); otherwise null.
+     * The "read on" link as a safe URL (http/https only); otherwise null.
      */
     public function sourceUrl(): ?string
     {
-        $source = trim((string) $this->source);
+        $url = trim((string) $this->source_url);
 
-        return filter_var($source, FILTER_VALIDATE_URL) && preg_match('#^https?://#i', $source) ? $source : null;
+        return filter_var($url, FILTER_VALIDATE_URL) && preg_match('#^https?://#i', $url) ? $url : null;
+    }
+
+    /**
+     * What readers see instead of a raw link: the source's name, else the book, else the site's name.
+     */
+    public function sourceLabel(): ?string
+    {
+        if (filled($this->source)) {
+            return $this->source;
+        }
+
+        if (filled($this->book)) {
+            return $this->book;
+        }
+
+        $host = $this->sourceUrl() ? parse_url($this->sourceUrl(), PHP_URL_HOST) : null;
+
+        return $host ? preg_replace('/^www\./i', '', $host) : null;
+    }
+
+    /**
+     * Shown to everyone (home, books, search). Private quotes live only in their owner's corner.
+     *
+     * @param  Builder<Quote>  $query
+     */
+    public function scopePublic(Builder $query): void
+    {
+        $query->where('quotes.is_public', true);
+    }
+
+    /**
+     * Public quotes, plus the viewer's own private ones.
+     *
+     * @param  Builder<Quote>  $query
+     */
+    public function scopeVisibleTo(Builder $query, ?User $viewer): void
+    {
+        $query->where(fn (Builder $visible) => $visible->where('quotes.is_public', true)
+            ->when($viewer, fn (Builder $own) => $own->orWhere('quotes.user_id', $viewer->id)));
     }
 
     /**
@@ -184,7 +226,7 @@ class Quote extends Model
      */
     public static function ofTheDay(): ?self
     {
-        $count = static::count();
+        $count = static::public()->count();
 
         if ($count === 0) {
             return null;
@@ -192,7 +234,7 @@ class Quote extends Model
 
         $offset = crc32(today()->toDateString()) % $count;
 
-        return static::with(['user', 'category'])->orderBy('id')->skip($offset)->first();
+        return static::public()->with(['user', 'category'])->orderBy('id')->skip($offset)->first();
     }
 
     /**

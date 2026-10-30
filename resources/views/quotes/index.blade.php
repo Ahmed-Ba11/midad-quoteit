@@ -10,7 +10,7 @@
     @endphp
 
     @if ($isFrontPage)
-        {{-- The front door: what مِداد is, today's quote, and a way in for everyone. --}}
+        {{-- The front door: what رقيم is, today's quote, and a way in for everyone. --}}
         <section class="hero-ink relative isolate overflow-hidden">
             <x-ornament name="girih" class="girih absolute inset-0 -z-10 h-full w-full" />
             <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:py-20">
@@ -51,12 +51,12 @@
             </div>
         </section>
 
-        {{-- أقلام مِداد: readers and what they chose to share publicly — a way to visit their corners. --}}
+        {{-- أقلام رقيم: readers and what they chose to share publicly — a way to visit their corners. --}}
         @if ($pens->isNotEmpty())
             <section aria-labelledby="pens-title" class="border-b border-line bg-surface">
                 <div class="mx-auto max-w-6xl px-4 py-8">
                     <div class="flex flex-wrap items-baseline justify-between gap-2">
-                        <h2 id="pens-title" class="font-display text-2xl font-bold">أقـــلام مِداد</h2>
+                        <h2 id="pens-title" class="font-display text-2xl font-bold">أقـــلام رقيم</h2>
                         <p class="text-sm text-muted">قرّاء يشاركون ما بقي معهم؛ زُر أركانهم.</p>
                     </div>
                     <ul class="-mx-4 mt-5 flex snap-x gap-3 overflow-x-auto px-4 pb-2">

@@ -39,10 +39,10 @@ class AnthologyController extends Controller
             Gate::authorize('view', $quote = Quote::findOrFail($request->integer('quote_id')));
             $anthology->quotes()->attach($quote);
 
-            return $this->backTo('#anthologies');
+            return $this->backTo('#anthologies')->with('toast', 'أُنشئت المختارات وفيها هذا الاقتباس.');
         }
 
-        return redirect()->route('anthologies.show', $anthology);
+        return redirect()->route('anthologies.show', $anthology)->with('toast', 'أُنشئت مختاراتك؛ أضف إليها من أي اقتباس.');
     }
 
     /**
@@ -52,7 +52,7 @@ class AnthologyController extends Controller
     {
         $anthology->update($request->safe()->except('quote_id'));
 
-        return redirect()->route('anthologies.show', $anthology);
+        return redirect()->route('anthologies.show', $anthology)->with('toast', 'حُفظت المختارات.');
     }
 
     /**
@@ -62,7 +62,7 @@ class AnthologyController extends Controller
     {
         $anthology->delete();
 
-        return redirect()->route('profile.show', [$request->user(), 'tab' => 'anthologies']);
+        return redirect()->route('profile.show', [$request->user(), 'tab' => 'anthologies'])->with('toast', 'حُذفت المختارات، وبقيت الاقتباسات نفسها.');
     }
 
     /**

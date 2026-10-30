@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
- * ديوان قارئ: a poet and the verses a reader copied out with their source. Not reviewed by مِداد,
+ * ديوان قارئ: a poet and the verses a reader copied out with their source. Not reviewed by رقيم,
  * so it lives apart from خزانة الأدب and is always labelled as a reader's contribution.
  */
 #[Fillable(['poet_name', 'poet_death_year', 'title', 'about', 'source', 'color', 'is_public'])]

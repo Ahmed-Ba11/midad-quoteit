@@ -33,7 +33,34 @@ document.querySelectorAll('[data-copy]').forEach((button) => {
 });
 
 // Light/dark toggle — the initial class is set by an inline script in the layout <head> to avoid a flash.
-document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+// PWA: the service worker only provides an offline page (public/sw.js); pages always come from the network.
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+}
+
+// Toast: fades away after a few seconds, or at once when closed.
+document.querySelectorAll('[data-toast]').forEach((toast) => {
+    const hide = () => {
+        toast.classList.add('toast-leave');
+        setTimeout(() => toast.remove(), 300);
+    };
+    toast.querySelector('[data-toast-close]')?.addEventListener('click', hide);
+    setTimeout(hide, 5000);
+});
+
+// The lamp over the book: lighting it turns on night reading (dark mode); putting it out, day.
+const themeButtons = document.querySelectorAll('[data-theme-toggle]');
+const syncLamp = () => {
+    const isDark = document.documentElement.classList.contains('dark');
+    themeButtons.forEach((button) => {
+        button.setAttribute('aria-pressed', String(isDark));
+        button.setAttribute('aria-label', isDark ? 'أطفئ المصباح: الوضع النهاري' : 'أشعل المصباح: الوضع الليلي');
+        button.title = button.getAttribute('aria-label');
+    });
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#1B1714' : '#F5EFE4');
+};
+
+themeButtons.forEach((button) => {
     button.addEventListener('click', () => {
         const isDark = document.documentElement.classList.toggle('dark');
 
@@ -42,5 +69,8 @@ document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
         } catch {
             // Storage can be blocked (private mode); the toggle still works for this page.
         }
+
+        syncLamp();
     });
 });
+syncLamp();

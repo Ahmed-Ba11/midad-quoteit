@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#F5EFE4">
+    <title>لا اتصال · رقيم</title>
+    <link rel="icon" href="/icons/raqeem.svg" type="image/svg+xml">
+    <style>
+        :root { color-scheme: light dark; --paper: #F5EFE4; --ink: #2B2520; --muted: #7A7068; --accent: #8A3324; --gold: #A8873F; }
+        @media (prefers-color-scheme: dark) { :root { --paper: #1B1714; --ink: #F1E8DA; --muted: #B8AB98; --accent: #E8A27F; --gold: #D9B56A; } }
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100dvh; display: grid; place-items: center; padding: 24px; background: var(--paper); color: var(--ink); font-family: 'Amiri', 'Noto Naskh Arabic', serif; text-align: center; }
+        svg { width: 72px; height: 90px; color: var(--accent); }
+        h1 { margin: 20px 0 8px; font-size: 1.8rem; }
+        p { margin: 0 auto; max-width: 22rem; color: var(--muted); line-height: 1.9; }
+        .verse { margin-top: 24px; color: var(--gold); }
+        button { margin-top: 28px; min-height: 48px; padding: 0 24px; border: 0; border-radius: 999px; background: var(--accent); color: var(--paper); font: inherit; font-size: 1rem; cursor: pointer; }
+    </style>
+</head>
+
+<body>
+    <main>
+        <svg viewBox="0 0 32 40" fill="none" aria-hidden="true">
+            <path d="M5 37.5V16a11 11 0 0 1 22 0v21.5Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
+            <g fill="#C9A45C">
+                <rect x="14.1" y="12.6" width="3.8" height="3.8" transform="rotate(45 16 14.5)" />
+                <rect x="9.6" y="19.6" width="3.8" height="3.8" transform="rotate(45 11.5 21.5)" />
+                <rect x="18.6" y="19.6" width="3.8" height="3.8" transform="rotate(45 20.5 21.5)" />
+            </g>
+        </svg>
+        <h1>انقطع الاتصال</h1>
+        <p>اللوح محفوظ في مكانه؛ عُد إليه حين يعود الاتصال.</p>
+        <p class="verse">ستُبدي لك الأيامُ ما كنتَ جاهلاً ◆ ويأتيكَ بالأخبارِ من لم تزوِّدِ</p>
+        <button type="button" onclick="location.reload()">أعد المحاولة</button>
+    </main>
+</body>
+
+</html>

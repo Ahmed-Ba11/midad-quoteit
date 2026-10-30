@@ -1,7 +1,7 @@
 @extends('layouts.auth')
 
 @section('title', 'حساب جديد')
-@section('heading', 'انضم إلى مِداد')
+@section('heading', 'انضم إلى رقيم')
 @section('subheading', 'أنشئ حسابك وشارك أول اقتباس في أقل من دقيقة.')
 
 @section('form')

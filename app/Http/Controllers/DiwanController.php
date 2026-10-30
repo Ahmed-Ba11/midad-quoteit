@@ -38,7 +38,7 @@ class DiwanController extends Controller
     {
         $diwan = $request->user()->diwans()->create($request->validated());
 
-        return redirect()->route('diwans.show', $diwan)->with('status', 'أُنشئ الديوان. أضف أول بيت.');
+        return redirect()->route('diwans.show', $diwan)->with('toast', 'أُنشئ الديوان؛ أضف أول بيت.');
     }
 
     /**
@@ -60,14 +60,14 @@ class DiwanController extends Controller
     {
         $diwan->update($request->validated());
 
-        return redirect()->route('diwans.show', $diwan)->with('status', 'حُفظت التعديلات.');
+        return redirect()->route('diwans.show', $diwan)->with('toast', 'حُفظت التعديلات.');
     }
 
     public function destroy(Request $request, Diwan $diwan): RedirectResponse
     {
         $diwan->delete();
 
-        return redirect()->route('profile.show', [$request->user(), 'tab' => 'diwans']);
+        return redirect()->route('profile.show', [$request->user(), 'tab' => 'diwans'])->with('toast', 'حُذف الديوان.');
     }
 
     /**
@@ -78,7 +78,7 @@ class DiwanController extends Controller
         $diwan->verses()->create($request->validated());
         $diwan->touch();
 
-        return redirect()->to(route('diwans.show', $diwan).'#add-verse');
+        return redirect()->to(route('diwans.show', $diwan).'#add-verse')->with('toast', 'أُضيف البيت إلى الديوان.');
     }
 
     /**

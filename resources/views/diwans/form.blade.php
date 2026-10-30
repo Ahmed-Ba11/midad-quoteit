@@ -4,13 +4,7 @@
 
 @section('content')
     <div class="mx-auto max-w-2xl px-4 py-12">
-        <nav aria-label="مسار التصفح" class="mb-6 text-sm text-muted">
-            <a href="{{ route('diwans.index') }}" class="hover:text-accent">دواوين القرّاء</a>
-            @if ($diwan->exists)
-                <span aria-hidden="true" class="mx-1">/</span>
-                <a href="{{ route('diwans.show', $diwan) }}" class="hover:text-accent">{{ $diwan->title }}</a>
-            @endif
-        </nav>
+        <x-back :href="$diwan->exists ? route('diwans.show', $diwan) : route('diwans.index')" :label="$diwan->exists ? $diwan->title : 'دواوين القرّاء'" />
 
         <h1 class="font-display text-4xl font-black">{{ $diwan->exists ? 'تعديل الديوان' : 'ديوان جديد' }}</h1>
         <p class="mt-2 text-muted">انقل أبيات شاعر تحبه مع مصدرها. بعد الحفظ تضيف الأبيات واحداً واحداً.</p>

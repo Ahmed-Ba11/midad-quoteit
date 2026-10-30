@@ -3,8 +3,16 @@
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>@hasSection('title')@yield('title') · @endif مِداد</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>@hasSection('title')@yield('title') · @endif رقيم</title>
+    <meta name="description" content="رقيم: لوحٌ لما بقي معك من كلام؛ اقتبس من كتاب تقرؤه أو بيت تحفظه، وصمّمه وشاركه.">
+
+    {{-- PWA: installable on phones, with the bar coloured like the page. --}}
+    <meta name="theme-color" content="#F5EFE4">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/icons/raqeem.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icons/raqeem-192.png">
+    <meta name="apple-mobile-web-app-title" content="رقيم">
 
     <script>
         try {
@@ -15,10 +23,13 @@
         } catch {}
     </script>
 
+    {{-- Reading fonts block the first paint; the card-design fonts load after it, so phones show text sooner. --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+Arabic:wght@300;400;500;700&family=Noto+Naskh+Arabic:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=El+Messiri:wght@400;600&family=Reem+Kufi:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=EB+Garamond:ital@0;1&family=Playfair+Display:ital@0;1&family=Libre+Baskerville:ital@0;1&family=IM+Fell+English:ital@0;1&display=swap">
+        href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+Arabic:wght@300;400;500;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap">
+    <link rel="stylesheet" media="print" onload="this.media='all'"
+        href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=El+Messiri:wght@400;600&family=Reem+Kufi:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=EB+Garamond:ital@0;1&family=Playfair+Display:ital@0;1&family=Libre+Baskerville:ital@0;1&family=IM+Fell+English:ital@0;1&display=swap">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -30,12 +41,9 @@
         @yield('content')
     </main>
 
-    <footer class="mt-16 border-t border-line">
-        <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-8 text-sm text-muted">
-            <p><span class="logo font-display text-base font-bold text-ink">مِـــداد</span> · منصّة لنشر الاقتباسات وتصميمها</p>
-            <p>النصوص الأدبية من ويكي مصدر وويكي الاقتباس (CC BY-SA) · معسكر القمّة ٢٠٢٦</p>
-        </div>
-    </footer>
+    <x-site-footer />
+
+    <x-toast />
 
     @auth
         <div id="quote-popup" popover

@@ -1,7 +1,7 @@
 // خزانة الأدب — shelf, poets' arcade, "لكلّ مقامٍ مقال" slider and the selection bar.
 // Every panel is rendered by Blade; this file only shows the chosen one.
 
-const STORAGE_KEY = 'midad.library.selection';
+const STORAGE_KEY = 'raqeem.library.selection';
 const MAX_VERSES = 2;
 const MAX_LENGTH = 155;
 

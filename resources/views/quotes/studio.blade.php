@@ -34,6 +34,7 @@
         {{-- Tools panel --}}
         <section class="flex flex-col overflow-hidden rounded-3xl border border-line bg-surface lg:min-h-0">
             <header class="px-6 pt-5">
+                <x-back :href="$isEditing ? route('quotes.show', $quote) : $backUrl" label="رجوع" class="!mb-3" />
                 <h1 class="font-display text-2xl font-bold">مرسم الحـــروف</h1>
                 <p class="mt-1 text-sm text-muted">{{ $isEditing ? 'أعد تصميم اقتباسك.' : 'اكتب، ثم اختر الخط واللون، وانشر.' }}</p>
                 <x-epigraph context="writing" class="mt-2 !text-xs" />

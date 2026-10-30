@@ -25,17 +25,9 @@
     </header>
 
     <div class="mx-auto max-w-4xl px-4 py-12">
-        <nav aria-label="مسار التصفح" class="mb-6 text-sm text-muted">
-            <a href="{{ route('diwans.index') }}" class="hover:text-accent">دواوين القرّاء</a>
-            <span aria-hidden="true" class="mx-1">/</span>
-            <a href="{{ route('profile.show', [$diwan->user, 'tab' => 'diwans']) }}" class="hover:text-accent">دواوين {{ $diwan->user->name }}</a>
-        </nav>
+        <x-back :href="route('diwans.index')" label="دواوين القرّاء" />
 
-        @if (session('status'))
-            <p role="status" class="mb-6 rounded-2xl border border-gold/40 bg-paper p-4 text-center text-sm">{{ session('status') }}</p>
-        @endif
-
-        {{-- Provenance: who copied it, from where, and that مِداد has not reviewed it. --}}
+        {{-- Provenance: who copied it, from where, and that رقيم has not reviewed it. --}}
         <aside class="rounded-3xl border border-line bg-surface p-6">
             @if ($diwan->about)
                 <p class="mb-3 font-text text-lg leading-loose">{{ $diwan->about }}</p>
@@ -56,7 +48,7 @@
             </dl>
             <p class="mt-4 flex items-start gap-2 rounded-xl bg-paper p-3 text-xs leading-relaxed text-muted">
                 <x-icon name="book-open" class="mt-0.5 size-4 shrink-0" />
-                مساهمة قارئ لم تراجعها مِداد؛ قد يقع في النقل خطأ أو اختلاف رواية، فارجع إلى المصدر قبل الاستشهاد.
+                مساهمة قارئ لم يراجعها رقيم؛ قد يقع في النقل خطأ أو اختلاف رواية، فارجع إلى المصدر قبل الاستشهاد.
             </p>
 
             @can('update', $diwan)

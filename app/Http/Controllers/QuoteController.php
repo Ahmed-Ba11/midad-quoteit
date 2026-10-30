@@ -51,7 +51,7 @@ class QuoteController extends Controller
             'filters' => $filters,
             'isFrontPage' => $isFrontPage,
             'quoteOfTheDay' => $isFrontPage ? Quote::ofTheDay() : null,
-            // أقلام مِداد: readers with the most public quotes — only what they chose to make public.
+            // أقلام رقيم: readers with the most public quotes — only what they chose to make public.
             'pens' => $isFrontPage
                 ? User::whereHas('quotes', fn ($quotes) => $quotes->public())
                     ->withCount(['quotes as public_quotes_count' => fn ($quotes) => $quotes->public()])
@@ -124,6 +124,7 @@ class QuoteController extends Controller
     {
         return view('quotes.studio', [
             'quote' => $this->draftFromLibrary($request),
+            'backUrl' => $this->previousOnSite(),
             'categories' => Category::orderBy('id')->get(),
             'bookTitles' => Book::whereHas('quotes', fn ($quotes) => $quotes->public())->latest()->limit(300)->pluck('title'),
         ]);
@@ -184,7 +185,9 @@ class QuoteController extends Controller
         $this->linkBook($quote, $request);
         $quote->user()->associate($request->user())->save();
 
-        return redirect()->route('home');
+        return redirect()->route('quotes.show', $quote)->with('toast', $quote->is_public
+            ? 'رُقِم اقتباسك، وصار في لوح القرّاء.'
+            : 'رُقِم اقتباسك في ركنك، لا يراه غيرك.');
     }
 
     /**
@@ -209,7 +212,7 @@ class QuoteController extends Controller
         $quote->save();
 
         return $request->input('_form') === 'studio'
-            ? redirect()->route('home')
+            ? redirect()->route('quotes.show', $quote)->with('toast', 'حُفظ تصميمك الجديد.')
             : $this->backTo();
     }
 

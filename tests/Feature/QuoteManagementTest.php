@@ -8,7 +8,7 @@ test('a logged-in user can share a quote (FR-05)', function () {
 
     $this->actingAs($user)
         ->post(route('store_quote'), ['content' => 'الصبر مفتاح الفرج'])
-        ->assertRedirect(route('home'));
+        ->assertRedirect(route('quotes.show', Quote::sole()))->assertSessionHas('toast');
 
     $this->assertDatabaseHas('quotes', ['user_id' => $user->id, 'content' => 'الصبر مفتاح الفرج']);
 });

@@ -9,7 +9,7 @@
             <x-ornament name="shamsa" class="mx-auto size-14 text-gold" />
             <h1 class="mt-4 font-display text-4xl font-black sm:text-5xl">دواوين القرّاء</h1>
             <p class="mx-auto mt-4 max-w-2xl font-text text-lg leading-loose text-muted">
-                شعراء ليسوا في خزانة الأدب، نقل أبياتهم القرّاء مع مصادرها. لم تراجعها مِداد، فارجع إلى المصدر المذكور في كل ديوان.
+                شعراء ليسوا في خزانة الأدب، نقل أبياتهم القرّاء مع مصادرها. لم يراجعها رقيم، فارجع إلى المصدر المذكور في كل ديوان.
             </p>
 
             <form method="GET" action="{{ route('diwans.index') }}" role="search" class="mx-auto mt-8 flex max-w-lg gap-2">

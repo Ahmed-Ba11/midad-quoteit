@@ -86,7 +86,7 @@ class ProfileController extends Controller
     {
         $request->user()->update($request->validated());
 
-        return redirect()->route('profile.show', $request->user());
+        return redirect()->route('profile.show', $request->user())->with('toast', 'تزيّن ركنك.');
     }
 
     /**

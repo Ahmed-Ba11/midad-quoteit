@@ -1,7 +1,7 @@
 @props(['verse'])
 
 {{--
-    شرح البيت: a plain meaning and the difficult words (written for مِداد), with every word one click
+    شرح البيت: a plain meaning and the difficult words (written for رقيم), with every word one click
     away from لسان العرب on Wikisource (CC BY-SA) so the reader can check it. Nothing is fetched at runtime.
 --}}
 @php
@@ -23,7 +23,7 @@
             <section>
                 <h4 class="mb-1 font-medium text-ink">المعنى</h4>
                 <p class="text-ink/85">{{ $verse->explanation }}</p>
-                <p class="mt-1 text-xs text-muted">شرح مبسّط من مِداد؛ وللتوسّع ابحث عن أي كلمة في لسان العرب أدناه.</p>
+                <p class="mt-1 text-xs text-muted">شرح مبسّط من رقيم؛ وللتوسّع ابحث عن أي كلمة في لسان العرب أدناه.</p>
             </section>
         @endif
 

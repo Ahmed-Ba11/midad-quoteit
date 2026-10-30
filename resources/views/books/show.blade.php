@@ -8,9 +8,7 @@
     @endphp
 
     <div class="mx-auto max-w-6xl px-4 py-10">
-        <nav aria-label="مسار التصفح" class="mb-8 text-sm text-muted">
-            <a href="{{ route('books.index') }}" class="hover:text-accent">رفوف القرّاء</a>
-        </nav>
+        <x-back :href="route('books.index')" label="رفوف القرّاء" />
 
         <header class="grid gap-10 md:grid-cols-[220px_1fr] md:items-start">
             <x-book-cover :book="$book" size="lg" class="mx-auto w-48 md:w-full" />

@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
     /**
      * Unique and strong, so browsers do not flag it as a password seen in data breaches.
      */
-    public const DEMO_PASSWORD = 'Midad-Demo-2026';
+    public const DEMO_PASSWORD = 'Raqeem-Demo-2026';
 
     /**
      * Seed the application's database.
@@ -34,11 +34,11 @@ class DatabaseSeeder extends Seeder
         $this->call(LibrarySeeder::class);
 
         $users = collect([
-            ['name' => 'سارة', 'email' => 'sara@midad.test', 'bio' => 'أقرأ الشعر الجاهلي بصوتٍ عالٍ.'],
-            ['name' => 'خالد', 'email' => 'khalid@midad.test', 'bio' => 'أجمع الحِكم القصيرة في دفتر صغير.'],
-            ['name' => 'نورة', 'email' => 'noura@midad.test', 'bio' => 'المتنبي أولاً، ثم كل شيء.'],
-            ['name' => 'Fahad', 'email' => 'fahad@midad.test', 'bio' => null],
-            ['name' => 'ريم', 'email' => 'reem@midad.test', 'bio' => 'أحب الخطوط العربية والقهوة.'],
+            ['name' => 'سارة', 'email' => 'sara@raqeem.test', 'bio' => 'أقرأ الشعر الجاهلي بصوتٍ عالٍ.'],
+            ['name' => 'خالد', 'email' => 'khalid@raqeem.test', 'bio' => 'أجمع الحِكم القصيرة في دفتر صغير.'],
+            ['name' => 'نورة', 'email' => 'noura@raqeem.test', 'bio' => 'المتنبي أولاً، ثم كل شيء.'],
+            ['name' => 'Fahad', 'email' => 'fahad@raqeem.test', 'bio' => null],
+            ['name' => 'ريم', 'email' => 'reem@raqeem.test', 'bio' => 'أحب الخطوط العربية والقهوة.'],
         ])->map(fn (array $user) => User::factory()->create([...$user, 'password' => self::DEMO_PASSWORD]));
 
         $category = fn (string $slug) => Category::where('slug', $slug)->value('id');
@@ -73,7 +73,7 @@ class DatabaseSeeder extends Seeder
             [2, [...$fromVerse($verse('ما كلُّ ما يتمنّى')), ...$palette('navy'), 'font' => 'amiri', 'highlights' => [6, 7, 8, 9], 'ratio' => 'wide']],
             [1, [...$fromVerse($verse('لسانُ الفتى')), ...$palette('sand'), 'font' => 'naskh', 'ratio' => 'wide', 'texture' => false]],
             [4, [...$fromVerse($verse('السيفُ أصدقُ')), ...$palette('ink'), 'font' => 'thmanyah-display', 'highlights' => [0, 1, 2], 'ratio' => 'wide']],
-            [0, [...$fromSaying('إنَّ من البيانِ'), ...$palette('cocoa'), 'font' => 'reem-kufi', 'ratio' => 'square', 'font_size' => 48, 'highlights' => [2]]],
+            [0, [...$fromSaying('خيرُ الكلامِ'), ...$palette('cocoa'), 'font' => 'reem-kufi', 'ratio' => 'square', 'font_size' => 44, 'highlights' => [0, 1]]],
             [3, [...$fromSaying('الوقتُ كالسيفِ'), ...$palette('sage'), 'font' => 'amiri', 'ratio' => 'wide', 'font_size' => 40]],
             [1, ['content' => 'القراءة سفرٌ لا يحتاج إلى جواز، ولا تنتهي تذكرته.', 'category_id' => $category('adab'), ...$palette('sand'), 'font' => 'thmanyah-text', 'highlights' => [0, 1]]],
             [2, ['content' => 'ليست الحكمة أن تعرف الطريق، بل أن تمشيه وأنت تعرف لماذا.', 'category_id' => $category('falsafa'), ...$palette('navy'), 'font' => 'naskh', 'highlights' => [6, 7]]],

@@ -4,11 +4,7 @@
 
 @section('content')
     <div class="mx-auto max-w-5xl px-4 py-12">
-        <nav aria-label="مسار التصفح" class="mb-8 text-sm text-muted">
-            <a href="{{ route('library.index') }}" class="hover:text-accent">خزانة الأدب</a>
-            <span aria-hidden="true" class="mx-1">/</span>
-            <a href="{{ route('library.index') }}#poets" class="hover:text-accent">رواق الشعراء</a>
-        </nav>
+        <x-back :href="route('library.index').'#poets'" label="رواق الشعراء" />
 
         {{-- The poet's arch, filled with their colour, beside the biography. --}}
         <header class="flex flex-col items-center gap-8 sm:flex-row sm:items-end">

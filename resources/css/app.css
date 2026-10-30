@@ -66,15 +66,70 @@
     --color-gold: #A8873F;
 }
 
+/*
+ * Night reading: warm walnut instead of cold black — like a page under a lamp. Text stays soft cream
+ * (contrast ≈ 13:1 on paper), muted text keeps ≈ 6:1, and surfaces step up gently so cards still read.
+ */
 .dark {
-    --color-paper: #14110F;
-    --color-surface: #1D1916;
-    --color-ink: #EEE6D8;
-    --color-muted: #A89D8F;
-    --color-line: #342D27;
-    --color-accent: #E3977D;
-    --color-accent-soft: #2F211C;
-    --color-gold: #C9A45C;
+    --color-paper: #1B1714;
+    --color-surface: #25201B;
+    --color-ink: #F1E8DA;
+    --color-muted: #B8AB98;
+    --color-line: #3B332B;
+    --color-accent: #E8A27F;
+    --color-accent-soft: #3A2A22;
+    --color-gold: #D9B56A;
+}
+
+/* The lamp's light: a faint warm glow from the top of the page, in dark mode only. */
+html.dark body {
+    background-image: radial-gradient(ellipse 70% 40% at 50% 0%, rgb(217 181 106 / 0.07), transparent 70%);
+    background-attachment: fixed;
+}
+
+/* Toast: rises in, fades out. */
+.toast {
+    animation: toast-in 380ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    transition: opacity 300ms ease, translate 300ms ease;
+}
+
+.toast-leave {
+    opacity: 0;
+    translate: 0 12px;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        translate: 0 16px;
+    }
+}
+
+/* Theme lamp: unlit by day; lit — flame and glow, with a gentle flicker — at night. */
+.theme-lamp .lamp-glow,
+.theme-lamp .lamp-flame {
+    opacity: 0;
+    transform-origin: 17.6px 9.6px;
+    transition: opacity 400ms ease, transform 400ms ease;
+}
+
+.dark .theme-lamp {
+    color: var(--color-gold);
+}
+
+.dark .theme-lamp .lamp-flame {
+    opacity: 1;
+    animation: lamp-flicker 2.4s ease-in-out infinite;
+}
+
+.dark .theme-lamp .lamp-glow {
+    opacity: 0.22;
+}
+
+@keyframes lamp-flicker {
+    0%, 100% { transform: scale(1, 1); }
+    40% { transform: scale(0.94, 1.06); }
+    70% { transform: scale(1.04, 0.96); }
 }
 
 @layer base {
@@ -319,6 +374,11 @@
 /* The opened diwan: two manuscript pages ruled with a double gold frame (الجدول). */
 .open-book {
     perspective: 1800px;
+}
+
+/* At night a manuscript page is a little dimmer, so it does not glare against the dark page. */
+.dark .manuscript-page {
+    filter: brightness(0.9) sepia(0.08);
 }
 
 .manuscript-page {

@@ -45,7 +45,7 @@ test('a designed quote is stored with all its design fields', function () {
     $this->actingAs($user)
         ->post(route('store_quote'), designedQuote())
         ->assertSessionHasNoErrors()
-        ->assertRedirect(route('home'));
+        ->assertRedirect(route('quotes.show', Quote::sole()));
 
     $quote = Quote::sole();
 
@@ -124,7 +124,7 @@ test('the owner can redesign their quote', function () {
 
     $this->actingAs($quote->user)
         ->put(route('edit_quote', $quote), designedQuote(['_form' => 'studio']))
-        ->assertRedirect(route('home'));
+        ->assertRedirect(route('quotes.show', $quote))->assertSessionHas('toast');
 
     expect($quote->fresh()->font)->toBe('ruqaa');
 });

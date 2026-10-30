@@ -18,6 +18,9 @@
     @endphp
 
     <div class="mx-auto max-w-6xl px-4 py-10">
+        @unless ($isOwner)
+            <x-back :href="route('home')" label="الاقتباسات" />
+        @endunless
         {{-- ركني: the reader's card in their own colour, beside the quote they pinned. --}}
         <div @class(['grid gap-6', 'lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]' => $pinned || $isOwner])>
             <header class="relative isolate flex flex-col overflow-hidden rounded-3xl p-7 shadow-lg ring-1 ring-black/10 sm:p-9"
@@ -26,7 +29,7 @@
 
                 <p class="flex items-center gap-2 text-xs opacity-75">
                     <x-ornament name="star" class="size-3.5" style="color: {{ $colors['highlight'] }}" />
-                    {{ $isOwner ? 'ركنك في مِداد: ما كتبتَ، وما جمعتَ، وما بقي معك' : 'ركنٌ من أركان مِداد' }}
+                    {{ $isOwner ? 'ركنك في رقيم: ما كتبتَ، وما جمعتَ، وما بقي معك' : 'ركنٌ من أركان رقيم' }}
                 </p>
 
                 <div class="mt-6 flex items-center gap-5">

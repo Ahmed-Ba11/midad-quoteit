@@ -106,7 +106,7 @@ test('every write route rejects requests without a CSRF token', function () {
 });
 
 test('error pages are in Arabic and use the site layout', function () {
-    $this->get('/quote/999999')->assertNotFound()->assertSee('الصفحة غير موجودة')->assertSee('مِـــداد');
+    $this->get('/quote/999999')->assertNotFound()->assertSee('الصفحة غير موجودة')->assertSee('رقيــم');
 
     $quote = Quote::factory()->create();
     $this->actingAs(User::factory()->create())

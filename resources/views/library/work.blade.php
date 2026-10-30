@@ -17,11 +17,7 @@
     </header>
 
     <div class="mx-auto max-w-4xl px-4 py-12">
-        <nav aria-label="مسار التصفح" class="mb-8 text-sm text-muted">
-            <a href="{{ route('library.index') }}" class="hover:text-accent">خزانة الأدب</a>
-            <span aria-hidden="true" class="mx-1">/</span>
-            <a href="{{ route('library.index') }}#shelf" class="hover:text-accent">رفّ الدواوين</a>
-        </nav>
+        <x-back :href="route('library.index').'#shelf'" label="رفّ الدواوين" />
 
         <p class="mb-6 text-muted">{{ $work->verses->count() }} بيتاً مختاراً. اختر بيتاً أو بيتين لتصمّمهما في مرسم الحروف.</p>
 

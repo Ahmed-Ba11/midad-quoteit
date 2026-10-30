@@ -45,7 +45,7 @@ class LibrarySeeder extends Seeder
             }
         }
 
-        // شرح البيت: a plain meaning and the meanings of its difficult words (written for مِداد).
+        // شرح البيت: a plain meaning and the meanings of its difficult words (written for رقيم).
         foreach ($library['explanations'] ?? [] as $sadr => $explanation) {
             Verse::where('sadr', $sadr)->update([
                 'explanation' => $explanation['meaning'],
@@ -58,6 +58,9 @@ class LibrarySeeder extends Seeder
         foreach ($library['sayings'] as [$text, $source]) {
             Saying::updateOrCreate(['text' => $text], ['source' => $source]);
         }
+
+        // A saying taken out of library.json leaves the wall too.
+        Saying::whereNotIn('text', array_column($library['sayings'], 0))->delete();
 
         // The epigraphs read the verses from the cache; refresh it with the new text.
         Cache::forget('epigraph-verses.v2');

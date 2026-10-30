@@ -14,9 +14,8 @@
 
 <header class="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-md">
     <nav aria-label="التنقّل الرئيسي" class="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:gap-6">
-        <a href="{{ route('home') }}" class="flex items-center gap-2" aria-label="مِداد، الصفحة الرئيسية">
-            <x-ornament name="shamsa" class="size-8 text-gold" />
-            <span class="logo font-display text-3xl font-black text-accent">مِـــداد</span>
+        <a href="{{ route('home') }}" aria-label="رقيم، الصفحة الرئيسية" class="text-accent">
+            <x-logo class="text-[1.65rem]" />
         </a>
 
         {{-- Wide screens: the places, each with a short hint underneath on hover. --}}
@@ -39,16 +38,13 @@
         </ul>
 
         <div class="ms-auto flex items-center gap-1 sm:gap-2">
-            <button type="button" data-theme-toggle aria-label="تبديل الوضع الليلي" title="الوضع الليلي"
-                class="grid size-11 place-items-center rounded-full text-muted transition hover:bg-accent-soft hover:text-accent">
-                <x-icon name="moon" class="size-5 dark:hidden" />
-                <x-icon name="sun" class="hidden size-5 dark:block" />
-            </button>
+            <x-theme-lamp />
 
             @auth
-                <x-button popovertarget="quote-popup" icon="plus" aria-label="شارك اقتباساً">
-                    <span class="hidden sm:inline">شارك اقتباساً</span>
-                </x-button>
+                {{-- On phones this lives in the middle of the bottom bar instead. --}}
+                <span class="hidden md:block">
+                    <x-button popovertarget="quote-popup" icon="quill">شارك اقتباساً</x-button>
+                </span>
 
                 @php $mine = $user->accentColors(); @endphp
                 <a href="{{ route('profile.show', $user) }}" aria-label="ركني: {{ $user->name }}" title="ركني"
@@ -75,11 +71,19 @@
     </nav>
 </header>
 
-{{-- Phones: the same places as a tab bar at the bottom, within thumb's reach. --}}
+{{-- Phones: the same places as a tab bar at the bottom, within thumb's reach; sharing sits in the middle. --}}
 <nav aria-label="التنقّل السريع" class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden">
-    <ul class="mx-auto grid max-w-md" style="grid-template-columns: repeat({{ count($places) }}, minmax(0, 1fr))">
+    <ul class="mx-auto flex max-w-md items-stretch">
         @foreach ($places as $place)
-            <li>
+            @if ($user && $loop->index === 2)
+                <li class="flex flex-1 justify-center">
+                    <button type="button" popovertarget="quote-popup" aria-label="شارك اقتباساً"
+                        class="-mt-5 grid size-14 place-items-center rounded-full bg-accent text-paper shadow-lg ring-4 ring-paper transition active:scale-95">
+                        <x-icon name="quill" class="size-6" />
+                    </button>
+                </li>
+            @endif
+            <li class="flex-1">
                 <a href="{{ route($place['route'], $place['params'] ?? []) }}" @if ($place['active']) aria-current="page" @endif
                     @class([
                         'flex h-16 flex-col items-center justify-center gap-1 text-[11px] transition',

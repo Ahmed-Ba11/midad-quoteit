@@ -12,10 +12,18 @@ abstract class Controller
      */
     protected function backTo(string $fragment = ''): RedirectResponse
     {
+        return redirect()->to($this->previousOnSite().$fragment);
+    }
+
+    /**
+     * The previous page if it is on this site (and not the current page), otherwise home.
+     */
+    protected function previousOnSite(): string
+    {
         $previous = url()->previous();
         $isOwnSite = parse_url($previous, PHP_URL_HOST) === request()->getHost()
             && parse_url($previous, PHP_URL_PORT) === parse_url(url('/'), PHP_URL_PORT);
 
-        return redirect()->to(($isOwnSite ? $previous : route('home')).$fragment);
+        return $isOwnSite && $previous !== request()->fullUrl() ? $previous : route('home');
     }
 }

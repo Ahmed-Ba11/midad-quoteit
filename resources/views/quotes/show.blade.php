@@ -12,6 +12,7 @@
 
     <div class="mx-auto grid max-w-6xl gap-10 px-4 py-10 lg:grid-cols-[1fr_300px]">
         <div class="min-w-0">
+            <x-back :href="route('home')" label="الاقتباسات" />
             {{-- Big card --}}
             <article id="quote-{{ $quote->id }}" class="scroll-mt-24">
                 @unless ($quote->is_public)

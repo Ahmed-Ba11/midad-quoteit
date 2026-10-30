@@ -19,7 +19,7 @@ test('the seeder loads every poet, the seven muallaqat and the sayings, and can 
 
     expect(Poet::count())->toBe(14)
         ->and(Work::where('type', 'muallaqa')->count())->toBe(7)
-        ->and(Saying::count())->toBe(10)
+        ->and(Saying::count())->toBe(9)
         ->and(Verse::count())->toBeGreaterThanOrEqual(90);
 });
 

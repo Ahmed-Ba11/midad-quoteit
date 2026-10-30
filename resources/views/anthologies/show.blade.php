@@ -29,6 +29,7 @@
     </header>
 
     <div class="mx-auto max-w-6xl px-4 py-10">
+        <x-back :href="route('profile.show', [$anthology->user, 'tab' => 'anthologies'])" :label="'مختارات '.$anthology->user->name" />
         @can('update', $anthology)
             <details class="group mb-8 rounded-3xl border border-line bg-surface" @if ($errors->any()) open @endif>
                 <summary class="flex cursor-pointer list-none items-center gap-2 px-6 py-4 font-medium [&::-webkit-details-marker]:hidden">

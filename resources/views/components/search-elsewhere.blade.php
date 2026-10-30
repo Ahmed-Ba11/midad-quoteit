@@ -1,7 +1,7 @@
 @props(['term', 'here' => 'quotes'])
 
 {{--
-    When a search finds nothing: try the other parts of مِداد, search trusted sites (plain links that
+    When a search finds nothing: try the other parts of رقيم, search trusted sites (plain links that
     open their own search — nothing is fetched from them), or quote the text yourself with its source.
 --}}
 @php
@@ -20,7 +20,7 @@
 <div {{ $attributes->class('mx-auto max-w-2xl space-y-6 text-start') }}>
     @if ($inside)
         <div>
-            <p class="text-sm font-medium">ابحث عن «{{ $term }}» في مِداد</p>
+            <p class="text-sm font-medium">ابحث عن «{{ $term }}» في رقيم</p>
             <div class="mt-2 flex flex-wrap gap-2">
                 @foreach ($inside as [$label, $url])
                     <x-chip :href="$url">{{ $label }}</x-chip>
@@ -30,7 +30,7 @@
     @endif
 
     <div>
-        <p class="text-sm font-medium">أو ابحث عنه خارج مِداد</p>
+        <p class="text-sm font-medium">أو ابحث عنه خارج رقيم</p>
         <div class="mt-2 flex flex-wrap gap-2">
             @foreach ($outside as $label => $url)
                 <x-external-link :href="$url"

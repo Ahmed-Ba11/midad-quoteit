@@ -226,6 +226,8 @@
             @endforeach
         </section>
 
+        <x-peninsula-voices class="mb-16" />
+
         {{-- لكلّ مقامٍ مقال: pick a mood, get the verse for it. --}}
         <section id="occasions" aria-labelledby="occasions-title" class="scroll-mt-20 border-t border-line py-16" data-occasions>
             <header class="mx-auto max-w-2xl text-center">
@@ -285,7 +287,8 @@
             <ul class="mt-12 grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($sayings as $saying)
                     @php $palette = $palettes[$loop->index % count($palettes)]; @endphp
-                    <li id="saying-{{ $saying->id }}" class="relative scroll-mt-24 pt-12">
+                    {{-- Nine plaques at first (a different nine each visit); the rest behind «more». --}}
+                    <li id="saying-{{ $saying->id }}" @class(['relative scroll-mt-24 pt-12', 'saying-more hidden' => $loop->index >= 9])>
                         <svg aria-hidden="true" viewBox="0 0 200 48" preserveAspectRatio="none" class="absolute inset-x-[18%] top-0 h-12 w-[64%] text-muted">
                             <path d="M100 6 4 48M100 6l96 42" fill="none" stroke="currentColor" stroke-width="1.2" vector-effect="non-scaling-stroke" />
                         </svg>
@@ -295,7 +298,16 @@
                             style="--tilt: {{ $tilts[$loop->index % count($tilts)] }}deg; background: {{ $palette['bg'] }}; color: {{ $palette['text'] }};">
                             <x-paper-texture />
                             <blockquote class="relative font-text text-2xl leading-relaxed">{{ $saying->text }}</blockquote>
-                            <figcaption class="relative mt-3 text-sm opacity-75">— {{ $saying->source }}</figcaption>
+                            @if ($saying->meaning)
+                                <p class="relative mt-2 text-sm opacity-85">{{ $saying->meaning }}</p>
+                            @endif
+                            <figcaption class="relative mt-3 text-xs opacity-75">
+                                @if ($saying->source_url)
+                                    <x-external-link :href="$saying->source_url" class="inline-flex min-h-11 items-center !text-current underline-offset-4">— {{ $saying->source }}</x-external-link>
+                                @else
+                                    — {{ $saying->source }}
+                                @endif
+                            </figcaption>
                             <div class="relative mt-4 flex flex-wrap items-center justify-center gap-2">
                                 <x-pick-button type="saying" :id="$saying->id" :text="$saying->text" class="h-9" />
                                 @auth
@@ -314,6 +326,16 @@
                     </li>
                 @endforeach
             </ul>
+
+            @if ($sayings->count() > 9)
+                <div class="mt-10 text-center">
+                    <button type="button" data-show-more=".saying-more"
+                        class="inline-flex min-h-11 items-center gap-2 rounded-full border border-line bg-surface px-6 text-sm font-medium transition hover:border-accent hover:text-accent">
+                        <x-icon name="plus" class="size-4" /> اعرض كل المأثورات ({{ $sayings->count() }})
+                    </button>
+                </div>
+            @endif
+            <p class="mt-6 text-center text-xs text-muted">الأمثال موثّقة من «مجمع الأمثال» للميداني وغيره؛ اضغط اسم المصدر لترى الصفحة.</p>
         </section>
 
         {{-- دواوين القرّاء: poets the readers brought, kept apart from the verified shelves above. --}}

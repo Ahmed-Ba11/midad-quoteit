@@ -63,6 +63,14 @@ document.querySelectorAll('form[data-confirm]').forEach((form) => {
     });
 });
 
+// "Show more": reveal hidden items (data-show-more="<selector>"), then the button retires.
+document.querySelectorAll('[data-show-more]').forEach((button) => {
+    button.addEventListener('click', () => {
+        document.querySelectorAll(button.dataset.showMore).forEach((item) => item.classList.remove('hidden'));
+        button.closest('div')?.remove();
+    });
+});
+
 // Live character count under a text box (data-count-target="<id of the counter>").
 document.querySelectorAll('[data-count-target]').forEach((field) => {
     const counter = document.getElementById(field.dataset.countTarget);

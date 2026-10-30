@@ -55,8 +55,14 @@ class LibrarySeeder extends Seeder
             ]);
         }
 
-        foreach ($library['sayings'] as [$text, $source]) {
-            Saying::updateOrCreate(['text' => $text], ['source' => $source]);
+        // Each saying: [text, source label, plain meaning?, URL of the page that documents it?].
+        foreach ($library['sayings'] as $saying) {
+            [$text, $source] = $saying;
+            Saying::updateOrCreate(['text' => $text], [
+                'source' => $source,
+                'meaning' => $saying[2] ?? null,
+                'source_url' => $saying[3] ?? null,
+            ]);
         }
 
         // A saying taken out of library.json leaves the wall too.

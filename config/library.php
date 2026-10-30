@@ -38,6 +38,50 @@ return [
         'abu-tammam', 'al-maarri', 'jarir', 'tarafa', 'labid', 'amr-ibn-kulthum', 'harith-ibn-hilliza',
     ],
 
+    /*
+     * أصوات من الجزيرة: modern Saudi poets, whose work is still under copyright (life + 50 years).
+     * So: at most two lines each, quoted for citation (Saudi copyright law, Art. 15), with the poet's
+     * name, the poem, and a link to read it in full. Every line was matched word for word in two
+     * independent sources (listed in "sources") on 2026-10-30; anything not confirmed was left out.
+     */
+    'peninsula_voices' => [
+        'badr' => [
+            'poet' => 'بدر بن عبدالمحسن', 'years' => '١٩٤٩ – ٢٠٢٤',
+            'about' => 'شاعر وفنان سعودي من رواد الشعر الشعبي، غنّى قصائدَه كبارُ الفنانين العرب.',
+            'verses' => [['فوق هام السحب وإن كنتِ ثرى', 'فوق عالي الشهب يا أغلى ثرى']],
+            'poem' => 'فوق هام السحب',
+            'read_more' => 'https://folk.aldiwan.net/cat-poet-albadr',
+            'sources' => ['https://www.al-jazirah.com/2023/20230423/ar5.htm', 'https://ar.wikipedia.org/wiki/فوق_هام_السحب'],
+        ],
+        'ghazi' => [
+            'poet' => 'غازي القصيبي', 'years' => '١٩٤٠ – ٢٠١٠',
+            'about' => 'شاعر وروائي ودبلوماسي سعودي، من أبرز أصوات الشعر العربي الحديث.',
+            'verses' => [
+                ['أَجَلْ نَحْنُ الْحِجَازُ وَنَحْنُ نَجْدُ', 'هُنَا مَجْدٌ لَنَا وَهُنَاكَ مَجْدُ'],
+                ['خمسٌ وستُونَ.. في أجفان إعصارِ', 'أما سئمتَ ارتحالاً أيّها الساري؟'],
+            ],
+            'poem' => 'أجل نحن الحجاز · حديقة الغروب',
+            'read_more' => 'https://www.aldiwan.net/poem61097.html',
+            'sources' => ['https://www.aldiwan.net/poem61097.html', 'https://al-jazirah.com/2010/20100822/fe3.htm', 'https://www.aldiwan.net/poem25742.html', 'https://al-jazirah.com/2005/20050607/ra1.htm'],
+        ],
+        'thubaiti' => [
+            'poet' => 'محمد الثبيتي', 'years' => '١٩٥٢ – ٢٠١١',
+            'about' => '«سيد البيد»، من رواد الحداثة في الشعر السعودي، وأول من نال جائزة سوق عكاظ للشعر.',
+            'verses' => [['أَدِرْ مُهْجَةَ الصُّبْحِ', 'صُبَّ لنَا وطناً فِي الكُؤُوسْ']],
+            'poem' => 'تغريبة القوافل والمطر',
+            'read_more' => 'https://www.aldiwan.net/poem63031.html',
+            'sources' => ['https://www.aldiwan.net/poem63031.html', 'https://www.youm7.com/story/2018/5/13/الشاعر-محمد-الثبيتى-صب-لنا-وطنا-فى-الكؤوس/3792422'],
+        ],
+        'khalid' => [
+            'poet' => 'خالد الفيصل', 'years' => 'وُلد ١٩٤٠',
+            'about' => 'شاعر وكاتب وفنان سعودي، يوقّع شعره باسم «دايم السيف».',
+            'verses' => [['أنا والصحاري والمطر والفرس والطير', 'ونبت الخزامى والظبي والشعر خلان']],
+            'poem' => 'أنا والصحاري',
+            'read_more' => 'https://www.aldiwan.net/poem111169.html',
+            'sources' => ['https://www.aldiwan.net/poem111169.html', 'https://poetsgate.com/poem.php?pm=8534'],
+        ],
+    ],
+
     // Library text in a quote is built from up to this many verses.
     'max_selection' => 2,
 

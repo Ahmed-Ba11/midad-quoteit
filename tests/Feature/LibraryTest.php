@@ -19,7 +19,7 @@ test('the seeder loads every poet, the seven muallaqat and the sayings, and can 
 
     expect(Poet::count())->toBe(14)
         ->and(Work::where('type', 'muallaqa')->count())->toBe(7)
-        ->and(Saying::count())->toBe(9)
+        ->and(Saying::count())->toBe(29)
         ->and(Verse::count())->toBeGreaterThanOrEqual(90);
 });
 
@@ -127,7 +127,7 @@ test('a saying is published with its source', function () {
 
     expect(Quote::sole())
         ->content->toBe($saying->text)
-        ->author->toBe('مثل عربي')
+        ->author->toBe('قول مأثور')
         ->saying_id->toBe($saying->id);
 });
 
@@ -245,4 +245,41 @@ test('pages show an epigraph from the verses chosen for them', function () {
 
     $signup = $this->get(route('signup'))->assertOk()->getContent();
     expect($chosen('beginning')->contains(fn (Verse $verse) => str_contains($signup, $verse->sadr)))->toBeTrue();
+});
+
+test('modern Saudi poets appear with one or two lines each, a source, and a way to read on', function () {
+    foreach (config('library.peninsula_voices') as $voice) {
+        expect(count($voice['verses']))->toBeLessThanOrEqual(2)
+            ->and(count($voice['sources']))->toBeGreaterThanOrEqual(2)
+            ->and($voice['read_more'])->toStartWith('https://');
+    }
+
+    $this->get(route('library.index'))
+        ->assertSee('أصواتٌ من الجزيرة')
+        ->assertSee('فوق هام السحب وإن كنتِ ثرى')
+        ->assertSee('أكمل قراءتك في الديوان')
+        ->assertSee('الحقوق محفوظة لأصحابها');
+});
+
+test('quoting a Saudi poet from the library pre-fills the poet, the poem and the link', function () {
+    $this->actingAs(User::factory()->create())
+        ->get(route('quotes.create', ['voice' => 'ghazi', 'line' => 0]))
+        ->assertOk()
+        ->assertSee('أَجَلْ نَحْنُ الْحِجَازُ وَنَحْنُ نَجْدُ')
+        ->assertSee('غازي القصيبي')
+        ->assertSee('https://www.aldiwan.net/poem61097.html', false);
+
+    $this->actingAs(User::factory()->create())
+        ->get(route('quotes.create', ['voice' => 'nobody', 'line' => 9]))
+        ->assertOk()->assertDontSee('غازي القصيبي');
+});
+
+test('every saying shows its meaning, and sourced ones link to the page that documents them', function () {
+    $this->seed(LibrarySeeder::class);
+    $documented = Saying::whereNotNull('source_url')->first();
+
+    expect(Saying::whereNull('meaning')->count())->toBe(0)
+        ->and(Saying::where('source', 'like', '%حديث%')->count())->toBe(0);
+
+    $this->get(route('library.index'))->assertSee('اعرض كل المأثورات')->assertSee($documented->source_url, false);
 });

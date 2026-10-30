@@ -154,7 +154,7 @@ class QuoteController extends Controller
                 $quote->setRelation('libraryVerses', $verses);
             }
         } elseif ($saying = Saying::find($request->query('saying'))) {
-            $quote->fill(['content' => $saying->text, 'author' => $saying->source]);
+            $quote->fill(['content' => $saying->text, 'author' => $saying->attribution()]);
             $quote->setRelation('saying', $saying);
         } elseif (ctype_digit((string) $request->query('diwan_verse'))
             && ($diwanVerse = DiwanVerse::with('diwan')->find((int) $request->query('diwan_verse')))
@@ -164,6 +164,17 @@ class QuoteController extends Controller
                 'content' => $diwanVerse->asText(),
                 'author' => $diwanVerse->diwan->poet_name,
                 'source' => $diwanVerse->diwan->source,
+                'category_id' => Category::where('slug', 'shir')->value('id'),
+            ]);
+        } elseif (is_array($voice = config('library.peninsula_voices.'.$request->query('voice')))
+            && isset($voice['verses'][(int) $request->query('line')])) {
+            // «اقتبس هذا البيت» from أصوات من الجزيرة: the line with its poet, poem and where to read it.
+            [$sadr, $ajuz] = $voice['verses'][(int) $request->query('line')];
+            $quote->fill([
+                'content' => $sadr."\n".$ajuz,
+                'author' => $voice['poet'],
+                'source' => 'قصيدة «'.$voice['poem'].'»',
+                'source_url' => $voice['read_more'],
                 'category_id' => Category::where('slug', 'shir')->value('id'),
             ]);
         } elseif (is_array($draft = $request->session()->get('quote_draft'))) {

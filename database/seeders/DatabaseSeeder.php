@@ -58,7 +58,7 @@ class DatabaseSeeder extends Seeder
         $fromSaying = function (string $start) use ($category) {
             $saying = Saying::where('text', 'like', $start.'%')->firstOrFail();
 
-            return ['content' => $saying->text, 'author' => $saying->source, 'saying_id' => $saying->id, 'category_id' => $category('hikma')];
+            return ['content' => $saying->text, 'author' => $saying->attribution(), 'saying_id' => $saying->id, 'category_id' => $category('hikma')];
         };
 
         $quotes = [

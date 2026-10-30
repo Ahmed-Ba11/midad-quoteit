@@ -63,7 +63,7 @@ class QuoteRequest extends FormRequest
         $sayingId = $this->input('saying');
 
         if (ctype_digit((string) $sayingId) && $saying = Saying::find((int) $sayingId)) {
-            $this->merge(['content' => $saying->text, 'author' => $saying->source, 'book' => null, 'is_original' => false]);
+            $this->merge(['content' => $saying->text, 'author' => $saying->attribution(), 'book' => null, 'is_original' => false]);
             $this->libraryLink = ['verse_id' => null, 'saying_id' => $saying->id];
 
             return;

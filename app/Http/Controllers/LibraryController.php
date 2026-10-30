@@ -42,7 +42,7 @@ class LibraryController extends Controller
             // Six verses per mood, a different six on each visit: fresh to come back to, light to load.
             'occasionVerses' => Verse::with('work.poet')->whereNotNull('occasion')->get()
                 ->groupBy('occasion')->map(fn ($verses) => $verses->shuffle()->take(6)->values()),
-            'sayings' => Saying::orderBy('id')->get(),
+            'sayings' => Saying::get()->shuffle(),
             'myWall' => $request->user()?->wallSayings()->pluck('sayings.id')->all() ?? [],
             'readersDiwans' => Diwan::where('is_public', true)->latest('updated_at')->take(6)->get(),
             'counts' => [

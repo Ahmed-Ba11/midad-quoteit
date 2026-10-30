@@ -5,14 +5,17 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>@hasSection('title')@yield('title') · @endif رقيم</title>
-    <meta name="description" content="رقيم: لوحٌ لما بقي معك من كلام؛ اقتبس من كتاب تقرؤه أو بيت تحفظه، وصمّمه وشاركه.">
+    <meta name="description" content="رقيم: اقتباسات تصنع حكايات؛ اقتبس من كتاب تقرؤه أو بيت تحفظه، وصمّمه وشاركه.">
 
-    {{-- PWA: installable on phones, with the bar coloured like the page. --}}
-    <meta name="theme-color" content="#F5EFE4" media="(prefers-color-scheme: light)">
-    <meta name="theme-color" content="#1B1714" media="(prefers-color-scheme: dark)">
+    {{-- PWA: installable on phones, with the bar in the brand's قاني red. --}}
+    <meta name="theme-color" content="#8A3324">
     <link rel="manifest" href="/manifest.webmanifest">
-    <link rel="icon" href="/icons/raqeem.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icons/raqeem-192.png">
+    <link rel="icon" href="/favicon.ico" sizes="48x48">
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="رقيم">
 
     <script>

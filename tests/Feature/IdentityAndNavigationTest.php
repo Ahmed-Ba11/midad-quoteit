@@ -19,14 +19,14 @@ test('every page carries the رقيم name, the documentation footer and the ins
 
     expect(file_exists(public_path('manifest.webmanifest')))->toBeTrue()
         ->and(json_decode(file_get_contents(public_path('manifest.webmanifest')), true)['short_name'])->toBe('رقيم')
-        ->and(file_exists(public_path('icons/raqeem-512.png')))->toBeTrue()
+        ->and(file_exists(public_path('icons/icon-maskable-512.png')))->toBeTrue()
         ->and(file_get_contents(public_path('sw.js')))->toContain("event.request.mode !== 'navigate'");
 });
 
 test('the service worker never caches pages, only the offline page and icons', function () {
     $worker = file_get_contents(public_path('sw.js'));
 
-    expect($worker)->toContain("const OFFLINE_FILES = ['/offline.html', '/icons/raqeem.svg', '/icons/raqeem-192.png'];")
+    expect($worker)->toContain("const OFFLINE_FILES = ['/offline.html', '/icons/favicon.svg', '/icons/icon-192.png'];")
         ->not->toContain('cache.put');
 });
 

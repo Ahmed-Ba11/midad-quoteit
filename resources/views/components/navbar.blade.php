@@ -14,7 +14,7 @@
 
 <header class="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-md">
     <nav aria-label="التنقّل الرئيسي" class="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:gap-6">
-        <a href="{{ route('home') }}" aria-label="رقيم، الصفحة الرئيسية" class="text-accent">
+        <a href="{{ route('home') }}" aria-label="رقيم، الصفحة الرئيسية">
             <x-logo class="text-[1.65rem]" />
         </a>
 

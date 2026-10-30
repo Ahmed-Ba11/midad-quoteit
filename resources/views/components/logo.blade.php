@@ -1,26 +1,32 @@
 @props(['wordmark' => true, 'tagline' => false])
 
 {{--
-    رقيم: "الرقيم: الكتاب" (مقاييس اللغة) — a tablet with an arched top, as the inscribed tablet of the
-    Cave; and "الرَّقْم: تعجيم الكتاب" (لسان العرب) — three gold i'jam dots set on it like the dots of ث.
-    The same gold diamonds separate the two halves of every verse on the site.
+    رقيم's wordmark (direction 02 · رأس القلم): the word set in Thmanyah Black and converted to paths, so
+    no font file is served. Its ر is a pen nib, which alone is the app icon. Colours are the brand's:
+    قاني #8A3324 on light pages, the lighter #E3977D in dark mode.
 --}}
-<span {{ $attributes->class('inline-flex items-center gap-2') }}>
-    <svg viewBox="0 0 32 40" aria-hidden="true" class="h-[1.6em] w-auto shrink-0" fill="none">
-        <path d="M5 37.5V16a11 11 0 0 1 22 0v21.5Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" />
-        <path d="M9.5 31.5h13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".55" />
-        <g class="text-gold" fill="currentColor">
-            <rect x="14.1" y="12.6" width="3.8" height="3.8" rx=".5" transform="rotate(45 16 14.5)" />
-            <rect x="9.6" y="19.6" width="3.8" height="3.8" rx=".5" transform="rotate(45 11.5 21.5)" />
-            <rect x="18.6" y="19.6" width="3.8" height="3.8" rx=".5" transform="rotate(45 20.5 21.5)" />
+@php($nibMask = 'raqeem-nib-'.\Illuminate\Support\Str::random(6))
+
+<span {{ $attributes->class('inline-flex flex-col items-start leading-none') }}>
+    <svg viewBox="{{ $wordmark ? '0 -926 1930 1253' : '-170 -476 668 726' }}" role="img" aria-label="رقيم"
+        class="h-[1.8em] w-auto shrink-0 fill-[#8A3324] dark:fill-[#E3977D]">
+        <defs>
+            <mask id="{{ $nibMask }}" maskUnits="userSpaceOnUse" x="-500" y="-900" width="1400" height="1400">
+                <rect x="-500" y="-900" width="1400" height="1400" fill="#fff" />
+                <path d="M142.0 -456.0H122.0L54.0 -294.0C105.0 -243.0 172.0 -182.0 214.0 -114.0C182.0 -4.0 35.0 68.0 -150.0 101.0V121.0L65.0 230.0C164.0 115.0 235.0 -36.0 235.0 -184.0C235.0 -200.0 234.0 -217.0 231.0 -234.0L263.0 -307.0Z" fill="#000" stroke="#000" stroke-width="40" stroke-linejoin="round" />
+            </mask>
+        </defs>
+        @if ($wordmark)
+            <path d="M208.0 -225.0C167.0 -151.0 186.0 -90.0 259.0 -53.0C318.0 -23.0 376.0 0.0 456.0 15.0L515.0 -139.0C548.0 -69.0 577.0 0.0 637.0 0.0C667.0 -6.0 685.0 -13.0 685.0 -44.0V-189.0C560.0 -189.0 576.0 -429.0 425.0 -429.0H424.0C294.0 -429.0 200.0 -373.0 113.0 -277.0C40.0 -196.0 12.0 -104.0 27.0 4.0L67.0 287.0H82.0L135.0 156.0C150.0 119.0 155.0 80.0 151.0 40.0L119.0 -261.0C161.0 -272.0 202.0 -279.0 242.0 -283.0C234.0 -270.0 226.0 -257.0 219.0 -244.0ZM239.0 -244.0C267.0 -263.0 307.0 -287.0 355.0 -287.0C436.0 -287.0 476.0 -219.0 510.0 -150.0C403.0 -183.0 323.0 -210.0 239.0 -244.0ZM685.0 -189.0C653.0 -189.0 637.0 -173.0 637.0 -141.0V0.0C676.0 0.0 738.0 -11.0 771.0 -36.0L806.0 -171.0C799.0 -37.0 872.0 0.0 954.0 0.0C986.0 0.0 1003.0 -17.0 1003.0 -49.0V-189.0C924.0 -189.0 872.0 -217.0 867.0 -291.0L863.0 -354.0H843.0L822.0 -269.0C815.0 -242.0 811.0 -218.0 808.0 -196.0C783.0 -194.0 730.0 -189.0 685.0 -189.0ZM943.0 170.0C944.0 169.0 944.0 156.0 943.0 155.0L859.0 71.0L784.0 146.0L709.0 71.0L624.0 156.0V169.0L709.0 254.0L784.0 179.0L859.0 254.0ZM1004.0 -189.0C972.0 -189.0 955.0 -172.0 955.0 -140.0V0.0H972.0C1096.0 0.0 1228.0 -25.0 1318.0 -69.0L1346.0 -168.0C1438.0 -490.0 1300.0 -633.0 1185.0 -633.0C1092.0 -633.0 1004.0 -540.0 1004.0 -379.0C1004.0 -301.0 1056.0 -235.0 1146.0 -235.0C1223.0 -235.0 1290.0 -282.0 1332.0 -324.0C1342.0 -290.0 1346.0 -253.0 1342.0 -213.0C1284.0 -200.0 1154.0 -189.0 1038.0 -189.0ZM1332.0 -787.0C1333.0 -788.0 1333.0 -801.0 1332.0 -802.0L1248.0 -886.0L1173.0 -811.0L1098.0 -886.0L1013.0 -801.0V-788.0L1098.0 -703.0L1173.0 -778.0L1248.0 -703.0ZM1150.0 -376.0C1090.0 -376.0 1022.0 -384.0 1022.0 -416.0C1022.0 -449.0 1092.0 -460.0 1138.0 -460.0C1207.0 -460.0 1260.0 -434.0 1295.0 -393.0C1258.0 -384.0 1210.0 -376.0 1150.0 -376.0Z" />
+        @endif
+        <g @if ($wordmark) transform="translate(1412 0)" @endif>
+            <g mask="url(#{{ $nibMask }})">
+                <path transform="translate(215 -40)" d="M122 -456 H142 L263 -307 L236 -246 C222 -196 196 -150 152 -104 C164 -150 168 -188 160 -222 L54 -294 Z" />
+            </g>
+            <path d="M142.0 -456.0H122.0L54.0 -294.0C105.0 -243.0 172.0 -182.0 214.0 -114.0C182.0 -4.0 35.0 68.0 -150.0 101.0V121.0L65.0 230.0C164.0 115.0 235.0 -36.0 235.0 -184.0C235.0 -200.0 234.0 -217.0 231.0 -234.0L263.0 -307.0Z" />
         </g>
     </svg>
-    @if ($wordmark)
-        <span class="leading-none">
-            <span class="logo block font-display font-black">رقيــم</span>
-            @if ($tagline)
-                <span class="mt-1 block font-sans text-[0.32em] font-normal tracking-wide opacity-70">لوحٌ لما بقي معك</span>
-            @endif
-        </span>
+    @if ($tagline)
+        <span class="mt-2 block font-sans text-[0.32em] font-normal tracking-wide text-muted">اقتباسات تصنع حكايات</span>
     @endif
 </span>

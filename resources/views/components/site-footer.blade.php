@@ -12,7 +12,7 @@
         {{-- The name and its meaning. --}}
         <section aria-labelledby="footer-about">
             <h2 id="footer-about" class="sr-only">عن رقيم</h2>
-            <x-logo tagline class="text-3xl text-accent" />
+            <x-logo tagline class="text-3xl" />
             <dl class="mt-6 space-y-3 text-sm leading-relaxed">
                 <div>
                     <dt class="inline font-text font-bold">الرَّقيم:</dt>

@@ -3,8 +3,8 @@
 // network, so nothing personal (private quotes, a signed-in corner) is ever stored on the device;
 // when the network is down, a page request falls back to the offline page.
 
-const CACHE = 'raqeem-offline-v1';
-const OFFLINE_FILES = ['/offline.html', '/icons/raqeem.svg', '/icons/raqeem-192.png'];
+const CACHE = 'raqeem-offline-v2';
+const OFFLINE_FILES = ['/offline.html', '/icons/favicon.svg', '/icons/icon-192.png'];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(OFFLINE_FILES)).then(() => self.skipWaiting()));

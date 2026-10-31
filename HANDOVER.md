@@ -53,12 +53,18 @@ composer run dev                # افتح http://127.0.0.1:8000 (لا localhost
    - **الجوال:** أهداف لمس أصغر من 44px (شرائح التصنيف، دوائر الألوان، كلمات الإبراز، نقاط «لكلّ مقامٍ مقال»)؛ تبويبات ركني تحتاج تمريراً للتبويب النشط؛ مؤثرات الورق مكررة في المكتبة قد تثقل الجوالات الضعيفة.
    - **بقايا:** `text_fonts` في `config/quotes.php`، CSS `.quote-art-line` و`.brass-plaque`، خيارات `withPresentation` في `text-origin.blade.php`، و ERD/Phase 6 في PROJECT.md غير محدّثة.
    - **محلياً:** صفحات أكبر من 126KB تتوقف أحياناً ~19 ثانية (خادم PHP على Windows أو فحص Avast لـ localhost)، ليس من الكود.
-2. **النشر على Laravel Cloud:**
-   - أنشئ التطبيق من GitHub، وأضف قاعدة بيانات MySQL أو Postgres (لا SQLite: الملفات تُمسح عند كل نشر).
-   - المتغيرات: `APP_ENV=production`، `APP_DEBUG=false`، `APP_KEY` جديد، `APP_URL` = رابط الموقع، `SESSION_SECURE_COOKIE=true`، `SESSION_DRIVER=database`، `CACHE_STORE=database`.
-   - أمر البناء: `composer install --no-dev --optimize-autoloader && npm ci && npm run build`.
-   - أمر النشر: `php artisan migrate --force && php artisan db:seed --force && php artisan optimize`.
-   - تأكد أن الهجرات تعمل على MySQL/Postgres (كُتبت وجُرّبت على SQLite).
+2. **النشر على Laravel Cloud (اختيار المالك):**
+   - **على المالك وحده (لا تفعله الأداة):** إنشاء حساب Laravel Cloud، وإدخال الدفع (الشهر الأول ورصيد 5$ مجاناً، ثم 5$ شهرياً + الاستهلاك)، وربط GitHub بالمستودع `Ahmed-Ba11/midad-quoteit` فرع `main`.
+   - **تم التحقق منه:** البناء ينجح بدون خطوط ثمانية؛ `LibrarySeeder` آمن للتكرار (updateOrCreate)؛ في الإنتاج تُزرع المكتبة فقط؛ `trustProxies` وترويسات الأمان مضبوطة.
+   - **الإعدادات:**
+     1. تطبيق جديد من المستودع، PHP 8.4، أقرب منطقة (مثلاً Frankfurt)، حوسبة Flex.
+     2. قاعدة بيانات Laravel MySQL أو Serverless Postgres مرتبطة بالبيئة (لا SQLite: الملفات تُمسح عند كل نشر). Cloud يضيف متغيرات `DB_*` تلقائياً.
+     3. المتغيرات: `APP_NAME=Raqeem`، `APP_ENV=production`، `APP_DEBUG=false`، `APP_URL=<رابط laravel.cloud>`، `APP_LOCALE=ar`، `SESSION_DRIVER=database`، `SESSION_SECURE_COOKIE=true`، `CACHE_STORE=database`، `QUEUE_CONNECTION=sync`، `LOG_LEVEL=warning`. و`APP_KEY` يولّده Cloud (أو `php artisan key:generate --show` محلياً).
+     4. أمر البناء: `composer install --no-dev --optimize-autoloader && npm ci && npm run build && php artisan optimize`
+     5. أمر النشر: `php artisan migrate --force && php artisan db:seed --force`
+     6. انشر؛ وبعد أي تغيير في المتغيرات أو الموارد أعد النشر.
+   - **عبر سطر الأوامر (اختياري، بموافقة المالك على إضافة الحزمة):** `composer require --dev laravel/cloud-cli` ثم `./vendor/bin/cloud auth -n` (يسجّل المالك دخوله في المتصفح) ثم `cloud ship -h` و`cloud ship -n …` لأول نشر، وبعدها `cloud deploy {app} {env} -n` ثم دائماً `cloud deploy:monitor -n`. التوثيق: https://cloud.laravel.com/docs/llms.txt
+   - **التحقق بعد النشر:** `/up` يرجع 200؛ الرئيسية تعرض «بيتُ اليوم» ولا أرقام وهمية؛ المكتبة تعمل؛ إنشاء حساب حقيقي ونشر اقتباس؛ الاقتباس الخاص لا يظهر للزوار؛ الترويسات فيها `X-Frame-Options` و`Strict-Transport-Security`؛ لا مسارات `_boost`. ثم يُضاف الرابط إلى SRS v1.3 والتسليم.
 3. **ملفات التسليم:** SRS v1.3 (الميزات الجديدة والجداول)، ERD PDF (الجداول الجديدة: books, book_user, anthologies, anthology_quote, poet_user, diwans, diwan_verses, saying_user، وأعمدة quotes الجديدة: layout, design, presentation, mark_style…)، فيديو دقيقة من النسخة المحلية، ملف ZIP بـ `git archive` (يستثني الخطوط و`.env` وقاعدة البيانات)، والتسليم على Pathy.
 
 ## بعد كل تعديل

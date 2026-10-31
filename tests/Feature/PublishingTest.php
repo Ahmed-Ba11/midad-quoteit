@@ -13,7 +13,7 @@ test('"صمّمه بطاقة" carries the typed details into the studio without 
     expect($response->headers->get('Location'))->not->toContain('جملة');
 
     $this->actingAs($reader)->get(route('quotes.create', ['draft' => 1, 'as' => 'card']))
-        ->assertOk()->assertSee('مرسم الحـــروف')->assertSee('جملة كتبتها في النافذة')->assertSee('شاعر')->assertSee('ديوانه');
+        ->assertOk()->assertSee('مرسم الحروف')->assertSee('جملة كتبتها في النافذة')->assertSee('شاعر')->assertSee('ديوانه');
 
     // Opening the studio some other way never picks up an old draft.
     $this->actingAs($reader)->get(route('quotes.create'))->assertDontSee('جملة كتبتها في النافذة');

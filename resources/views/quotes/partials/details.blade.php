@@ -1,8 +1,9 @@
 {{--
-    «النص والمصدر» in «محرّر النص» and مرسم الحروف. When the details already came from «شارك اقتباساً»
-    (or a quote is being edited) they fold into one line — the words and who said them — with
-    «تعديل» to open them; nothing is asked twice. A fresh start opens it. Library text is locked:
-    it is published exactly as in the diwan (QuoteRequest rebuilds it on the server).
+    «النص» in «محرّر النص» and مرسم الحروف. When the details already came from «شارك اقتباساً» (or a
+    quote is being edited) they fold into one line — the words and who said them. «تعديل» opens the
+    words only; who said it, the source and who sees it wait in their own fold («المصدر والنشر»), so
+    editing the words never brings the whole share form back. A fresh start opens both.
+    Library text is locked: it is published exactly as in the diwan (QuoteRequest rebuilds it on the server).
     Needs: $quote, $draft, $myAnthologies (optional), $categories, $bookTitles; $withStory adds حكاية الاقتباس.
 --}}
 @php
@@ -11,6 +12,7 @@
     $librarySaying = ! $isEditing && $quote->relationLoaded('saying') ? $quote->saying : null;
     $isLibrary = $libraryVerses->isNotEmpty() || $librarySaying || $quote->isFromLibrary();
     $hasDetails = filled(old('content', $quote->content)) && ! $errors->any();
+    $detailErrors = $errors->hasAny(['author', 'source', 'source_url', 'signature', 'book', 'page', 'kind', 'is_public', 'category_id', 'story', 'anthology_id', 'book_genre']);
     $who = $quote->is_original ? ($draft['signature'] ?? $quote->author ?? 'بقلمك') : ($quote->author ?: 'مأثور');
 @endphp
 
@@ -18,7 +20,7 @@
     <summary class="flex cursor-pointer list-none items-center gap-3 p-4 [&::-webkit-details-marker]:hidden">
         <x-icon :name="$isLibrary ? 'book-open' : 'quill'" class="size-5 shrink-0 text-accent" />
         <span class="min-w-0 flex-1">
-            <span class="block text-xs text-muted">النص والمصدر</span>
+            <span class="block text-xs text-muted">النص</span>
             <span data-details-summary class="block truncate font-text text-base">{{ $hasDetails ? \Illuminate\Support\Str::limit(str_replace(["\r", "\n", "\t"], ' ', $quote->content), 60) : 'اكتب النص ومن قاله' }}</span>
             @if ($hasDetails)
                 <span class="block truncate text-xs text-muted">— {{ $who }}{{ $quote->book ? ' · '.$quote->book : '' }} · {{ $quote->is_public ? 'عام' : 'خاص' }}</span>
@@ -64,8 +66,18 @@
             <x-textarea name="content" label="نص الاقتباس" hint="من ٣ إلى ١٥٥ حرفاً؛ للشعر: اكتب كل شطر في سطر، أو افصل الشطرين بـ * أو …" rows="4" minlength="3"
                 maxlength="155" required :value="old('content', $quote->content)" />
 
-            @include('quotes.partials.text-origin', ['quote' => $quote, 'withBook' => true, 'anthologies' => $myAnthologies ?? collect(), 'defaults' => $draft])
         @endif
+
+        {{-- Who said it, where from, who sees it: folded away once known. --}}
+        <details class="group/more rounded-2xl border border-line bg-surface" @if (! $hasDetails || $detailErrors) open @endif>
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 text-sm font-medium [&::-webkit-details-marker]:hidden">
+                <span class="flex items-center gap-2"><x-icon name="book-open" class="size-4 text-accent" /> المصدر والنشر</span>
+                <x-icon name="chevron-left" class="size-4 text-muted transition group-open/more:-rotate-90" />
+            </summary>
+            <div class="space-y-5 border-t border-line p-4">
+        @unless ($isLibrary)
+            @include('quotes.partials.text-origin', ['quote' => $quote, 'withBook' => true, 'withPresentation' => false, 'anthologies' => $myAnthologies ?? collect(), 'defaults' => $draft])
+        @endunless
 
         @if ($withStory ?? false)
             <x-textarea name="story" label="حكاية الاقتباس" hint="اختياري، حتى ٥٠٠ حرف: أين قرأته؟ ولماذا بقي معك؟"
@@ -85,5 +97,7 @@
             </select>
             <p class="mt-1.5 text-xs text-muted">اختياري، يساعد القرّاء على التصفية</p>
         </div>
+            </div>
+        </details>
     </div>
 </details>

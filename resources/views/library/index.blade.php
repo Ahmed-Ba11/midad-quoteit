@@ -93,7 +93,7 @@
         <x-peninsula-voices class="mb-16" />
 
         {{-- لكلّ مقامٍ مقال: pick a mood, get the verse for it. --}}
-        <section id="occasions" aria-labelledby="occasions-title" class="paint-later scroll-mt-20 border-t border-line py-16" data-occasions>
+        <section id="occasions" aria-labelledby="occasions-title" class="scroll-mt-20 border-t border-line py-16" data-occasions>
             <header class="mx-auto max-w-2xl text-center">
                 <h2 id="occasions-title" class="font-display text-4xl font-bold">لكلّ مقامٍ مقـــال</h2>
                 <p class="mt-3 text-muted">ما الذي في خاطرك اليوم؟ اختر مقاماً، ودع الشعراء يقولون عنك.</p>
@@ -142,7 +142,7 @@
         </section>
 
         {{-- جدار المأثورات: plaques hung on nails. --}}
-        <section id="sayings" aria-labelledby="sayings-title" class="paint-later scroll-mt-20 border-t border-line py-16">
+        <section id="sayings" aria-labelledby="sayings-title" class="scroll-mt-20 border-t border-line py-16">
             <header class="mx-auto max-w-2xl text-center">
                 <h2 id="sayings-title" class="font-display text-4xl font-bold">جدار المأثـــورات</h2>
                 <p class="mt-3 text-muted">أمثال وأقوال جرت على ألسنة العرب حتى صارت حكمة الجميع.</p>
@@ -202,7 +202,7 @@
         </section>
 
         {{-- دواوين القرّاء: poets the readers brought, kept apart from the verified shelves above. --}}
-        <section id="readers-diwans" aria-labelledby="readers-diwans-title" class="paint-later scroll-mt-20 border-t border-line py-16">
+        <section id="readers-diwans" aria-labelledby="readers-diwans-title" class="scroll-mt-20 border-t border-line py-16">
             <div class="flex flex-col items-center gap-8 rounded-3xl border border-line bg-surface p-8 text-center md:flex-row md:text-start">
                 <x-ornament name="shamsa" class="size-20 shrink-0 text-gold" />
                 <div class="flex-1">

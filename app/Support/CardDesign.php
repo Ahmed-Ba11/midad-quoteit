@@ -4,30 +4,23 @@ namespace App\Support;
 
 /**
  * مرسم الحروف's card settings (quotes.design), whitelisted against config/card.php. Whatever arrives
- * from the browser, only known keys with known values (or #RRGGBB colours, or a 0–70 dim) are kept;
- * anything else falls back to the default. No HTML, no free text: the dedication's names and message
- * never reach the server (they live only in the saved image).
+ * from the browser, only known keys with known values (or a #RRGGBB colour, or a 0–70 dim) are kept;
+ * anything else falls back to the default. No HTML and no free text are ever stored.
  */
 class CardDesign
 {
     private const CHOICES = [
         'palette' => 'palettes',
-        'gradient' => 'gradients',
         'texture' => 'textures',
-        'box_style' => 'box_styles',
-        'box_padding' => 'box_paddings',
-        'box_shadow' => 'box_shadows',
-        'frame' => 'frames',
         'divider' => 'dividers',
         'align' => 'aligns',
-        'seal_color' => 'seal_colors',
-        'seal_emblem' => 'seal_emblems',
-        'seal_position' => 'seal_positions',
+        'box_padding' => 'box_paddings',
+        'box_shadow' => 'box_shadows',
     ];
 
-    private const COLOURS = ['box_color', 'frame_color'];
+    private const COLOURS = ['box_color'];
 
-    private const SWITCHES = ['box', 'box_outline', 'brand', 'big_marks', 'seal'];
+    private const SWITCHES = ['box', 'box_outline'];
 
     /**
      * @param  array<string, mixed>|null  $input

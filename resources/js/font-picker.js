@@ -1,26 +1,26 @@
-// «بأيّ قلمٍ تكتب؟» (resources/views/components/font-picker.blade.php): group filters, light previews,
-// and the chosen font loaded in full. Fonts come from Google Fonts (all SIL OFL); ثمانية is local.
+// «بأيّ قلمٍ تكتب؟» (resources/views/components/font-picker.blade.php): group filters, previews,
+// and the chosen font. Fonts come from Google Fonts (all SIL OFL); ثمانية is local.
+//
+// Every family is always loaded WHOLE. (A preview-only subset — Google's `&text=` — registers under the
+// family's real name and only holds a few letters; the browser then draws the reader's own text with
+// it, falling back letter by letter, and the words look scrambled.)
 
-const SAMPLE = 'بأيّ قلمٍ تكتب؟Words that stay';
 const loaded = new Set();
-
-const addStylesheet = (href) => {
-    const link = document.createElement('link');
-    link.rel = 'stylesheet';
-    link.href = href;
-    document.head.append(link);
-    return link;
-};
 
 /**
  * Load one family in full (once), and resolve when the browser can draw it.
  */
 export function loadFont(font) {
-    if (!font?.google || loaded.has(font.google)) return Promise.resolve();
-    loaded.add(font.google);
-    addStylesheet(`https://fonts.googleapis.com/css2?family=${font.google}&display=swap`);
+    if (!font?.google) return Promise.resolve();
+    if (!loaded.has(font.google)) {
+        loaded.add(font.google);
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = `https://fonts.googleapis.com/css2?family=${font.google}&display=swap`;
+        document.head.append(link);
+    }
     const family = font.stack.split(',')[0].trim();
-    return document.fonts.load(`1em ${family}`, 'بسم').catch(() => {});
+    return document.fonts.load(`1em ${family}`, 'بسم الله').catch(() => {});
 }
 
 export function initFontPicker(picker, onChange) {
@@ -28,18 +28,14 @@ export function initFontPicker(picker, onChange) {
     const rows = [...picker.querySelectorAll('[data-font-row]')];
     const filters = [...picker.querySelectorAll('[data-font-filter]')];
 
-    // Previews: one tiny stylesheet with only the sample's letters, fetched when the list first shows.
-    const loadPreviews = () => {
-        const families = Object.values(fonts).filter((font) => font.google).map((font) => `family=${font.google.split(':')[0]}`);
-        addStylesheet(`https://fonts.googleapis.com/css2?${families.join('&')}&text=${encodeURIComponent(SAMPLE)}&display=swap`);
-    };
+    // A row's font is fetched when the row comes into view (the list opens, or is scrolled).
     const observer = new IntersectionObserver((entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-            loadPreviews();
-            observer.disconnect();
-        }
-    });
-    observer.observe(picker);
+        entries.filter((entry) => entry.isIntersecting).forEach((entry) => {
+            loadFont(fonts[entry.target.querySelector('input').value]);
+            observer.unobserve(entry.target);
+        });
+    }, { root: picker.querySelector('.font-list') });
+    rows.forEach((row) => observer.observe(row));
 
     filters.forEach((filter) => {
         filter.addEventListener('click', () => {
@@ -52,14 +48,9 @@ export function initFontPicker(picker, onChange) {
 
     picker.addEventListener('change', (event) => {
         if (event.target.name !== 'font') return;
-        const font = fonts[event.target.value];
-        loadFont(font).then(() => onChange?.(event.target.value));
+        loadFont(fonts[event.target.value]).then(() => onChange?.(event.target.value));
     });
 
-    // The chosen font is drawn in full from the start; the selected row scrolls into view.
     const checked = picker.querySelector('input:checked');
-    if (checked) {
-        loadFont(fonts[checked.value]);
-        checked.closest('[data-font-row]')?.scrollIntoView({ block: 'nearest' });
-    }
+    if (checked) loadFont(fonts[checked.value]);
 }

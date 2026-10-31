@@ -36,7 +36,7 @@ and a built-in poetry library (classical Arab and Arabian-Peninsula poets) users
 1. **Categories** (حكمة، شعر، أدب، فلسفة، تأمل) — filter chips on home.
 2. **Quote source fields**: author (القائل) + book/diwan (الكتاب).
 3. **Quote story** (حكاية الاقتباس) — optional ≤ 500 chars, shown on the quote page.
-4. **Card design — "مرسم الحروف" page**: 23 OFL fonts in groups (+ local ثمانية), 12 heritage palettes **or custom colors**, gradients, textures (paper / linen / kraft / pattern), dim, an inner box (solid / glass, padding, shadow, outline), frames (line, double, geometric corners, arabesque, mihrab, girih band), divider, ratio (wide 16:9 / square / tall 4:5 / story 9:16) with automatic text sizing, **word highlighting** (color or shading; adjacent highlighted words render as ONE continuous highlight), 12 one-tap templates + «فاجئني», a dedication card with a wax seal, **save as PNG** and share. Stored as `quotes.design` (JSON, whitelisted by `App\Support\CardDesign`).
+4. **Card design — "مرسم الحروف" page** (kept simple on the owner's request): 23 OFL fonts in groups (+ local ثمانية), 12 heritage palettes **or a custom colour**, texture (paper / linen / kraft), dim, a divider under the words, an inner box (colour, padding, shadow, outline), alignment, ratio (wide 16:9 / square / tall 4:5 / story 9:16) with automatic text sizing, **word highlighting** (color or shading; adjacent highlighted words render as ONE continuous highlight). Stored as `quotes.design` (JSON, whitelisted by `App\Support\CardDesign`).
 4b. **Text quotes — "محرّر النص"**: details typed once in «شارك اقتباساً», then format (تلقائي / شعر / نثر via `App\Support\QuoteLayout`), font list, emphasis in 12 colours, quote marks previewed live.
 5. **Likes** (M:N) and **Bookmarks / المحفوظات** (M:N).
 6. **Replies** on quotes (≤ 300 chars). *(Moves "comments" into scope — document in SRS v1.3.)*
@@ -53,7 +53,7 @@ and a built-in poetry library (classical Arab and Arabian-Peninsula poets) users
 ### Explicitly NOT doing (out of scope)
 Image upload to the server / avatar upload, delete confirmation, saved "my colors" list, following users, DMs, external APIs at runtime.
 
-**Scope change (31 Oct 2026, approved by the owner):** saving a card as a PNG and using a photo from the device as a card background are now in scope, **entirely in the browser**: the photo is never uploaded or stored (a published card falls back to its colour), and the PNG is made on the device (modern-screenshot, MIT). The dedication's names and message exist only in the saved image.
+**Tried and withdrawn (31 Oct 2026):** saving a card as a PNG and a photo from the device were built client-side, then removed at the owner's request: the saved image could not be guaranteed to match the card on every phone (fonts in Safari). Back to: no image saving, no photo.
 
 ## 4. Database (target ERD)
 ```

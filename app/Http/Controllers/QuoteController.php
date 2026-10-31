@@ -129,10 +129,14 @@ class QuoteController extends Controller
         $asText = $request->query('as', $draft['presentation'] ?? null) === 'text';
         $quote->presentation = $asText ? 'text' : 'card';
 
+        // Back from a library pick goes to the library, wherever the reader arrived from (e.g. sign-in).
+        $fromLibrary = $request->has('verses') || $request->has('saying');
+        $backUrl = $this->previousOnSite();
+
         return view($asText ? 'quotes.editor' : 'quotes.studio', [
             'quote' => $quote,
             'draft' => $draft,
-            'backUrl' => $this->previousOnSite(),
+            'backUrl' => $fromLibrary && $backUrl === route('home') ? route('library.index') : $backUrl,
             'myAnthologies' => $request->user()->anthologies()->latest('updated_at')->get(['id', 'title']),
             'categories' => Category::orderBy('id')->get(),
             'bookTitles' => Book::whereHas('quotes', fn ($quotes) => $quotes->public())->latest()->limit(300)->pluck('title'),

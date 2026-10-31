@@ -97,6 +97,24 @@ document.querySelectorAll('[data-toast]').forEach((toast) => {
     setTimeout(hide, 5000);
 });
 
+// «رجوع»: back to the very place the reader came from on this site (scroll position included), unless
+// that was a form, sign-in, or this same page — then the link's own address (the parent page).
+const FORM_PAGES = /^\/(login|signup|quotes\/create|quotes\/draft|diwans\/create)\/?$|\/edit\/?$/;
+document.addEventListener('click', (event) => {
+    const link = event.target.closest('a[data-back]');
+    if (!link || event.metaKey || event.ctrlKey || event.shiftKey) return;
+
+    try {
+        const from = new URL(document.referrer);
+        if (from.origin === location.origin && from.href !== location.href && !FORM_PAGES.test(from.pathname) && history.length > 1) {
+            event.preventDefault();
+            history.back();
+        }
+    } catch {
+        // No referrer: follow the link.
+    }
+});
+
 // Sun and crescent: switching to night lights the star; the label always names the mode a click brings.
 const themeButtons = document.querySelectorAll('[data-theme-toggle]');
 const syncThemeButtons = () => {

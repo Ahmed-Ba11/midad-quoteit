@@ -48,10 +48,13 @@ function initArcade() {
     const arches = [...arcade.querySelectorAll('[data-poet]')];
     const panels = [...document.querySelectorAll('[data-poet-panel]')];
 
+    // Choosing a poet opens their panel and goes straight to it — the reader never hunts for it.
     arches.forEach((arch) => {
         arch.addEventListener('click', () => {
             arches.forEach((other) => other.setAttribute('aria-pressed', String(other === arch)));
             panels.forEach((panel) => (panel.hidden = panel.dataset.poetPanel !== arch.dataset.poet));
+            const panel = panels.find((candidate) => candidate.dataset.poetPanel === arch.dataset.poet);
+            panel?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
         });
     });
 }
@@ -131,11 +134,11 @@ function initSelection() {
         render();
     });
 
-    // The selection travels in the link to مرسم الحروف; once used, start fresh next time.
-    bar.querySelector('[data-selection-go]').addEventListener('click', () => {
+    // The selection travels in the link (to «محرّر النص» or مرسم الحروف); once used, start fresh next time.
+    bar.querySelectorAll('[data-selection-go]').forEach((go) => go.addEventListener('click', () => {
         selection = [];
         save();
-    });
+    }));
 
     bar.querySelector('[data-selection-clear]').addEventListener('click', () => {
         selection = [];
@@ -153,13 +156,14 @@ function initSelection() {
 
         const isSaying = selection[0].type === 'saying';
         const tooLong = selection.map((item) => item.text.replace(' / ', '\n')).join('\n').length > MAX_LENGTH;
-        const go = bar.querySelector('[data-selection-go]');
-        const url = new URL(go.href, location.origin);
-
-        url.search = '';
-        selection.forEach((item) => url.searchParams.append(isSaying ? 'saying' : 'verses[]', item.id));
-        go.href = url.toString();
-        go.setAttribute('aria-disabled', String(tooLong));
+        bar.querySelectorAll('[data-selection-go]').forEach((go) => {
+            const url = new URL(go.href, location.origin);
+            url.search = '';
+            selection.forEach((item) => url.searchParams.append(isSaying ? 'saying' : 'verses[]', item.id));
+            url.searchParams.set('as', go.dataset.as);
+            go.href = url.toString();
+            go.setAttribute('aria-disabled', String(tooLong));
+        });
 
         bar.querySelector('[data-selection-count]').textContent = isSaying
             ? 'مأثور مختار'

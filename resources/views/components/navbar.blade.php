@@ -1,6 +1,8 @@
 @php
     $user = auth()->user();
     $onMyCorner = $user && request()->routeIs('profile.show') && request()->route('user')?->is($user);
+    // While writing a quote (editor or studio) there is nothing else to open: no share buttons.
+    $canShare = $user && ! request()->routeIs('quotes.create', 'quotes.edit');
     // Each place has a one-line hint, shown under the link on hover (and read by screen readers), and an icon for the phone tab bar only.
     $places = [
         ['route' => 'home', 'active' => request()->routeIs('home', 'quotes.*'), 'label' => 'الرئيسية', 'icon' => 'feather', 'hint' => 'أحدث ما شاركه القرّاء'],
@@ -41,7 +43,7 @@
 
             @auth
                 {{-- On phones this lives in the middle of the bottom bar instead. --}}
-                <span class="hidden md:block">
+                <span @class(['hidden', 'md:block' => $canShare])>
                     <x-button popovertarget="quote-popup" icon="quill">شارك اقتباساً</x-button>
                 </span>
 
@@ -70,7 +72,7 @@
 <nav aria-label="التنقّل السريع" class="tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper pb-[env(safe-area-inset-bottom)] md:hidden">
     <ul class="mx-auto flex max-w-md items-stretch">
         @foreach ($places as $place)
-            @if ($user && $loop->index === 2)
+            @if ($canShare && $loop->index === 2)
                 <li class="flex flex-1 justify-center">
                     <button type="button" popovertarget="quote-popup" aria-label="شارك اقتباساً"
                         class="-mt-5 grid size-14 place-items-center rounded-full bg-accent text-paper shadow-lg ring-4 ring-paper transition active:scale-95">

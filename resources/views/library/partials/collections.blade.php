@@ -3,7 +3,7 @@
     HTML (keyed on the library's data, see LibraryController@index). Nothing here may depend on who is looking.
 --}}
         {{-- رفّ الدواوين: the seven muallaqat and the great diwans, in an arched walnut niche. --}}
-        <section id="shelf" aria-labelledby="shelf-title" class="paint-later scroll-mt-20 py-16">
+        <section id="shelf" aria-labelledby="shelf-title" class="scroll-mt-20 py-16">
             <header class="mx-auto max-w-2xl text-center">
                 <h2 id="shelf-title" class="font-display text-4xl font-bold">رفّ الدواويـــن</h2>
                 <p class="mt-3 text-muted">اختر كتاباً من الرف ليُفتح بين يديك على عيون أبياته.</p>
@@ -21,7 +21,7 @@
                                 @endphp
                                 <button type="button" data-book="{{ $book->slug }}" aria-pressed="false"
                                     aria-label="{{ $book->title }}، {{ $book->poet->name }}"
-                                    @class(['book group flex flex-col items-center justify-between px-1 pb-7 pt-8 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C9A45C]', 'book-leaning' => $loop->last && $books->count() > 8])
+                                    @class(['book group flex flex-col items-center justify-between px-1 pb-7 pt-8 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C9A45C]'])
                                     style="width: {{ $width }}px; height: {{ $height }}px; --leather: {{ $book->color }}; --tooling: {{ $book->ink }};">
                                     <x-ornament name="star" class="size-4 opacity-90" />
                                     <span class="book-title font-display text-[15px] font-bold">{{ $book->type === 'muallaqa' ? $book->poet->name : $book->title }}</span>
@@ -77,7 +77,7 @@
         </section>
 
         {{-- رواق الشعراء: arches grouped on an era timeline. --}}
-        <section id="poets" aria-labelledby="poets-title" class="paint-later scroll-mt-20 border-t border-line py-16">
+        <section id="poets" aria-labelledby="poets-title" class="scroll-mt-20 border-t border-line py-16">
             <header class="mx-auto max-w-2xl text-center">
                 <h2 id="poets-title" class="font-display text-4xl font-bold">رواق الشعـــراء</h2>
                 <p class="mt-3 text-muted">أشهر الأصوات أولاً، من الجاهلية إلى العصر العباسي؛ اختر شاعراً لتقرأ سيرته وعيون أبياته.</p>
@@ -100,7 +100,7 @@
 
             @foreach ($poets as $poet)
                 <article data-poet-panel="{{ $poet->slug }}" @if (! $loop->first) hidden @endif
-                    class="mt-6 grid gap-8 rounded-3xl border border-line bg-surface p-6 sm:p-10 lg:grid-cols-[1fr_1.3fr]">
+                    class="mt-6 grid scroll-mt-20 gap-8 rounded-3xl border border-line bg-surface p-6 sm:p-10 lg:grid-cols-[1fr_1.3fr]">
                     <div>
                         <p class="text-sm text-gold">{{ $poet->eraLabel() }} · {{ $poet->years }}</p>
                         <h3 class="mt-1 font-display text-3xl font-bold">{{ $poet->name }}</h3>

@@ -48,9 +48,10 @@ class LibraryController extends Controller
             'myWall' => $request->user()?->wallSayings()->pluck('sayings.id')->all() ?? [],
             'readersDiwans' => Diwan::where('is_public', true)->latest('updated_at')->take(6)->get(),
             // The shelf and the poets' arcade are the same for everyone, so their HTML is cached; this key
-            // changes whenever a poet, work or verse does.
+            // changes whenever a poet, work or verse does — or the view that draws them.
             'collectionsVersion' => md5(implode('|', [
                 $poets->count(), $poets->max('updated_at'), $works->count(), $works->max('updated_at'), $verseCount, Verse::max('updated_at'),
+                filemtime(resource_path('views/library/partials/collections.blade.php')),
             ])),
             'counts' => [
                 'poets' => $poets->count(),

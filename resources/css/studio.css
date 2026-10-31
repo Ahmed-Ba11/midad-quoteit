@@ -161,54 +161,6 @@
 }
 
 /* ---------- studio pickers ---------- */
-.template-chip {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.35rem;
-    border-radius: 1rem;
-    padding: 0.25rem;
-    transition: transform 150ms ease;
-}
-
-.template-chip:hover {
-    transform: translateY(-2px);
-}
-
-.template-swatch {
-    display: grid;
-    place-items: center;
-    width: 100%;
-    aspect-ratio: 1;
-    border-radius: 0.9rem;
-    background: var(--t-bg);
-    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
-    font-family: 'Amiri', serif;
-    font-size: 1.4rem;
-    color: var(--t-ink);
-    position: relative;
-}
-
-.template-chip[data-has-frame="on"] .template-swatch::before {
-    content: "";
-    position: absolute;
-    inset: 12%;
-    border: 1.5px solid var(--t-frame);
-}
-
-.template-chip[data-has-box="on"] .template-swatch span {
-    display: grid;
-    place-items: center;
-    width: 58%;
-    height: 58%;
-    background: var(--t-box);
-    box-shadow: 0 4px 10px rgb(0 0 0 / 0.2);
-}
-
-.template-chip[aria-pressed="true"] .template-swatch {
-    box-shadow: 0 0 0 2px var(--color-paper), 0 0 0 4px var(--color-ink);
-}
-
 .palette-dot {
     position: relative;
     flex-shrink: 0;
@@ -234,39 +186,7 @@
     outline-offset: 4px;
 }
 
-.frame-chip {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.2rem;
-    padding: 0.5rem 0.25rem;
-    border-radius: 0.9rem;
-    border: 1px solid var(--color-line);
-    background: var(--color-paper);
-    cursor: pointer;
-    color: var(--color-muted);
-    transition: border-color 150ms ease, color 150ms ease;
-}
-
-.frame-chip:hover {
-    border-color: var(--color-accent);
-}
-
-.frame-chip:has(:checked) {
-    border-color: var(--color-ink);
-    color: var(--color-ink);
-    background: var(--color-accent-soft);
-}
-
-.frame-chip:has(:focus-visible) {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
-}
-
 button.swatch {
     border: 0;
 }
 
-.swatch[style*="radial-gradient"] {
-    background: var(--swatch);
-}

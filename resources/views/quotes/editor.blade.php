@@ -5,8 +5,6 @@
 @section('content')
     @php
         $isEditing = $quote->exists;
-        $isLibrary = $quote->relationLoaded('libraryVerses') && $quote->getRelation('libraryVerses')->isNotEmpty()
-            || (! $isEditing && $quote->relationLoaded('saying') && $quote->saying) || $quote->isFromLibrary();
         $tabs = [
             'layout' => ['label' => 'التنسيق', 'icon' => 'align'],
             'font' => ['label' => 'الخط', 'icon' => 'font'],
@@ -19,9 +17,6 @@
         $isCustomColor = ! array_key_exists($highlightColor, config('quotes.highlight_colors'));
         $card = 'flex cursor-pointer flex-col gap-1 rounded-2xl border border-line bg-paper p-3 transition hover:border-accent has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-accent/30';
         $sectionTitle = 'mb-2 text-sm font-medium';
-        // To the studio with everything kept: a draft goes back through QuoteController@draft; a library
-        // pick or a saved quote simply reopens as a card (their words are fixed or already stored).
-        $toStudio = $isEditing ? route('quotes.edit', [$quote, 'as' => 'card']) : ($isLibrary ? request()->fullUrlWithQuery(['as' => 'card']) : null);
     @endphp
 
     <form method="POST" id="text-editor" novalidate
@@ -35,28 +30,8 @@
         <input type="hidden" name="_form" value="editor">
         <input type="hidden" name="presentation" value="text">
 
-        <div class="relative mx-auto grid max-w-6xl gap-6 px-4 pb-32 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-start lg:pb-12">
-            <header class="order-0 lg:col-span-2">
-                <x-back :href="$isEditing ? route('quotes.show', $quote) : $backUrl" label="رجوع" class="!mb-3" />
-                <div class="flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                        <h1 class="font-display text-2xl font-bold sm:text-3xl">محرّر النـــص</h1>
-                        <p class="mt-1 hidden text-sm text-muted sm:block">اختر الخط والتنسيق، وما تراه في المعاينة هو ما يُنشر.</p>
-                    </div>
-
-                    {{-- Text or card: the same quote, two ways to show it. --}}
-                    <div role="group" aria-label="طريقة العرض" class="flex rounded-full border border-line bg-surface p-1 text-sm">
-                        <span aria-current="true" class="inline-flex h-9 items-center gap-1.5 rounded-full bg-ink px-4 text-paper"><x-icon name="type" class="size-4" /> نص</span>
-                        @if ($toStudio)
-                            <a href="{{ $toStudio }}" class="inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-muted transition hover:text-accent"><x-icon name="palette" class="size-4" /> بطاقة</a>
-                        @else
-                            <button type="submit" formaction="{{ route('quotes.draft') }}" name="presentation" value="card"
-                                class="inline-flex h-9 items-center gap-1.5 rounded-full px-4 text-muted transition hover:text-accent"><x-icon name="palette" class="size-4" /> بطاقة</button>
-                        @endif
-                    </div>
-                </div>
-                <x-epigraph context="writing" class="mt-3 hidden !text-xs sm:block" />
-            </header>
+        <div class="relative mx-auto grid max-w-6xl gap-5 px-4 pb-6 pt-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-start">
+            @include('quotes.partials.workbench-header', ['quote' => $quote, 'current' => 'text', 'title' => 'محرّر النص', 'backUrl' => $isEditing ? route('quotes.show', $quote) : $backUrl])
 
             {{-- Tools --}}
             <section class="order-2 min-w-0 space-y-5 lg:order-1">
@@ -168,17 +143,18 @@
                 </div>
             </section>
 
-            {{-- Live preview: on phones it stays at the top while the tools scroll under it. --}}
-            <section aria-label="معاينة" class="sticky top-16 z-10 order-1 -mx-4 bg-paper/95 px-4 pb-3 pt-2 lg:top-20 lg:order-2 lg:mx-0 lg:bg-transparent lg:p-0">
+            {{-- Live preview: above the tools on phones (it scrolls away with the page, never over the tools);
+                 beside them on wide screens, where it stays in view. --}}
+            <section aria-label="معاينة" class="order-1 lg:sticky lg:top-36 lg:order-2">
                 <div class="preview-stage">
-                    <x-quote-art :quote="$quote" class="max-h-[38dvh] overflow-y-auto rounded-3xl shadow-xl lg:max-h-none" />
+                    <x-quote-art :quote="$quote" class="rounded-3xl shadow-xl" />
                 </div>
                 <p class="mt-2 hidden text-center text-xs text-muted lg:block">المعاينة تتغيّر مع كل اختيار.</p>
             </section>
         </div>
 
-        {{-- Publish: always in reach (above the phone's tab bar). --}}
-        <div class="fixed inset-x-0 bottom-16 z-30 border-t border-line bg-surface px-4 py-3 md:bottom-0 lg:static lg:border-0 lg:bg-transparent lg:pb-10 lg:pt-0">
+        {{-- Publish: stays at the bottom of the screen while the form is in view (above the phone's tab bar). --}}
+        <div class="sticky bottom-16 z-30 border-t border-line bg-surface/95 px-4 py-3 md:bottom-0">
             <div class="mx-auto flex max-w-6xl items-center gap-2">
                 <x-button type="submit" icon="quill" class="h-12 flex-1 sm:flex-none sm:px-10">{{ $isEditing ? 'احفظ' : 'انشر الاقتباس' }}</x-button>
                 <x-button variant="ghost" :href="$isEditing ? route('quotes.show', $quote) : route('home')" class="h-12">إلغاء</x-button>

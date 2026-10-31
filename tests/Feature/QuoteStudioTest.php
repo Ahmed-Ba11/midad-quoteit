@@ -32,7 +32,7 @@ test('logged-in users can open مرسم الحروف', function () {
     $this->actingAs(User::factory()->create())
         ->get(route('quotes.create'))
         ->assertOk()
-        ->assertSee('مرسم الحـــروف');
+        ->assertSee('مرسم الحروف');
 });
 
 test('guests are sent to log in from مرسم الحروف', function () {

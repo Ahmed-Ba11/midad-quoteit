@@ -20,12 +20,12 @@
             <x-logo tagline class="text-3xl" />
             <dl class="mt-6 space-y-3 text-sm leading-relaxed">
                 <div>
-                    <dt class="inline font-text font-bold">الرَّقيم:</dt>
+                    <dt class="inline font-text font-bold">الرَقيم:</dt>
                     <dd class="inline text-muted">الكتاب. <cite class="not-italic text-xs">(مقاييس اللغة)</cite>
                         وقيل في أصحاب الكهف: لوحٌ كُتب فيه خبرهم. <cite class="not-italic text-xs">(لسان العرب)</cite></dd>
                 </div>
                 <div>
-                    <dt class="inline font-text font-bold">الرَّقْم:</dt>
+                    <dt class="inline font-text font-bold">الرَقْم:</dt>
                     <dd class="inline text-muted">الخطّ والكتابة؛ ورَقَمَ الكتابَ: أعجمه وبيّنه. <cite class="not-italic text-xs">(لسان العرب)</cite>
                         وكلُّ ثوبٍ وُشِيَ فهو رَقْم. <cite class="not-italic text-xs">(مقاييس اللغة)</cite></dd>
                 </div>

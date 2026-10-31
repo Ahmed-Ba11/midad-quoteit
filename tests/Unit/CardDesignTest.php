@@ -10,24 +10,24 @@ test('an empty design is the default card', function () {
         ->and(CardDesign::normalize([]))->toBe(config('card.defaults'));
 });
 
-test('known choices, colours, switches and the dim are kept', function () {
+test('known choices, the box colour, switches and the dim are kept', function () {
     $design = CardDesign::normalize([
-        'palette' => 'indigo', 'frame' => 'mihrab', 'texture' => 'linen', 'box' => '1', 'box_style' => 'glass',
-        'box_color' => '#aabbcc', 'dim' => '35', 'seal' => 'true', 'seal_color' => 'gold', 'seal_emblem' => 'initial',
+        'palette' => 'indigo', 'texture' => 'linen', 'divider' => 'dots', 'align' => 'start',
+        'box' => '1', 'box_color' => '#aabbcc', 'box_padding' => 'l', 'box_shadow' => 'none', 'box_outline' => 'true', 'dim' => '35',
     ]);
 
-    expect($design)->palette->toBe('indigo')->frame->toBe('mihrab')->texture->toBe('linen')
-        ->box->toBeTrue()->box_style->toBe('glass')->box_color->toBe('#AABBCC')
-        ->dim->toBe(35)->seal->toBeTrue()->seal_color->toBe('gold')->seal_emblem->toBe('initial');
+    expect($design)->palette->toBe('indigo')->texture->toBe('linen')->divider->toBe('dots')->align->toBe('start')
+        ->box->toBeTrue()->box_color->toBe('#AABBCC')->box_padding->toBe('l')->box_shadow->toBe('none')
+        ->box_outline->toBeTrue()->dim->toBe(35);
 });
 
-test('anything unknown or unsafe falls back to the default', function () {
+test('anything unknown or unsafe falls back to the default, and nothing else is stored', function () {
     $design = CardDesign::normalize([
-        'palette' => '<script>', 'frame' => ['corners'], 'box_color' => 'red;background:url(x)',
-        'dim' => '900', 'align' => 'justify', 'to' => 'سارة', 'message' => '<b>hi</b>', 'onload' => 'x',
+        'palette' => '<script>', 'texture' => ['paper'], 'box_color' => 'red;background:url(x)',
+        'dim' => '900', 'align' => 'justify', 'frame' => 'mihrab', 'seal' => '1', 'message' => '<b>hi</b>',
     ]);
 
-    expect($design)->palette->toBe('raqq')->frame->toBe('none')->box_color->toBe('#FBF7EF')
+    expect($design)->palette->toBe('raqq')->texture->toBe('paper')->box_color->toBe('#FBF7EF')
         ->dim->toBe(70)->align->toBe('center')
         ->and(array_keys($design))->toBe(array_keys(config('card.defaults')));
 });

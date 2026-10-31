@@ -6,7 +6,7 @@ use App\Models\User;
 test('the text editor offers the three formats, every font, twelve colours and the four marks', function () {
     $html = $this->actingAs(User::factory()->create())->get(route('quotes.create', ['as' => 'text']))
         ->assertOk()
-        ->assertSee('محرّر النـــص')
+        ->assertSee('محرّر النص')
         ->assertSee('data-font-picker', false)
         ->getContent();
 
@@ -75,8 +75,8 @@ test('only the three formats are accepted', function () {
 test('a text quote opens in the editor to edit, and can be reopened as a card', function () {
     $quote = Quote::factory()->for($owner = User::factory()->create())->create(['presentation' => 'text']);
 
-    $this->actingAs($owner)->get(route('quotes.edit', $quote))->assertOk()->assertSee('محرّر النـــص')
+    $this->actingAs($owner)->get(route('quotes.edit', $quote))->assertOk()->assertSee('محرّر النص')
         ->assertSee(route('quotes.edit', [$quote, 'as' => 'card']), false);
-    $this->actingAs($owner)->get(route('quotes.edit', [$quote, 'as' => 'card']))->assertOk()->assertSee('مرسم الحـــروف');
+    $this->actingAs($owner)->get(route('quotes.edit', [$quote, 'as' => 'card']))->assertOk()->assertSee('مرسم الحروف');
     $this->actingAs(User::factory()->create())->get(route('quotes.edit', $quote))->assertForbidden();
 });

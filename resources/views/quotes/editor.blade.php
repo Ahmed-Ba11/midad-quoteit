@@ -103,6 +103,7 @@
                                         <input type="color" data-custom-color value="{{ $isCustomColor ? $highlightColor : '#2B6CB0' }}" aria-label="لون من اختيارك" class="swatch-picker">
                                     </label>
                                 </div>
+                                <p class="mt-2 text-xs text-muted">لون الإبراز على الكلمات التي تختارها</p>
                             </fieldset>
 
                             <div>

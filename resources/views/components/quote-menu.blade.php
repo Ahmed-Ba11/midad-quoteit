@@ -1,8 +1,9 @@
-@props(['quote'])
+@props(['quote', 'withTemplate' => true])
 
 {{--
     "⋯" on a quote card: everything beyond like / reply / save, in one tidy menu —
     copy the words, reuse the design for a new quote, and (for its owner) edit, redesign, pin, delete.
+    The quote page has its own «صمّم مثله» button, so it turns the menu's copy off (:with-template="false").
 --}}
 @php
     $signature = $quote->is_original && blank($quote->author) ? 'بقلم '.$quote->user->name : $quote->author;
@@ -22,9 +23,11 @@
             <x-icon name="check" class="hidden size-[18px]" data-copied-icon />
             <span data-copy-label>انسخ النص</span>
         </button>
-        <a href="{{ route('quotes.create', ['template' => $quote->id]) }}" class="{{ $item }}">
-            <x-icon name="palette" class="size-[18px]" /> استخدم التصميم لنصّك
-        </a>
+        @if ($withTemplate)
+            <a href="{{ route('quotes.create', ['template' => $quote->id]) }}" class="{{ $item }}">
+                <x-icon name="palette" class="size-[18px]" /> استخدم التصميم لنصّك
+            </a>
+        @endif
 
         @can('update', $quote)
             <div class="my-1 border-t border-line"></div>
@@ -44,7 +47,7 @@
                     {{ $isPinned ? 'ألغِ التثبيت من ركني' : 'ثبّته في ركني' }}
                 </button>
             </form>
-            <form method="POST" action="{{ route('delete_quote', $quote) }}" data-confirm="يُحذف الاقتباس نهائياً. متأكد؟">
+            <form method="POST" action="{{ route('delete_quote', $quote) }}">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="{{ $item }} text-accent">

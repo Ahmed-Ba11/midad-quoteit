@@ -3,6 +3,7 @@
 use App\Models\Quote;
 use App\Models\User;
 use App\Models\Verse;
+use App\Support\CardDesign;
 use Database\Seeders\LibrarySeeder;
 
 test('مرسم الحروف is simple: background colours, texture, dim, a divider, the box, font and emphasis', function () {
@@ -24,6 +25,37 @@ test('مرسم الحروف is simple: background colours, texture, dim, a divid
         expect($html)->toContain('name="ratio" value="'.$ratio.'"');
     }
     expect($html)->toContain('name="design[dim]"')->toContain('name="design[box]"')->toContain('data-font-picker');
+});
+
+test('every studio tool carries a short hint, and so does the colour in the text editor', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)->get(route('quotes.create', ['as' => 'card']))->assertSeeInOrder([
+        'المقاس: شكل البطاقة', 'ملمس خفيف على الخلفية', 'زخرفة صغيرة تحت الكلمات', '«تلقائي» يملأ البطاقة',
+        'مكان الأسطر في البطاقة', 'يُقرأ بوضوح على الخلفية', 'الشعر صدرٌ وعجز', 'التظليل خلفية خلف الكلمة',
+        'لون المربّع الذي يحمل الكلمات', 'المسافة بين الكلمات وحافة الصندوق', 'يرفع الصندوق قليلاً', 'إطار رفيع يحدّ الصندوق',
+    ]);
+
+    $this->actingAs($user)->get(route('quotes.create', ['as' => 'text']))->assertSee('لون الإبراز على الكلمات التي تختارها');
+});
+
+test('a font size chosen by hand is kept when the card is opened again', function () {
+    $owner = User::factory()->create();
+    $this->actingAs($owner)->post(route('store_quote'), [
+        'content' => 'حجمٌ اخترته بيدي', 'kind' => 'anonymous', 'presentation' => 'card', 'font_size' => 50,
+        'design' => ['auto_size' => '0'],
+    ])->assertSessionHasNoErrors();
+
+    $quote = Quote::sole();
+    expect($quote->font_size)->toBe(50)->and($quote->cardDesign()['auto_size'])->toBeFalse();
+
+    $this->actingAs($owner)->get(route('quotes.edit', $quote))
+        ->assertSee('name="font_size" value="50"', false)
+        ->assertSee('name="design[auto_size]" value="0"', false);
+});
+
+test('older cards without the size choice still fit their words automatically', function () {
+    expect(CardDesign::normalize([])['auto_size'])->toBeTrue();
 });
 
 test('the removed extras are gone: no templates, frames, dedication, seal, photo, watermark or image export', function () {
@@ -81,7 +113,7 @@ test('the editor and the studio have no second share window, and switch between 
 
     $this->actingAs($owner)->get(route('quotes.edit', $quote))
         ->assertDontSee('id="quote-popup"', false)
-        ->assertSee(route('quotes.edit', [$quote, 'as' => 'text']), false);
+        ->assertSee('formaction="'.route('quotes.redraft', $quote).'"', false);
     $this->actingAs($owner)->get(route('quotes.create', ['as' => 'text']))
         ->assertDontSee('id="quote-popup"', false)
         ->assertSee('formaction="'.route('quotes.draft').'"', false);

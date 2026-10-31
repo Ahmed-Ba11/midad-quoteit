@@ -20,7 +20,7 @@ class CardDesign
 
     private const COLOURS = ['box_color'];
 
-    private const SWITCHES = ['box', 'box_outline'];
+    private const SWITCHES = ['box', 'box_outline', 'auto_size'];
 
     /**
      * @param  array<string, mixed>|null  $input

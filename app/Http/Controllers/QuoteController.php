@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Verse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
@@ -137,6 +138,8 @@ class QuoteController extends Controller
     {
         $draft = $request->boolean('draft') && is_array($stored = $request->session()->get('quote_draft')) ? $stored : [];
         $quote = $this->withTemplate($this->draftFromLibrary($request, $draft), $request);
+        // A library pick switched between «نص / بطاقة» keeps its locked text, and the reader's other choices.
+        $quote->fill(Arr::except($draft, ['content', 'author', 'book', 'source', 'source_url']));
         $asText = $request->query('as', $draft['presentation'] ?? null) === 'text';
         $quote->presentation = $asText ? 'text' : 'card';
 
@@ -219,17 +222,47 @@ class QuoteController extends Controller
      * the details are checked here with the same rules as publishing (so a missing author or source is
      * caught in the window itself), kept in the session — never the URL — and the chosen page opens.
      */
-    public function draft(QuoteRequest $request): RedirectResponse
+    public function draft(Request $request): RedirectResponse
     {
-        $draft = collect($request->validated())
+        $way = $request->input('switch_to', $request->input('presentation')) === 'text' ? 'text' : 'card';
+        $library = array_filter($request->only(['verses', 'saying']));
+
+        // «نص / بطاقة» on a form with nothing written yet: there is nothing to carry, so just switch.
+        if ($request->has('switch_to') && $request->isNotFilled('content') && $library === []) {
+            return redirect()->route('quotes.create', ['as' => $way]);
+        }
+
+        // Resolving the form request validates it, exactly as when publishing.
+        $request->session()->put('quote_draft', $this->draftFrom(app(QuoteRequest::class), $way));
+
+        return redirect()->route('quotes.create', ['draft' => 1, 'as' => $way, ...$library]);
+    }
+
+    /**
+     * «نص / بطاقة» on a saved quote: the unsaved choices come along to the other view, nothing is saved yet.
+     */
+    public function redraft(QuoteRequest $request, Quote $quote): RedirectResponse
+    {
+        $way = $request->input('switch_to') === 'text' ? 'text' : 'card';
+
+        $request->session()->put('quote_draft', [...$this->draftFrom($request, $way), 'quote_id' => $quote->id]);
+
+        return redirect()->route('quotes.edit', [$quote, 'as' => $way, 'draft' => 1]);
+    }
+
+    /**
+     * What was chosen so far, checked, to refill the next view.
+     *
+     * @return array<string, mixed>
+     */
+    private function draftFrom(QuoteRequest $request, string $way): array
+    {
+        return collect($request->validated())
             ->put('kind', $request->input('kind'))
             ->put('signature', $request->validated('signature'))
+            ->put('presentation', $way)
             ->reject(fn ($value) => $value === null)
             ->all();
-
-        $request->session()->put('quote_draft', $draft);
-
-        return redirect()->route('quotes.create', ['draft' => 1, 'as' => $draft['presentation'] ?? 'card']);
     }
 
     /**
@@ -245,7 +278,7 @@ class QuoteController extends Controller
         if ($template) {
             $quote->fill($template->only([
                 'font', 'bg_color', 'text_color', 'highlight_color', 'highlight_style',
-                'texture', 'ratio', 'font_size', 'presentation', 'mark_style',
+                'texture', 'ratio', 'font_size', 'presentation', 'mark_style', 'layout', 'design',
             ]));
         }
 
@@ -289,13 +322,18 @@ class QuoteController extends Controller
      */
     public function edit(Quote $quote, Request $request): View
     {
-        // A text quote opens in «محرّر النص», a card in مرسم الحروف; ?as= switches between them.
+        // A text quote opens in «محرّر النص», a card in مرسم الحروف; ?as= switches between them,
+        // and ?draft=1 brings back the choices not saved yet (QuoteController@redraft).
+        $stored = $request->session()->get('quote_draft');
+        $draft = $request->boolean('draft') && is_array($stored) && ($stored['quote_id'] ?? null) === $quote->id ? $stored : [];
+        $quote->fill(Arr::except($draft, ['quote_id']));
+
         $asText = $request->query('as', $quote->presentation) === 'text';
         $quote->presentation = $asText ? 'text' : 'card';
 
         return view($asText ? 'quotes.editor' : 'quotes.studio', [
             'quote' => $quote,
-            'draft' => [],
+            'draft' => $draft,
             'categories' => Category::orderBy('id')->get(),
             'bookTitles' => Book::whereHas('quotes', fn ($quotes) => $quotes->public())->latest()->limit(300)->pluck('title'),
         ]);
@@ -323,8 +361,8 @@ class QuoteController extends Controller
     {
         $quote->delete();
 
-        // Deleting from the quote's own page: that page no longer exists, so go home.
-        return url()->previous() === route('quotes.show', $quote)
+        // Deleting from the quote's own page (with or without a query): that page no longer exists, so go home.
+        return parse_url(url()->previous(), PHP_URL_PATH) === parse_url(route('quotes.show', $quote), PHP_URL_PATH)
             ? redirect()->route('home')
             : $this->backTo();
     }

@@ -60,15 +60,6 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-// Destructive forms ask once before going ahead (data-confirm="…").
-document.querySelectorAll('form[data-confirm]').forEach((form) => {
-    form.addEventListener('submit', (event) => {
-        if (!window.confirm(form.dataset.confirm)) {
-            event.preventDefault();
-        }
-    });
-});
-
 // "Show more": reveal hidden items (data-show-more="<selector>"), then the button retires.
 document.querySelectorAll('[data-show-more]').forEach((button) => {
     button.addEventListener('click', () => {

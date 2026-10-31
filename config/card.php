@@ -59,6 +59,8 @@ return [
         'box_padding' => 'm',
         'box_shadow' => 'soft',
         'box_outline' => false,
+        // The words take the largest size that fits, until the reader picks «أصغر» or «أكبر».
+        'auto_size' => true,
     ],
 
 ];

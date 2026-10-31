@@ -33,6 +33,7 @@
         <input type="hidden" name="_form" value="studio">
         <input type="hidden" name="presentation" value="card">
         <input type="hidden" name="font_size" value="{{ (int) $value('font_size', $quote->font_size) }}" data-font-size>
+        <input type="hidden" name="design[auto_size]" value="{{ $design['auto_size'] ? 1 : 0 }}" data-auto-size>
         <input type="hidden" name="texture" value="{{ $design['texture'] === 'none' ? 0 : 1 }}" data-legacy-texture>
 
         <div class="relative mx-auto grid max-w-6xl gap-5 px-4 pb-6 pt-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
@@ -40,7 +41,7 @@
 
             {{-- The card. Its size follows the chosen shape but always fits the screen, so the tools stay in reach. --}}
             <section aria-label="معاينة البطاقة" class="lg:sticky lg:top-36 lg:order-2">
-                <fieldset class="mb-3 flex items-center justify-center gap-1.5">
+                <fieldset class="mb-1.5 flex items-center justify-center gap-1.5">
                     <legend class="sr-only">المقاس</legend>
                     @foreach (config('quotes.ratios') as $key => $ratio)
                         <label class="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-xs transition hover:border-accent has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper">
@@ -50,6 +51,7 @@
                         </label>
                     @endforeach
                 </fieldset>
+                <p class="mb-3 text-center text-xs text-muted">المقاس: شكل البطاقة، والخط يتكيّف معه</p>
                 <div data-preview-stage class="flex justify-center">
                     <div data-preview-frame class="preview-stage w-full">
                         <x-quote-art :quote="$quote" class="rounded-2xl shadow-xl" />
@@ -99,6 +101,7 @@
                                         <label class="{{ $chip }}"><input type="radio" name="design[texture]" value="{{ $key }}" class="sr-only" @checked($design['texture'] === $key)>{{ $texture }}</label>
                                     @endforeach
                                 </div>
+                                <p class="mt-1.5 text-xs text-muted">ملمس خفيف على الخلفية كأنها ورق أو قماش</p>
                             </fieldset>
 
                             <div>
@@ -114,6 +117,7 @@
                                         <label class="{{ $chip }}"><input type="radio" name="design[divider]" value="{{ $key }}" class="sr-only" @checked($design['divider'] === $key)>{{ $divider }}</label>
                                     @endforeach
                                 </div>
+                                <p class="mt-1.5 text-xs text-muted">زخرفة صغيرة تحت الكلمات</p>
                             </fieldset>
                         </div>
 
@@ -129,6 +133,7 @@
                                         <button type="button" data-size-auto class="{{ $chip }}">تلقائي</button>
                                         <button type="button" data-size-step="1" class="{{ $chip }}" aria-label="أكبر">أكبر</button>
                                     </div>
+                                    <p class="mt-1.5 text-xs text-muted">«تلقائي» يملأ البطاقة بأكبر حجم يتّسع</p>
                                 </div>
                                 <fieldset>
                                     <legend class="{{ $label }}">المحاذاة</legend>
@@ -137,6 +142,7 @@
                                             <label class="{{ $chip }}"><input type="radio" name="design[align]" value="{{ $key }}" class="sr-only" @checked($design['align'] === $key)>{{ $align }}</label>
                                         @endforeach
                                     </div>
+                                    <p class="mt-1.5 text-xs text-muted">مكان الأسطر في البطاقة</p>
                                 </fieldset>
                             </div>
 
@@ -150,6 +156,7 @@
                                         <input type="color" name="text_color" value="{{ $value('text_color', $quote->text_color) }}" aria-label="لون النص من اختيارك" class="swatch-picker">
                                     </label>
                                 </div>
+                                <p class="mt-1.5 text-xs text-muted">اختر لوناً يُقرأ بوضوح على الخلفية</p>
                             </div>
 
                             <fieldset>
@@ -159,6 +166,7 @@
                                         <label class="{{ $chip }}"><input type="radio" name="layout" value="{{ $key }}" class="sr-only" @checked($value('layout', $quote->layout) === $key)>{{ $layout['label'] }}</label>
                                     @endforeach
                                 </div>
+                                <p class="mt-1.5 text-xs text-muted">الشعر صدرٌ وعجز، والنثر أسطر متصلة</p>
                             </fieldset>
 
                             <div class="space-y-3 rounded-2xl border border-line bg-paper p-3">
@@ -168,6 +176,7 @@
                                         <label class="{{ $chip }}"><input type="radio" name="highlight_style" value="{{ $key }}" class="sr-only" @checked($value('highlight_style', $quote->highlight_style) === $key)>{{ $styleLabel }}</label>
                                     @endforeach
                                 </div>
+                                <p class="text-xs text-muted">التظليل خلفية خلف الكلمة، والتلوين يلوّن حروفها</p>
                                 <div class="{{ $row }} items-center">
                                     @foreach (config('quotes.highlight_colors') as $hex => $name)
                                         <button type="button" data-set="highlight_color" data-value="{{ $hex }}" class="swatch" style="--swatch: {{ $hex }}" title="{{ $name }}"><span class="sr-only">{{ $name }}</span></button>
@@ -204,6 +213,7 @@
                                             <input type="color" name="design[box_color]" value="{{ $design['box_color'] }}" aria-label="لون الصندوق" class="swatch-picker">
                                         </label>
                                     </div>
+                                    <p class="mt-1.5 text-xs text-muted">لون المربّع الذي يحمل الكلمات</p>
                                 </div>
                                 <fieldset>
                                     <legend class="{{ $label }}">الحشوة</legend>
@@ -212,6 +222,7 @@
                                             <label class="{{ $chip }}"><input type="radio" name="design[box_padding]" value="{{ $key }}" class="sr-only" @checked($design['box_padding'] === $key)>{{ $paddingLabel }}</label>
                                         @endforeach
                                     </div>
+                                    <p class="mt-1.5 text-xs text-muted">المسافة بين الكلمات وحافة الصندوق</p>
                                 </fieldset>
                                 <fieldset>
                                     <legend class="{{ $label }}">الظل</legend>
@@ -220,9 +231,10 @@
                                             <label class="{{ $chip }}"><input type="radio" name="design[box_shadow]" value="{{ $key }}" class="sr-only" @checked($design['box_shadow'] === $key)>{{ $shadowLabel }}</label>
                                         @endforeach
                                     </div>
+                                    <p class="mt-1.5 text-xs text-muted">يرفع الصندوق قليلاً عن الخلفية</p>
                                 </fieldset>
                                 <label class="{{ $toggle }}">
-                                    <span class="text-sm font-medium">خط حول الصندوق</span>
+                                    <span><span class="block text-sm font-medium">خط حول الصندوق</span><span class="text-xs text-muted">إطار رفيع يحدّ الصندوق</span></span>
                                     <input type="hidden" name="design[box_outline]" value="0">
                                     <input type="checkbox" name="design[box_outline]" value="1" class="size-5 accent-[var(--color-accent)]" @checked($design['box_outline'])>
                                 </label>

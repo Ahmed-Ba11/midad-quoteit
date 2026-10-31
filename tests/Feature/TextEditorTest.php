@@ -2,6 +2,8 @@
 
 use App\Models\Quote;
 use App\Models\User;
+use App\Models\Verse;
+use Database\Seeders\LibrarySeeder;
 
 test('the text editor offers the three formats, every font, twelve colours and the four marks', function () {
     $html = $this->actingAs(User::factory()->create())->get(route('quotes.create', ['as' => 'text']))
@@ -76,9 +78,49 @@ test('a text quote opens in the editor to edit, and can be reopened as a card', 
     $quote = Quote::factory()->for($owner = User::factory()->create())->create(['presentation' => 'text']);
 
     $this->actingAs($owner)->get(route('quotes.edit', $quote))->assertOk()->assertSee('محرّر النص')
-        ->assertSee(route('quotes.edit', [$quote, 'as' => 'card']), false);
+        ->assertSee('formaction="'.route('quotes.redraft', $quote).'"', false);
     $this->actingAs($owner)->get(route('quotes.edit', [$quote, 'as' => 'card']))->assertOk()->assertSee('مرسم الحروف');
     $this->actingAs(User::factory()->create())->get(route('quotes.edit', $quote))->assertForbidden();
+});
+
+test('switching a saved quote between «نص» and «بطاقة» keeps the unsaved choices, and saves nothing', function () {
+    $quote = Quote::factory()->for($owner = User::factory()->create())
+        ->create(['presentation' => 'card', 'content' => 'نص محفوظ', 'is_original' => true, 'font' => 'amiri']);
+
+    $this->actingAs($owner)
+        ->put(route('quotes.redraft', $quote), ['_form' => 'studio', 'content' => 'نص لم يُحفظ بعد', 'kind' => 'original', 'font' => 'mirza', 'switch_to' => 'text'])
+        ->assertRedirect(route('quotes.edit', [$quote, 'as' => 'text', 'draft' => 1]));
+
+    $this->actingAs($owner)->get(route('quotes.edit', [$quote, 'as' => 'text', 'draft' => 1]))
+        ->assertOk()->assertSee('محرّر النص')->assertSee('نص لم يُحفظ بعد')
+        ->assertSee('name="font" value="mirza" class="sr-only" checked', false);
+
+    expect($quote->fresh())->content->toBe('نص محفوظ')->font->toBe('amiri');
+
+    $this->actingAs(User::factory()->create())
+        ->put(route('quotes.redraft', $quote), ['content' => 'ليس لي', 'switch_to' => 'text'])->assertForbidden();
+});
+
+test('switching an empty form just opens the other view, with no «required» error', function () {
+    $this->actingAs(User::factory()->create())
+        ->post(route('quotes.draft'), ['_form' => 'studio', 'content' => '', 'switch_to' => 'text'])
+        ->assertRedirect(route('quotes.create', ['as' => 'text']))
+        ->assertSessionHasNoErrors();
+});
+
+test('switching a library pick keeps the verse locked and the choices made', function () {
+    $this->seed(LibrarySeeder::class);
+    $verse = Verse::first();
+    $reader = User::factory()->create();
+
+    $this->actingAs($reader)
+        ->post(route('quotes.draft'), ['_form' => 'studio', 'verses' => [$verse->id], 'font' => 'mirza', 'is_public' => 0, 'switch_to' => 'text'])
+        ->assertRedirect(route('quotes.create', ['draft' => 1, 'as' => 'text', 'verses' => [$verse->id]]));
+
+    $this->actingAs($reader)->get(route('quotes.create', ['draft' => 1, 'as' => 'text', 'verses' => [$verse->id]]))
+        ->assertOk()->assertSee('من المكتبة · يُنشر كما هو')->assertSee(e($verse->sadr))
+        ->assertSee('name="font" value="mirza" class="sr-only" checked', false)
+        ->assertSee('name="is_public" value="0" class="sr-only" checked', false);
 });
 
 test('saving from the editor lands on the quote with a confirmation, and «عدّل النص» opens the editor away from home', function () {

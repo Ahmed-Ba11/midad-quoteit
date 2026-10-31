@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Anthology;
 use App\Models\Poet;
 use App\Models\Quote;
 use App\Models\Reply;
@@ -88,6 +89,23 @@ test('مرسم الحروف opens with the chosen verses locked and attributed',
         ->assertSee('من المكتبة · يُنشر كما هو')
         ->assertSee('اختر بيتاً آخر')
         ->assertSee('<input type="hidden" name="verses[]" value="'.$verse->id.'">', false);
+});
+
+test('a library verse offers who sees it and «أضفه إلى», and keeps both choices', function () {
+    $verse = Verse::first();
+    $user = User::factory()->create();
+    $anthology = Anthology::factory()->for($user)->create(['title' => 'أبيات الصبر']);
+
+    $this->actingAs($user)->get(route('quotes.create', ['verses' => [$verse->id], 'as' => 'card']))
+        ->assertSee('من يرى الاقتباس؟')->assertSee('أضفه إلى')->assertSee('أبيات الصبر')
+        ->assertDontSee('ما نوع النص؟');
+
+    $this->actingAs($user)->post(route('store_quote'), ['verses' => [$verse->id], 'is_public' => 0, 'anthology_id' => $anthology->id])
+        ->assertSessionHasNoErrors();
+
+    $quote = Quote::sole();
+    expect($quote->is_public)->toBeFalse()
+        ->and($anthology->quotes()->whereKey($quote->id)->exists())->toBeTrue();
 });
 
 test('publishing a library verse ignores any edited text and attributes it automatically', function () {

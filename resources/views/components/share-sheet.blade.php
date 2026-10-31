@@ -40,7 +40,7 @@
 
         @include('quotes.partials.text-origin', [
             'quote' => new \App\Models\Quote, 'prefix' => 'share-', 'useOld' => $useOld,
-            'withPresentation' => false, 'anthologies' => $myAnthologies,
+            'anthologies' => $myAnthologies,
         ])
 
         {{-- Two ways on, always in reach. Both carry the details just typed — nothing is asked twice:

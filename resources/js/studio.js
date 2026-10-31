@@ -43,7 +43,13 @@ export function initStudio(form) {
 
     let highlighted = new Set([...highlightInputs.querySelectorAll('input')].map((input) => Number(input.value)));
     let lastWords = '';
-    let autoSize = true;
+    // A size the reader chose by hand is kept when the card is opened again (design[auto_size]).
+    const autoSizeInput = form.querySelector('[data-auto-size]');
+    let autoSize = autoSizeInput.value === '1';
+    const setAutoSize = (on) => {
+        autoSize = on;
+        autoSizeInput.value = on ? '1' : '0';
+    };
 
     // Tabs
     const tabs = [...form.querySelectorAll('[data-tab]')];
@@ -134,13 +140,13 @@ export function initStudio(form) {
         sizeInput.value = low;
     }
     form.querySelectorAll('[data-size-step]').forEach((button) => button.addEventListener('click', () => {
-        autoSize = false;
+        setAutoSize(false);
         const { min, max } = config.fontSize;
         sizeInput.value = Math.max(min, Math.min(max, Number(sizeInput.value) + Number(button.dataset.sizeStep) * 3));
         render();
     }));
     form.querySelector('[data-size-auto]').addEventListener('click', () => {
-        autoSize = true;
+        setAutoSize(true);
         render();
     });
 

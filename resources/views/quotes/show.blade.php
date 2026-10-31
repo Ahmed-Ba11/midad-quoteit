@@ -46,7 +46,7 @@
                             class="inline-flex h-11 items-center gap-1.5 rounded-full px-3 text-sm text-muted transition hover:bg-accent-soft hover:text-accent">
                             <x-icon name="palette" class="size-[18px]" /> صمّم مثله
                         </a>
-                        <x-quote-menu :quote="$quote" />
+                        <x-quote-menu :quote="$quote" :with-template="false" />
                     </div>
                 </div>
 

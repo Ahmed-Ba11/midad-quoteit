@@ -62,6 +62,22 @@ test('"استخدم التصميم" copies the look of a visible quote, never it
         ->assertOk()->assertDontSee('value="messiri" checked', false);
 });
 
+test('«صمّم مثله» copies the whole design and the layout, and shows once on the quote page', function () {
+    $model = Quote::factory()->create([
+        'layout' => 'verse',
+        'design' => [...config('card.defaults'), 'palette' => array_key_last(config('card.palettes')), 'divider' => 'diamond', 'box' => true],
+    ]);
+    $reader = User::factory()->create();
+
+    $this->actingAs($reader)->get(route('quotes.create', ['template' => $model->id]))->assertOk()
+        ->assertSee('name="design[palette]" value="'.array_key_last(config('card.palettes')).'" class="sr-only" checked', false)
+        ->assertSee('name="design[divider]" value="diamond" class="sr-only" checked', false)
+        ->assertSee('name="layout" value="verse" class="sr-only" checked', false);
+
+    $page = $this->actingAs($reader)->get(route('quotes.show', $model))->getContent();
+    expect(substr_count($page, route('quotes.create', ['template' => $model->id])))->toBe(1);
+});
+
 test('"أضف إلى" files the new quote only into an anthology of my own', function () {
     $reader = User::factory()->create();
     $mine = Anthology::factory()->for($reader)->create();

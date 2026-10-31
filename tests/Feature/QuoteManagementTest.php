@@ -74,6 +74,24 @@ test('the owner deletes their quote immediately (FR-07)', function () {
     $this->assertModelMissing($quote);
 });
 
+test('the delete form submits straight away, without a confirmation step (FR-07)', function () {
+    $quote = Quote::factory()->create();
+
+    $this->actingAs($quote->user)->get(route('quotes.show', $quote))
+        ->assertSee('احذفه')->assertDontSee('data-confirm', false);
+});
+
+test('deleting from the quote page goes home even when its URL had a query', function () {
+    $quote = Quote::factory()->create();
+
+    $this->actingAs($quote->user)
+        ->from(route('quotes.show', [$quote, 'saved' => 1]))
+        ->delete(route('delete_quote', $quote))
+        ->assertRedirect(route('home'));
+
+    $this->assertModelMissing($quote);
+});
+
 test('another user cannot delete the quote', function () {
     $quote = Quote::factory()->create();
 

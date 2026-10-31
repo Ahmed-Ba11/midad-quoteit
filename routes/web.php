@@ -48,6 +48,7 @@ Route::middleware(['auth', 'throttle:60,1'])->group(function () {
     Route::post('/quotes/draft', [QuoteController::class, 'draft'])->name('quotes.draft')->middleware('throttle:20,1');
     Route::get('/quote/{quote}/edit', [QuoteController::class, 'edit'])->name('quotes.edit')->can('update', 'quote');
     Route::put('/quote/{quote}', [QuoteController::class, 'update'])->name('edit_quote')->can('update', 'quote');
+    Route::put('/quote/{quote}/draft', [QuoteController::class, 'redraft'])->name('quotes.redraft')->can('update', 'quote')->middleware('throttle:20,1');
     Route::delete('/quote/{quote}', [QuoteController::class, 'destroy'])->name('delete_quote')->can('delete', 'quote');
 
     Route::post('/quote/{quote}/like', [LikeController::class, 'toggle'])->name('quotes.like')->can('view', 'quote');

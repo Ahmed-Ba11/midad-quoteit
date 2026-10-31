@@ -75,9 +75,11 @@
                 <x-icon name="chevron-left" class="size-4 text-muted transition group-open/more:-rotate-90" />
             </summary>
             <div class="space-y-5 border-t border-line p-4">
-        @unless ($isLibrary)
-            @include('quotes.partials.text-origin', ['quote' => $quote, 'withBook' => true, 'withPresentation' => false, 'anthologies' => $myAnthologies ?? collect(), 'defaults' => $draft])
-        @endunless
+        @if ($isLibrary)
+            @include('quotes.partials.publish-options', ['quote' => $quote, 'anthologies' => $myAnthologies ?? collect(), 'defaults' => $draft])
+        @else
+            @include('quotes.partials.text-origin', ['quote' => $quote, 'withBook' => true, 'anthologies' => $myAnthologies ?? collect(), 'defaults' => $draft])
+        @endif
 
         @if ($withStory ?? false)
             <x-textarea name="story" label="حكاية الاقتباس" hint="اختياري، حتى ٥٠٠ حرف: أين قرأته؟ ولماذا بقي معك؟"

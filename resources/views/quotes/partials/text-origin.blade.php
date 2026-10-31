@@ -1,5 +1,6 @@
 {{--
-    "ما نوع النص؟" + "من يرى الاقتباس؟" + "طريقة العرض" — shared by the quick-share window and مرسم الحروف.
+    "ما نوع النص؟" + who said it and where from, then publish-options ("من يرى الاقتباس؟" + «أضفه إلى»);
+    shared by «شارك اقتباساً», «محرّر النص» and مرسم الحروف.
     The text kind decides what is required (QuoteRequest::withValidator):
       quoted    — someone else's words: the author and the source's name are required; a link is optional;
       original  — my own writing: signed with my signature, no source;
@@ -11,7 +12,6 @@
     $prefix ??= '';
     $useOld ??= true;
     $withBook ??= false;
-    $withPresentation ??= true;
     $anthologies ??= collect();
     $defaults ??= [];
     $old = fn (string $field, $default) => $useOld ? old($field, $defaults[$field] ?? $default) : ($defaults[$field] ?? $default);
@@ -21,7 +21,6 @@
         default => 'anonymous',
     });
     $mySignature = $defaults['signature'] ?? ($quote->is_original && filled($quote->author) ? $quote->author : 'بقلم '.auth()->user()->name);
-    $chip = 'inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-paper px-4 text-sm transition hover:border-accent has-[:checked]:border-accent has-[:checked]:bg-accent has-[:checked]:text-paper has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-accent/30';
     $choice = 'flex h-full cursor-pointer flex-col gap-1 rounded-2xl border border-line bg-paper p-3 transition hover:border-accent has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-accent/30';
     $kinds = [
         'quoted' => ['icon' => 'book-open', 'title' => 'نقلته عن غيري', 'text' => 'بيت شاعر أو جملة كاتب'],
@@ -96,59 +95,4 @@
         hint="اختياري؛ يرى القرّاء زر «أكمل القراءة» باسم المصدر، لا الرابط نفسه" />
 </fieldset>
 
-{{-- Who sees it: public (everyone, everywhere) or private (my corner only). --}}
-<fieldset class="mt-5">
-    <legend class="mb-2 text-sm font-medium">من يرى الاقتباس؟</legend>
-    <div class="grid grid-cols-2 gap-2">
-        <label class="{{ $choice }}">
-            <input type="radio" name="is_public" value="1" class="sr-only" @checked((string) $old('is_public', (int) $quote->is_public) === '1')>
-            <span class="flex items-center gap-1.5 text-sm font-medium"><x-icon name="globe" class="size-4 text-accent" /> عام</span>
-            <span class="text-xs leading-snug text-muted">في الرئيسية ورفوف القرّاء وركنك؛ يراه أي قارئ ويعجب به ويحفظه ويشاركه.</span>
-        </label>
-        <label class="{{ $choice }}">
-            <input type="radio" name="is_public" value="0" class="sr-only" @checked((string) $old('is_public', (int) $quote->is_public) === '0')>
-            <span class="flex items-center gap-1.5 text-sm font-medium"><x-icon name="lock" class="size-4 text-accent" /> خاص</span>
-            <span class="text-xs leading-snug text-muted">في ركنك وحدك؛ لا يظهر في الرئيسية ولا في صفحة الكتاب، ولا يراه غيرك.</span>
-        </label>
-    </div>
-</fieldset>
-
-@if ($withPresentation)
-{{-- How it looks: a designed card, or the words alone between quotation marks. --}}
-<fieldset class="mt-5">
-    <legend class="mb-2 text-sm font-medium">طريقة العرض</legend>
-    <div class="grid grid-cols-2 gap-2">
-        <label class="{{ $choice }}">
-            <input type="radio" name="presentation" value="card" class="sr-only" @checked($old('presentation', $quote->presentation) === 'card')>
-            <span class="flex items-center gap-1.5 text-sm font-medium"><x-icon name="palette" class="size-4 text-accent" /> بطاقة مصمّمة</span>
-            <span class="text-xs leading-snug text-muted">بالخط واللون اللذين تختارهما.</span>
-        </label>
-        <label class="{{ $choice }}">
-            <input type="radio" name="presentation" value="text" class="sr-only" @checked($old('presentation', $quote->presentation) === 'text')>
-            <span class="flex items-center gap-1.5 text-sm font-medium"><x-icon name="type" class="size-4 text-accent" /> نص مقتبس</span>
-            <span class="text-xs leading-snug text-muted">الكلمات وحدها بين «علامتي تنصيص».</span>
-        </label>
-    </div>
-</fieldset>
-@endif
-
-{{-- «أضفه إلى»: file it straight into one of my anthologies, or nowhere; each is a clear chip. --}}
-@if ($anthologies->isNotEmpty())
-    @php $chosenAnthology = (string) $old('anthology_id', ''); @endphp
-    <fieldset class="mt-5">
-        <legend class="mb-2 flex items-center gap-1.5 text-sm font-medium"><x-icon name="layers" class="size-4 text-accent" /> أضفه إلى</legend>
-        <div class="flex flex-wrap gap-2">
-            <label class="{{ $chip }}">
-                <input type="radio" name="anthology_id" value="" class="sr-only" @checked($chosenAnthology === '')>
-                لا شيء
-            </label>
-            @foreach ($anthologies as $anthology)
-                <label class="{{ $chip }}">
-                    <input type="radio" name="anthology_id" value="{{ $anthology->id }}" class="sr-only" @checked($chosenAnthology === (string) $anthology->id)>
-                    <x-icon name="layers" class="size-3.5 opacity-60" /> {{ $anthology->title }}
-                </label>
-            @endforeach
-        </div>
-        <p class="mt-1.5 text-xs text-muted">اختياري: يُحفظ في مختاراتك التي تختارها، ويبقى في ركنك على كل حال</p>
-    </fieldset>
-@endif
+@include('quotes.partials.publish-options', ['quote' => $quote, 'useOld' => $useOld, 'anthologies' => $anthologies, 'defaults' => $defaults])

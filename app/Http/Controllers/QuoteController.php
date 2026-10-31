@@ -20,6 +20,12 @@ use Illuminate\View\View;
 class QuoteController extends Controller
 {
     /**
+     * How many public quotes the home page needs before «اقتباس اليوم» replaces «بيت اليوم»,
+     * and before it shows how many quotes and readers there are.
+     */
+    public const QUOTE_OF_THE_DAY_FROM = 10;
+
+    /**
      * Display all quotes, 12 per page, with search, sort and category filter.
      */
     public function index(Request $request): View
@@ -45,24 +51,29 @@ class QuoteController extends Controller
         $isFiltering = $filters['q'] !== '' || $filters['category'] !== null || $filters['original'];
         $isFrontPage = ! $isFiltering && $quotes->onFirstPage();
 
+        // The hero's numbers move slowly; counting them once every few minutes is plenty.
+        $counts = $isFrontPage ? Cache::remember('home-counts', now()->addMinutes(5), fn () => [
+            'quotes' => Quote::public()->count(),
+            'readers' => User::whereHas('quotes', fn ($quotes) => $quotes->public())->count(),
+            'verses' => Verse::count(),
+        ]) : [];
+        // The day's leaf: a reader's quote once there are enough to choose from; until then a verse.
+        $hasEnoughQuotes = $isFrontPage && $counts['quotes'] >= self::QUOTE_OF_THE_DAY_FROM;
+
         return view('quotes.index', [
             'quotes' => $quotes,
             'categories' => $categories,
             'filters' => $filters,
             'isFrontPage' => $isFrontPage,
-            'quoteOfTheDay' => $isFrontPage ? Quote::ofTheDay() : null,
+            'quoteOfTheDay' => $hasEnoughQuotes ? Quote::ofTheDay() : null,
+            'verseOfTheDay' => $isFrontPage && ! $hasEnoughQuotes ? Verse::ofTheDay() : null,
             // أقلام رقيم: readers with the most public quotes — only what they chose to make public.
             'pens' => $isFrontPage
                 ? User::whereHas('quotes', fn ($quotes) => $quotes->public())
                     ->withCount(['quotes as public_quotes_count' => fn ($quotes) => $quotes->public()])
                     ->orderByDesc('public_quotes_count')->take(8)->get(['id', 'name', 'accent', 'badge', 'bio'])
                 : collect(),
-            // The hero's numbers move slowly; counting them once every few minutes is plenty.
-            'counts' => $isFrontPage ? Cache::remember('home-counts', now()->addMinutes(5), fn () => [
-                'quotes' => Quote::public()->count(),
-                'readers' => User::whereHas('quotes', fn ($quotes) => $quotes->public())->count(),
-                'verses' => Verse::count(),
-            ]) : [],
+            'counts' => $counts,
         ]);
     }
 

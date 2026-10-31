@@ -50,7 +50,7 @@ test('unknown filter values are ignored instead of failing', function () {
 });
 
 test('the quote of the day is the same all day and shows on the home page', function () {
-    Quote::factory()->count(5)->create();
+    Quote::factory()->count(10)->create();
 
     $first = Quote::ofTheDay();
     expect(Quote::ofTheDay()->id)->toBe($first->id);

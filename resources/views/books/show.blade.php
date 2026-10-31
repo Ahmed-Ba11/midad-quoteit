@@ -3,6 +3,7 @@
 @section('title', $book->title)
 
 @section('content')
+    <x-page-wall />
     @php
         $statuses = config('quotes.reading_statuses');
     @endphp

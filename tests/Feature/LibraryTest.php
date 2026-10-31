@@ -9,6 +9,7 @@ use App\Models\Verse;
 use App\Models\Work;
 use App\Support\Aldiwan;
 use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\DemoSeeder;
 use Database\Seeders\LibrarySeeder;
 
 beforeEach(function () {
@@ -156,7 +157,7 @@ test('verse lines render as صدر then عجز in the card', function () {
 });
 
 test('the demo seeder builds a complete, browsable dataset', function () {
-    $this->seed(DatabaseSeeder::class);
+    $this->seed(DemoSeeder::class);
 
     expect(User::count())->toBe(5)
         ->and(Quote::count())->toBe(22)
@@ -165,6 +166,22 @@ test('the demo seeder builds a complete, browsable dataset', function () {
 
     $this->get(route('home'))->assertOk()->assertSee('اقتبـــاس اليوم');
     $this->get(route('library.index'))->assertOk();
+});
+
+test('the public site starts with the library only: no demo readers, quotes or made-up numbers', function () {
+    app()->detectEnvironment(fn () => 'production');
+    app(DatabaseSeeder::class)->setContainer(app())->__invoke();
+    app()->detectEnvironment(fn () => 'testing');
+
+    expect(User::count())->toBe(0)
+        ->and(Quote::count())->toBe(0)
+        ->and(Verse::count())->toBeGreaterThan(100);
+
+    $this->get(route('home'))->assertOk()
+        ->assertSee('بيتُ اليوم')
+        ->assertDontSee('اقتبـــاس اليوم')
+        ->assertDontSee('>0</dd>', false)
+        ->assertSee('بيتاً موثّقاً');
 });
 
 test('a quote cannot be linked to the library by sending verse_id or saying_id directly', function () {

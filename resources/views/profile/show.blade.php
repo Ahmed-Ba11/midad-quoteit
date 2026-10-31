@@ -3,6 +3,7 @@
 @section('title', $isOwner ? 'ركني' : $user->name)
 
 @section('content')
+    <x-page-wall />
     @php
         $colors = $user->accentColors();
         // Only the tabs this viewer may open (ProfileController decides which).

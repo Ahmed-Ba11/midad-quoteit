@@ -35,8 +35,10 @@
                         <x-button :href="route('library.index')" variant="secondary" icon="book-open" class="!border-[#F2ECE2]/40 !text-[#F2ECE2] hover:!bg-[#F2ECE2]/10">خزانة الأدب</x-button>
                     </div>
 
+                    {{-- Only numbers that mean something: the verified verses always; quotes and readers once there are ten. --}}
                     <dl class="mt-10 flex justify-center gap-8 text-[#F2ECE2] lg:justify-start">
                         @foreach (['quotes' => 'اقتباس', 'readers' => 'قارئ', 'verses' => 'بيتاً موثّقاً'] as $key => $label)
+                            @continue($key !== 'verses' && $counts[$key] < \App\Http\Controllers\QuoteController::QUOTE_OF_THE_DAY_FROM)
                             <div class="flex flex-col-reverse">
                                 <dt class="text-xs text-[#F2ECE2]/60">{{ $label }}</dt>
                                 <dd class="font-display text-3xl font-bold text-[#E2C27E]">{{ number_format($counts[$key]) }}</dd>
@@ -45,8 +47,11 @@
                     </dl>
                 </div>
 
+                {{-- The day's leaf: a reader's quote once there are enough to choose from, else a verse. --}}
                 @if ($quoteOfTheDay)
-                    <x-quote-of-the-day :quote="$quoteOfTheDay" />
+                    <x-quote-of-the-day :quote="$quoteOfTheDay" class="quote-leaf" />
+                @elseif ($verseOfTheDay)
+                    <x-quote-of-the-day :verse="$verseOfTheDay" class="quote-leaf" />
                 @endif
             </div>
         </section>

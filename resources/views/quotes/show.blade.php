@@ -3,6 +3,7 @@
 @section('title', \Illuminate\Support\Str::limit(str_replace("\n", ' ', $quote->readableText()), 40))
 
 @section('content')
+    <x-page-wall />
     @php
         $ratioWidth = $quote->presentation === 'text' ? 760 : config('quotes.ratios.'.$quote->ratio.'.width', 760);
         $signature = $quote->is_original && blank($quote->author) ? 'بقلم '.$quote->user->name : $quote->author;

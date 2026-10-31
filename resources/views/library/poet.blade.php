@@ -3,6 +3,7 @@
 @section('title', $poet->name)
 
 @section('content')
+    <x-page-wall />
     <div class="mx-auto max-w-5xl px-4 py-12">
         <x-back :href="route('library.index').'#poets'" label="رواق الشعراء" />
 

@@ -58,6 +58,17 @@ class Verse extends Model
     }
 
     /**
+     * بيت اليوم: one verified verse, the same all day, a different one tomorrow.
+     */
+    public static function ofTheDay(): ?self
+    {
+        $count = static::count();
+
+        return $count === 0 ? null
+            : static::with('work.poet')->orderBy('id')->skip(crc32(today()->toDateString()) % $count)->first();
+    }
+
+    /**
      * The verse as quote text: صدر on the first line, عجز on the second.
      */
     public function asText(): string

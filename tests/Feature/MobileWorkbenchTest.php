@@ -91,7 +91,7 @@ test('the sign-in tablet writes its verse in Ruqʿa, loaded once and whole', fun
 
 test('the footer closes with its maker: أحمد, software engineering student, X and LinkedIn', function () {
     $this->get(route('home'))
-        ->assertSee('رَقَمَه')->assertSee('أحمد')->assertSee('هندسة البرمجيات')
+        ->assertSee('رَقَمَه')->assertSee('أحمد')->assertSee('طالب هندسة برمجيات')->assertDontSee('طالبٌ جامعيّ')
         ->assertSee('href="https://x.com/SWEa_7"', false)->assertDontSee('github.com/Ahmed-Ba11', false)
         ->assertSee('href="https://www.linkedin.com/in/ahmed-basharaf-9633b6435"', false)
         ->assertDontSee('utm_source', false)

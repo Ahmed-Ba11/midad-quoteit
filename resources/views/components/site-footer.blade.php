@@ -88,7 +88,7 @@
                 <span class="text-muted">رَقَمَه</span> أحمد
             </h2>
             <p class="max-w-md text-sm leading-relaxed text-muted">
-                طالبٌ جامعيّ في تخصّص هندسة البرمجيات، يكتب الشيفرة كما يُكتب البيت: سطراً يُوزن قبل أن يُرسَل.
+                طالب هندسة برمجيات
             </p>
             <ul class="flex items-center gap-2" aria-label="حسابات أحمد">
                 <li>

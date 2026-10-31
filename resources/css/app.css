@@ -346,6 +346,94 @@ html.dark body {
     pointer-events: none;
 }
 
+/*
+ * A quote's words (x-quote-words): verse as صدر / عجز, free lines, or paragraphs.
+ * On cards the hemistichs stack, centred; on a wide text page they sit side by side like a printed
+ * diwan, each centred in its half, with a small gold diamond between them.
+ */
+.quote-words p {
+    margin: 0;
+}
+
+.quote-words .poem {
+    display: grid;
+    row-gap: 0.55em;
+}
+
+.quote-words .bayt {
+    display: grid;
+    justify-items: center;
+}
+
+.quote-words .hemi,
+.quote-words .line,
+.quote-art-line {
+    text-wrap: balance;
+}
+
+.quote-words .sep {
+    display: none;
+}
+
+.quote-words .free-lines {
+    display: grid;
+    row-gap: 0.2em;
+}
+
+.quote-words .para + .para {
+    margin-top: 0.6em;
+}
+
+.quote-words .words-mark {
+    color: var(--color-gold);
+}
+
+.quote-words .words-attribution {
+    margin-top: 0.6em;
+    font-size: 0.6em;
+    opacity: 0.75;
+}
+
+@container (min-width: 34rem) {
+    .quote-text .quote-words .bayt {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        column-gap: 1.1em;
+        align-items: center;
+        justify-items: stretch;
+    }
+
+    .quote-text .quote-words .hemi {
+        text-align: center;
+    }
+
+    .quote-text .quote-words .sep {
+        display: block;
+        width: 0.32em;
+        height: 0.32em;
+        rotate: 45deg;
+        background: var(--color-gold);
+        opacity: 0.8;
+    }
+}
+
+/* Emphasis on a text quote: a soft wash of the chosen colour (readable by day and at night), or coloured letters. */
+.quote-text .hl-mark .hl {
+    background: color-mix(in srgb, var(--hl) 24%, transparent);
+    color: inherit;
+    padding: 0 0.2em;
+    border-radius: 0.2em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+}
+
+.quote-text .hl-color .hl {
+    color: var(--hl);
+}
+
+.dark .quote-text .hl-color .hl {
+    color: color-mix(in srgb, var(--hl) 65%, white);
+}
+
 /* Verses: balance the words of a hemistich so no single word drops to its own line. */
 .hemistich,
 .quote-art-line {

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\NormalizesArabic;
+use App\Support\QuoteLayout;
 use Database\Factories\QuoteFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
@@ -13,9 +14,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
-    'content', 'category_id', 'verse_id', 'saying_id', 'author', 'book', 'page', 'source', 'source_url', 'is_original', 'is_public', 'presentation', 'mark_style', 'story',
+    'content', 'category_id', 'verse_id', 'saying_id', 'author', 'book', 'page', 'source', 'source_url', 'is_original', 'is_public', 'presentation', 'mark_style', 'layout', 'story',
     'font', 'bg_color', 'text_color', 'highlight_color', 'highlight_style', 'highlights',
-    'texture', 'ratio', 'font_size',
+    'texture', 'ratio', 'font_size', 'design',
 ])]
 class Quote extends Model
 {
@@ -53,6 +54,7 @@ class Quote extends Model
         'is_original' => false,
         'presentation' => 'card',
         'mark_style' => 'guillemets',
+        'layout' => 'auto',
     ];
 
     /**
@@ -66,6 +68,7 @@ class Quote extends Model
             'is_original' => 'boolean',
             'is_public' => 'boolean',
             'font_size' => 'integer',
+            'design' => 'array',
         ];
     }
 
@@ -272,6 +275,54 @@ class Quote extends Model
         }
 
         return $lines;
+    }
+
+    /**
+     * The words set as the reader asked (App\Support\QuoteLayout): verses of صدر and عجز, free lines,
+     * or paragraphs of lines. Every hemistich, line and paragraph line comes as pieces (see
+     * contentLines()); word indexes for highlights run through them in reading order, separators left out.
+     *
+     * @return array{mode: 'verse'|'lines'|'prose', verses: list<array{sadr: list<array{text: string, highlighted: bool}>, ajuz: list<array{text: string, highlighted: bool}>}>, lines: list<list<array{text: string, highlighted: bool}>>, paragraphs: list<list<list<array{text: string, highlighted: bool}>>>, attribution: ?string}
+     */
+    public function typeset(): array
+    {
+        $layout = QuoteLayout::parse((string) $this->content, $this->layout ?? 'auto');
+        $highlighted = array_flip($this->highlights ?? []);
+        $index = 0;
+
+        $pieces = function (string $text) use (&$index, $highlighted): array {
+            $pieces = [];
+
+            foreach (preg_split('/\s+/u', trim($text), -1, PREG_SPLIT_NO_EMPTY) as $word) {
+                $isHighlighted = isset($highlighted[$index++]);
+                $last = array_key_last($pieces);
+
+                if ($last !== null && $pieces[$last]['highlighted'] === $isHighlighted) {
+                    $pieces[$last]['text'] .= ' '.$word;
+                } else {
+                    $pieces[] = ['text' => $word, 'highlighted' => $isHighlighted];
+                }
+            }
+
+            return $pieces;
+        };
+
+        $verses = [];
+        foreach ($layout['verses'] as $verse) {
+            $sadr = $pieces($verse['sadr']);
+            $verses[] = ['sadr' => $sadr, 'ajuz' => $pieces($verse['ajuz'])];
+        }
+
+        $lines = array_map($pieces, $layout['lines']);
+        $paragraphs = array_map(fn (string $paragraph) => array_map($pieces, explode("\n", $paragraph)), $layout['paragraphs']);
+
+        return [
+            'mode' => $layout['mode'],
+            'verses' => $verses,
+            'lines' => $lines,
+            'paragraphs' => $paragraphs,
+            'attribution' => $layout['attribution'],
+        ];
     }
 
     /**

@@ -147,12 +147,12 @@ test('the text of a library quote cannot be changed when editing it', function (
         ->font->toBe('naskh');
 });
 
-test('verse lines render on separate lines in the card', function () {
+test('verse lines render as صدر then عجز in the card', function () {
     $verse = Verse::first();
     $this->actingAs(User::factory()->create())->post(route('store_quote'), ['verses' => [$verse->id]]);
 
     $this->get(route('home', ['q' => 'نبك']))
-        ->assertSeeInOrder(['quote-art-line', e($verse->sadr), 'quote-art-line', e($verse->ajuz)], false);
+        ->assertSeeInOrder(['data-mode="verse"', 'hemi sadr', e($verse->sadr), 'hemi ajuz', e($verse->ajuz)], false);
 });
 
 test('the demo seeder builds a complete, browsable dataset', function () {

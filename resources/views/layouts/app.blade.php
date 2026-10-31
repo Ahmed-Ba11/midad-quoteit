@@ -32,8 +32,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+Arabic:wght@300;400;500;700&family=Noto+Naskh+Arabic:wght@400;700&display=swap">
-    <link rel="stylesheet" media="print" onload="this.media='all'"
-        href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=El+Messiri:wght@400;600&family=Reem+Kufi:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=EB+Garamond:ital@0;1&family=Playfair+Display:ital@0;1&family=Libre+Baskerville:ital@0;1&family=IM+Fell+English:ital@0;1&display=swap">
+    {{-- Only the card fonts this page shows (App\Support\PageFonts), after first paint. --}}
+    @if ($cardFonts = app(\App\Support\PageFonts::class)->stylesheetUrl())
+        <link rel="stylesheet" media="print" onload="this.media='all'" href="{{ $cardFonts }}">
+    @endif
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 

@@ -12,19 +12,46 @@
 
 return [
 
+    /*
+     * Fonts, grouped the way a reader thinks of them («بأيّ قلمٍ تكتب؟»). Every Google face is SIL OFL 1.1
+     * (github.com/google/fonts/tree/main/ofl/<slug>), loaded from fonts.googleapis.com and never committed;
+     * `google` is its css2 family spec. ثمانية is served locally (resources/fonts/thmanyah, gitignored).
+     * `best`: verse, prose or both — a hint shown in the list, never a restriction.
+     */
     'fonts' => [
-        'amiri' => ['label' => 'أميري', 'lang' => 'ar', 'stack' => "'Amiri', serif"],
-        'thmanyah-text' => ['label' => 'ثمانية نصّي', 'lang' => 'ar', 'stack' => "'thmanyah serif text', 'Amiri', serif"],
-        'thmanyah-display' => ['label' => 'ثمانية عرض', 'lang' => 'ar', 'stack' => "'thmanyah serif display', 'Noto Naskh Arabic', serif"],
-        'naskh' => ['label' => 'نسخ', 'lang' => 'ar', 'stack' => "'Noto Naskh Arabic', serif"],
-        'ruqaa' => ['label' => 'رقعة', 'lang' => 'ar', 'stack' => "'Aref Ruqaa', serif"],
-        'messiri' => ['label' => 'المسيري', 'lang' => 'ar', 'stack' => "'El Messiri', sans-serif"],
-        'reem-kufi' => ['label' => 'ريم كوفي', 'lang' => 'ar', 'stack' => "'Reem Kufi', sans-serif"],
-        'cormorant' => ['label' => 'Cormorant', 'lang' => 'en', 'stack' => "'Cormorant Garamond', serif", 'italic' => true],
-        'eb-garamond' => ['label' => 'EB Garamond', 'lang' => 'en', 'stack' => "'EB Garamond', serif"],
-        'playfair' => ['label' => 'Playfair', 'lang' => 'en', 'stack' => "'Playfair Display', serif"],
-        'baskerville' => ['label' => 'Baskerville', 'lang' => 'en', 'stack' => "'Libre Baskerville', serif"],
-        'im-fell' => ['label' => 'IM Fell', 'lang' => 'en', 'stack' => "'IM Fell English', serif"],
+        'amiri' => ['label' => 'أميري', 'lang' => 'ar', 'group' => 'naskh', 'best' => 'verse', 'stack' => "'Amiri', serif", 'google' => 'Amiri:wght@400;700'],
+        'scheherazade' => ['label' => 'شهرزاد', 'lang' => 'ar', 'group' => 'naskh', 'best' => 'verse', 'stack' => "'Scheherazade New', serif", 'google' => 'Scheherazade+New:wght@400;700'],
+        'naskh' => ['label' => 'نسخ', 'lang' => 'ar', 'group' => 'naskh', 'best' => 'both', 'stack' => "'Noto Naskh Arabic', serif", 'google' => 'Noto+Naskh+Arabic:wght@400;700'],
+        'markazi' => ['label' => 'مركزي', 'lang' => 'ar', 'group' => 'naskh', 'best' => 'prose', 'stack' => "'Markazi Text', serif", 'google' => 'Markazi+Text:wght@400;600'],
+        'thmanyah-text' => ['label' => 'ثمانية نصّي', 'lang' => 'ar', 'group' => 'naskh', 'best' => 'prose', 'stack' => "'thmanyah serif text', 'Amiri', serif"],
+        'ruqaa' => ['label' => 'رقعة', 'lang' => 'ar', 'group' => 'ruqaa', 'best' => 'verse', 'stack' => "'Aref Ruqaa', serif", 'google' => 'Aref+Ruqaa:wght@400;700'],
+        'reem-kufi' => ['label' => 'ريم كوفي', 'lang' => 'ar', 'group' => 'kufi', 'best' => 'prose', 'stack' => "'Reem Kufi', sans-serif", 'google' => 'Reem+Kufi:wght@400;600'],
+        'kufam' => ['label' => 'كوفام', 'lang' => 'ar', 'group' => 'kufi', 'best' => 'prose', 'stack' => "'Kufam', sans-serif", 'google' => 'Kufam:wght@400;700'],
+        'qahiri' => ['label' => 'قاهري', 'lang' => 'ar', 'group' => 'kufi', 'best' => 'prose', 'stack' => "'Qahiri', sans-serif", 'google' => 'Qahiri'],
+        'thmanyah-display' => ['label' => 'ثمانية عرض', 'lang' => 'ar', 'group' => 'display', 'best' => 'both', 'stack' => "'thmanyah serif display', 'Noto Naskh Arabic', serif"],
+        'mirza' => ['label' => 'ميرزا', 'lang' => 'ar', 'group' => 'display', 'best' => 'verse', 'stack' => "'Mirza', serif", 'google' => 'Mirza:wght@400;700'],
+        'katibeh' => ['label' => 'كاتبة', 'lang' => 'ar', 'group' => 'display', 'best' => 'verse', 'stack' => "'Katibeh', serif", 'google' => 'Katibeh'],
+        'rakkas' => ['label' => 'رقّاص', 'lang' => 'ar', 'group' => 'display', 'best' => 'prose', 'stack' => "'Rakkas', serif", 'google' => 'Rakkas'],
+        'messiri' => ['label' => 'المسيري', 'lang' => 'ar', 'group' => 'modern', 'best' => 'both', 'stack' => "'El Messiri', sans-serif", 'google' => 'El+Messiri:wght@400;600'],
+        'almarai' => ['label' => 'المراعي', 'lang' => 'ar', 'group' => 'modern', 'best' => 'prose', 'stack' => "'Almarai', sans-serif", 'google' => 'Almarai:wght@400;700'],
+        'plex' => ['label' => 'بلكس', 'lang' => 'ar', 'group' => 'modern', 'best' => 'prose', 'stack' => "'IBM Plex Sans Arabic', sans-serif", 'google' => 'IBM+Plex+Sans+Arabic:wght@400;600'],
+        'lalezar' => ['label' => 'لاله‌زار', 'lang' => 'ar', 'group' => 'playful', 'best' => 'prose', 'stack' => "'Lalezar', sans-serif", 'google' => 'Lalezar'],
+        'marhey' => ['label' => 'مرحى', 'lang' => 'ar', 'group' => 'playful', 'best' => 'prose', 'stack' => "'Marhey', sans-serif", 'google' => 'Marhey:wght@400;600'],
+        'cormorant' => ['label' => 'Cormorant', 'lang' => 'en', 'group' => 'latin', 'best' => 'both', 'stack' => "'Cormorant Garamond', serif", 'italic' => true, 'google' => 'Cormorant+Garamond:ital,wght@0,500;1,500'],
+        'eb-garamond' => ['label' => 'EB Garamond', 'lang' => 'en', 'group' => 'latin', 'best' => 'both', 'stack' => "'EB Garamond', serif", 'google' => 'EB+Garamond:ital@0;1'],
+        'playfair' => ['label' => 'Playfair', 'lang' => 'en', 'group' => 'latin', 'best' => 'both', 'stack' => "'Playfair Display', serif", 'google' => 'Playfair+Display:ital@0;1'],
+        'baskerville' => ['label' => 'Baskerville', 'lang' => 'en', 'group' => 'latin', 'best' => 'both', 'stack' => "'Libre Baskerville', serif", 'google' => 'Libre+Baskerville:ital@0;1'],
+        'im-fell' => ['label' => 'IM Fell', 'lang' => 'en', 'group' => 'latin', 'best' => 'both', 'stack' => "'IM Fell English', serif", 'google' => 'IM+Fell+English:ital@0;1'],
+    ],
+
+    'font_groups' => [
+        'naskh' => 'نسخ',
+        'ruqaa' => 'رقعة',
+        'kufi' => 'كوفي',
+        'display' => 'زخرفي',
+        'modern' => 'حديث',
+        'playful' => 'مرِح',
+        'latin' => 'لاتيني',
     ],
 
     'palettes' => [
@@ -40,6 +67,7 @@ return [
         'wide' => ['label' => 'عريض', 'aspect' => '16 / 9', 'width' => 760],
         'square' => ['label' => 'مربّع', 'aspect' => '1 / 1', 'width' => 560],
         'tall' => ['label' => 'طولي', 'aspect' => '4 / 5', 'width' => 520],
+        'story' => ['label' => 'قصة', 'aspect' => '9 / 16', 'width' => 420],
     ],
 
     'font_size' => ['min' => 20, 'max' => 56],
@@ -50,6 +78,20 @@ return [
         'curly' => ['label' => 'علامة كبيرة', 'open' => '❝', 'close' => '❞'],
         'ornament' => ['label' => 'زخرفة ذهبية', 'open' => null, 'close' => null],
         'arch' => ['label' => 'لوح رقيم', 'open' => null, 'close' => null],
+    ],
+
+    // How the words are set (App\Support\QuoteLayout): detected, or forced to verse or prose.
+    'layouts' => [
+        'auto' => ['label' => 'تلقائي', 'hint' => 'يتعرّف على الشعر من طريقة كتابتك'],
+        'verse' => ['label' => 'شعر', 'hint' => 'صدرٌ وعجز كما في الدواوين'],
+        'prose' => ['label' => 'نثر', 'hint' => 'فقرة كما كتبتها'],
+    ],
+
+    // Twelve colours for emphasis (shading or coloured letters), each readable on paper and at night.
+    'highlight_colors' => [
+        '#8A3324' => 'قاني', '#B5543C' => 'آجرّي', '#D98C5F' => 'مشمشي', '#C9A45C' => 'ذهبي',
+        '#E3B448' => 'زعفراني', '#6E8B3D' => 'زيتي', '#3E8E7E' => 'فيروزي', '#3A6EA5' => 'لازوردي',
+        '#5B4B8A' => 'بنفسجي', '#B0577E' => 'وردي', '#7A5C45' => 'بُنّي', '#1E1A17' => 'حبر',
     ],
 
     // شارتي: emblems a reader can wear instead of their initial (drawn in resources/views/components/badge.blade.php).

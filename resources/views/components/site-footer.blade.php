@@ -16,14 +16,16 @@
             <dl class="mt-6 space-y-3 text-sm leading-relaxed">
                 <div>
                     <dt class="inline font-text font-bold">الرَّقيم:</dt>
-                    <dd class="inline text-muted">الكتاب، واللوح المكتوب. <cite class="not-italic text-xs">(مقاييس اللغة لابن فارس، والصحاح)</cite></dd>
+                    <dd class="inline text-muted">الكتاب. <cite class="not-italic text-xs">(مقاييس اللغة)</cite>
+                        وقيل في أصحاب الكهف: لوحٌ كُتب فيه خبرهم. <cite class="not-italic text-xs">(لسان العرب)</cite></dd>
                 </div>
                 <div>
                     <dt class="inline font-text font-bold">الرَّقْم:</dt>
-                    <dd class="inline text-muted">تعجيم الكتاب وتبيينه، ووشيُ الثوب وتزيينه. <cite class="not-italic text-xs">(لسان العرب، وأساس البلاغة)</cite></dd>
+                    <dd class="inline text-muted">الخطّ والكتابة؛ ورَقَمَ الكتابَ: أعجمه وبيّنه. <cite class="not-italic text-xs">(لسان العرب)</cite>
+                        وكلُّ ثوبٍ وُشِيَ فهو رَقْم. <cite class="not-italic text-xs">(مقاييس اللغة)</cite></dd>
                 </div>
             </dl>
-            <p class="mt-3 text-sm text-muted">فهنا تُكتب الجملة التي بقيت معك، وتُزيَّن بخطٍّ يليق بها.</p>
+            <p class="mt-3 text-sm text-muted">فهنا تُكتب الجملة التي بقيت معك، وتُوشّى بخطٍّ يليق بها.</p>
         </section>
 
         {{-- Where to go. --}}

@@ -148,7 +148,7 @@ class DatabaseSeeder extends Seeder
      */
     private function seedCorners($users, $quotes): void
     {
-        foreach ([['navy', 'quill'], ['cocoa', 'palm'], ['mauve', 'star8'], [null, null], ['sage', 'dad']] as $index => [$accent, $badge]) {
+        foreach ([['navy', 'quill'], ['cocoa', 'nib'], ['mauve', 'star8'], [null, null], ['sage', 'seal']] as $index => [$accent, $badge]) {
             $users[$index]->update(['accent' => $accent, 'badge' => $badge]);
         }
 

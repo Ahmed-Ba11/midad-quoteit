@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>@hasSection('title')@yield('title') · @endif رقيم</title>
-    <meta name="description" content="رقيم: اقتباسات تصنع حكايات؛ اقتبس من كتاب تقرؤه أو بيت تحفظه، وصمّمه وشاركه.">
+    <meta name="description" content="رقيم، حيثُ يُرقَمُ الأثر: اقتبس من كتاب تقرؤه أو بيت تحفظه، وصمّمه وشاركه.">
 
     {{-- PWA: installable on phones, with the bar in the brand's قاني red. --}}
     <meta name="theme-color" content="#8A3324">

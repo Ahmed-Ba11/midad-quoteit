@@ -30,11 +30,11 @@ test('the service worker never caches pages, only the offline page and icons', f
         ->not->toContain('cache.put');
 });
 
-test('the theme switch is the lamp over the book, labelled for screen readers', function () {
+test('the theme switch is the familiar sun and crescent, labelled for screen readers', function () {
     $this->get(route('home'))
         ->assertSee('data-theme-toggle', false)
-        ->assertSee('أشعل المصباح: الوضع الليلي')
-        ->assertSee('lamp-flame', false);
+        ->assertSee('aria-label="الوضع الليلي"', false)
+        ->assertSee('theme-star', false);
 });
 
 test('inner pages have a back link to the page they belong to', function () {

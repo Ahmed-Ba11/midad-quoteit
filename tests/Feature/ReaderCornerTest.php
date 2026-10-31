@@ -145,11 +145,11 @@ test('a reader picks a badge that then stands for them across the site', functio
     $reader = User::factory()->create(['name' => 'ريم']);
     Quote::factory()->for($reader)->create();
 
-    $this->actingAs($reader)->patch(route('profile.bio'), ['badge' => 'palm'])->assertSessionHasNoErrors();
-    expect($reader->fresh()->badge)->toBe('palm');
+    $this->actingAs($reader)->patch(route('profile.bio'), ['badge' => 'bookmark'])->assertSessionHasNoErrors();
+    expect($reader->fresh()->badge)->toBe('bookmark');
 
-    $this->get(route('home'))->assertSee('M12 21v-9', false);
-    $this->get(route('profile.show', $reader))->assertSee('شارة النخلة');
+    $this->get(route('home'))->assertSee('M6.5 3h11v18', false);
+    $this->get(route('profile.show', $reader))->assertSee('شارة فاصل الكتاب');
 
     // Back to the initial.
     $this->actingAs($reader)->patch(route('profile.bio'), ['badge' => ''])->assertSessionHasNoErrors();
@@ -161,6 +161,14 @@ test('only the listed badges can be chosen', function () {
         ->patch(route('profile.bio'), ['badge' => '<svg onload=alert(1)>'])
         ->assertSessionHasErrors('badge');
 });
+
+test('a reader whose badge was retired is shown by their initial again', function (string $retired) {
+    $reader = User::factory()->create(['name' => 'ريم', 'badge' => $retired]);
+    Quote::factory()->for($reader)->create();
+
+    $this->actingAs($reader)->patch(route('profile.bio'), ['badge' => $retired])->assertSessionHasErrors('badge');
+    $this->get(route('profile.show', $reader))->assertOk()->assertDontSee('شارة ');
+})->with(['shamsa', 'crescent', 'inkwell', 'palm', 'dad']);
 
 test('a reader hangs sayings on their wall, and can keep the wall private', function () {
     $this->seed(LibrarySeeder::class);

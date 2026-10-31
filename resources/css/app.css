@@ -117,31 +117,97 @@ html.dark body {
     }
 }
 
-/* Theme lamp: unlit by day; lit — flame and glow, with a gentle flicker — at night. */
-.theme-lamp .lamp-glow,
-.theme-lamp .lamp-flame {
-    opacity: 0;
-    transform-origin: 17.6px 9.6px;
-    transition: opacity 400ms ease, transform 400ms ease;
+/*
+ * Theme toggle: sun by day, crescent by night. The rays fold away, a shadow (the mask circle) slides
+ * over the disc to carve the crescent, and a star lights beside it like a lamp. Transforms only, so it
+ * stays smooth on phones.
+ */
+.theme-toggle svg * {
+    transition: transform 520ms cubic-bezier(0.65, 0, 0.35, 1), opacity 360ms ease;
 }
 
-.dark .theme-lamp {
+.theme-toggle .theme-rays {
+    transform-origin: 12px 12px;
+}
+
+.theme-toggle .theme-disc {
+    transform-origin: 12px 12px;
+}
+
+.theme-toggle .theme-cut {
+    transform: translate(7px, -7px);
+}
+
+.theme-toggle .theme-star,
+.theme-toggle .theme-star-glow {
+    opacity: 0;
+    transform-origin: 18.4px 5.2px;
+    transform: scale(0.2);
+}
+
+.dark .theme-toggle {
     color: var(--color-gold);
 }
 
-.dark .theme-lamp .lamp-flame {
+.dark .theme-toggle .theme-rays {
+    opacity: 0;
+    transform: rotate(90deg) scale(0.4);
+}
+
+.dark .theme-toggle .theme-disc {
+    transform: scale(1.5);
+}
+
+.dark .theme-toggle .theme-cut {
+    transform: none;
+}
+
+.dark .theme-toggle .theme-star {
     opacity: 1;
-    animation: lamp-flicker 2.4s ease-in-out infinite;
+    transform: none;
+    transition-delay: 260ms;
+    animation: star-twinkle 3.2s ease-in-out 900ms infinite;
 }
 
-.dark .theme-lamp .lamp-glow {
-    opacity: 0.22;
+.dark .theme-toggle .theme-star-glow {
+    opacity: 0.18;
+    transform: none;
+    transition-delay: 260ms;
 }
 
-@keyframes lamp-flicker {
-    0%, 100% { transform: scale(1, 1); }
-    40% { transform: scale(0.94, 1.06); }
-    70% { transform: scale(1.04, 0.96); }
+/* Lighting the star when the reader switches to night: it catches, flares, and settles. */
+.dark .theme-toggle.is-lighting .theme-star {
+    animation: star-light 760ms ease-out 260ms both, star-twinkle 3.2s ease-in-out 1100ms infinite;
+}
+
+.dark .theme-toggle.is-lighting .theme-star-glow {
+    animation: glow-light 900ms ease-out 260ms both;
+}
+
+@keyframes star-light {
+    0% { opacity: 0; transform: scale(0.2) rotate(-40deg); }
+    45% { opacity: 1; transform: scale(1.35) rotate(8deg); }
+    65% { transform: scale(0.88); }
+    80% { transform: scale(1.08); }
+    100% { opacity: 1; transform: none; }
+}
+
+@keyframes glow-light {
+    0% { opacity: 0; transform: scale(0.2); }
+    50% { opacity: 0.45; transform: scale(1.4); }
+    100% { opacity: 0.18; transform: none; }
+}
+
+@keyframes star-twinkle {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(0.82); opacity: 0.75; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-toggle svg * {
+        transition: none;
+        animation: none !important;
+    }
 }
 
 @layer base {
@@ -291,6 +357,38 @@ html.dark body {
     .nav-hint {
         display: none;
     }
+}
+
+/* Header: a hairline that warms to gold in the middle, like a rule under a manuscript heading. */
+.site-header::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-line) 12%, color-mix(in srgb, var(--color-gold) 55%, var(--color-line)) 50%, var(--color-line) 88%, transparent);
+    pointer-events: none;
+}
+
+/* Wide-screen links are words only: a small gold diamond marks where you are and grows in on hover. */
+.nav-link::after {
+    content: "";
+    position: absolute;
+    bottom: -0.15rem;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    background: var(--color-gold);
+    transform: translateX(-50%) rotate(45deg) scale(0);
+    transition: transform 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.nav-link[aria-current="page"]::after {
+    transform: translateX(-50%) rotate(45deg) scale(1);
+}
+
+.nav-link:hover::after {
+    transform: translateX(-50%) rotate(45deg) scale(0.7);
 }
 
 /* Home hero: ink-dark in both themes, a warm gold glow, the girih lattice faintly behind. */

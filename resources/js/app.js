@@ -91,22 +91,21 @@ document.querySelectorAll('[data-toast]').forEach((toast) => {
     setTimeout(hide, 5000);
 });
 
-// The lamp over the book: lighting it turns on night reading (dark mode); putting it out, day.
+// Sun and crescent: switching to night lights the star; the label always names the mode a click brings.
 const themeButtons = document.querySelectorAll('[data-theme-toggle]');
-const syncLamp = () => {
+const syncThemeButtons = () => {
     const isDark = document.documentElement.classList.contains('dark');
     themeButtons.forEach((button) => {
         button.setAttribute('aria-pressed', String(isDark));
-        button.setAttribute('aria-label', isDark ? 'أطفئ المصباح: الوضع النهاري' : 'أشعل المصباح: الوضع الليلي');
+        button.setAttribute('aria-label', isDark ? 'الوضع النهاري' : 'الوضع الليلي');
         button.title = button.getAttribute('aria-label');
     });
-    // The phone's status bar follows the chosen theme, not only the system one.
-    document.querySelectorAll('meta[name="theme-color"]').forEach((meta) => meta.setAttribute('content', isDark ? '#1B1714' : '#F5EFE4'));
 };
 
 themeButtons.forEach((button) => {
     button.addEventListener('click', () => {
         const isDark = document.documentElement.classList.toggle('dark');
+        button.classList.toggle('is-lighting', isDark);
 
         try {
             localStorage.setItem('theme', isDark ? 'dark' : 'light');
@@ -114,7 +113,7 @@ themeButtons.forEach((button) => {
             // Storage can be blocked (private mode); the toggle still works for this page.
         }
 
-        syncLamp();
+        syncThemeButtons();
     });
 });
-syncLamp();
+syncThemeButtons();

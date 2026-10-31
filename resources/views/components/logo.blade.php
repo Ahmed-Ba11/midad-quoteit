@@ -27,6 +27,6 @@
         </g>
     </svg>
     @if ($tagline)
-        <span class="mt-2 block font-sans text-[0.32em] font-normal tracking-wide text-muted">اقتباسات تصنع حكايات</span>
+        <span class="mt-2 block font-sans text-[0.32em] font-normal tracking-wide text-muted">حيثُ يُرقَمُ الأثر</span>
     @endif
 </span>

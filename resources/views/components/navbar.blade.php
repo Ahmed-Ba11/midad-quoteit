@@ -1,7 +1,7 @@
 @php
     $user = auth()->user();
     $onMyCorner = $user && request()->routeIs('profile.show') && request()->route('user')?->is($user);
-    // Each place has an icon and a one-line hint, shown under the link on hover (and read by screen readers).
+    // Each place has a one-line hint, shown under the link on hover (and read by screen readers), and an icon for the phone tab bar only.
     $places = [
         ['route' => 'home', 'active' => request()->routeIs('home', 'quotes.*'), 'label' => 'الرئيسية', 'icon' => 'feather', 'hint' => 'أحدث ما شاركه القرّاء'],
         ['route' => 'library.index', 'active' => request()->routeIs('library.*', 'diwans.*'), 'label' => 'المكتبة', 'icon' => 'scroll', 'hint' => 'معلّقات ودواوين موثّقة'],
@@ -12,7 +12,7 @@
     }
 @endphp
 
-<header class="sticky top-0 z-40 border-b border-line bg-paper/85 backdrop-blur-md">
+<header class="site-header sticky top-0 z-40 bg-paper/90 backdrop-blur-md">
     <nav aria-label="التنقّل الرئيسي" class="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:gap-6">
         <a href="{{ route('home') }}" aria-label="رقيم، الصفحة الرئيسية">
             <x-logo class="text-[1.65rem]" />
@@ -25,11 +25,10 @@
                     <a href="{{ route($place['route'], $place['params'] ?? []) }}" aria-describedby="hint-{{ $loop->index }}"
                         @if ($place['active']) aria-current="page" @endif
                         @class([
-                            'inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 transition',
-                            'bg-accent-soft font-bold text-accent' => $place['active'],
-                            'text-ink/80 hover:bg-surface hover:text-accent' => ! $place['active'],
+                            'nav-link relative inline-flex items-center px-3.5 py-2 text-[0.95rem] transition',
+                            'font-bold text-accent' => $place['active'],
+                            'text-ink/75 hover:text-accent' => ! $place['active'],
                         ])>
-                        <x-icon :name="$place['icon']" class="size-4" />
                         {{ $place['label'] }}
                     </a>
                     <span id="hint-{{ $loop->index }}" role="tooltip" class="nav-hint">{{ $place['hint'] }}</span>
@@ -38,7 +37,7 @@
         </ul>
 
         <div class="ms-auto flex items-center gap-1 sm:gap-2">
-            <x-theme-lamp />
+            <x-theme-toggle />
 
             @auth
                 {{-- On phones this lives in the middle of the bottom bar instead. --}}

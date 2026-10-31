@@ -12,7 +12,7 @@
     }
 @endphp
 
-<header class="site-header sticky top-0 z-40 bg-paper/90 backdrop-blur-md">
+<header class="site-header sticky top-0 z-40 bg-paper md:bg-paper/90 md:backdrop-blur-md">
     <nav aria-label="التنقّل الرئيسي" class="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:gap-6">
         <a href="{{ route('home') }}" aria-label="رقيم، الصفحة الرئيسية">
             <x-logo class="text-[1.65rem]" />
@@ -67,7 +67,7 @@
 </header>
 
 {{-- Phones: the same places as a tab bar at the bottom, within thumb's reach; sharing sits in the middle. --}}
-<nav aria-label="التنقّل السريع" class="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden">
+<nav aria-label="التنقّل السريع" class="tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper pb-[env(safe-area-inset-bottom)] md:hidden">
     <ul class="mx-auto flex max-w-md items-stretch">
         @foreach ($places as $place)
             @if ($user && $loop->index === 2)

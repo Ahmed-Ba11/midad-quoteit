@@ -1,11 +1,13 @@
 <?php
 
+use App\Models\Poet;
 use App\Models\Quote;
 use App\Models\Reply;
 use App\Models\User;
 use Database\Seeders\LibrarySeeder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * Runs the request and returns how many SQL queries it made.
@@ -56,6 +58,25 @@ test('the library page avoids per-item queries', function () {
     $this->seed(LibrarySeeder::class);
 
     expect(queriesFor(fn () => $this->get(route('library.index'))->assertOk()))->toBeLessThanOrEqual(15);
+});
+
+test('the library keeps its shelf and arcade ready-made, and renews them when the library changes', function () {
+    $this->seed(LibrarySeeder::class);
+
+    $first = $this->get(route('library.index'))->assertOk()->assertSee('رفّ الدواويـــن')->assertSee('رواق الشعـــراء')->getContent();
+    $second = $this->get(route('library.index'))->assertOk()->getContent();
+    expect(substr_count($second, 'data-book-panel='))->toBe(substr_count($first, 'data-book-panel='));
+
+    Poet::first()->update(['name' => 'شاعر بعد التحديث']);
+    $this->get(route('library.index'))->assertSee('شاعر بعد التحديث');
+});
+
+test('links are fetched ahead only for reading pages, never for signing in or out or editing', function () {
+    $rules = json_decode(Str::between($this->get(route('home'))->getContent(), '<script type="speculationrules">', '</script>'), true);
+    $excluded = $rules['prefetch'][0]['where']['and'][1]['not']['href_matches'];
+
+    expect($excluded)->toContain('/logout', '/login', '/signup', '/quotes/create', '/*/edit')
+        ->and($rules)->not->toHaveKey('prerender');
 });
 
 test('passwords are stored hashed, never as plain text (NFR)', function () {

@@ -36,6 +36,25 @@
         href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=El+Messiri:wght@400;600&family=Reem+Kufi:wght@400;600&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=EB+Garamond:ital@0;1&family=Playfair+Display:ital@0;1&family=Libre+Baskerville:ital@0;1&family=IM+Fell+English:ital@0;1&display=swap">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    {{--
+        Fetch a page as soon as the reader points at (or touches) its link, so it opens at once.
+        Prefetch only reads; pages that sign in or out, start a form, or edit are never fetched ahead.
+    --}}
+    <script type="speculationrules">
+        {
+            "prefetch": [{
+                "where": {
+                    "and": [
+                        { "href_matches": "/*" },
+                        { "not": { "href_matches": ["/logout", "/login", "/signup", "/quotes/create", "/diwans/create", "/*/edit", "/_boost/*"] } },
+                        { "not": { "selector_matches": "[target=_blank], [data-no-prefetch]" } }
+                    ]
+                },
+                "eagerness": "moderate"
+            }]
+        }
+    </script>
 </head>
 
 <body class="flex min-h-screen flex-col bg-paper pb-16 font-sans text-ink antialiased md:pb-0">

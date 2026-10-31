@@ -85,7 +85,36 @@
 /* The lamp's light: a faint warm glow from the top of the page, in dark mode only. */
 html.dark body {
     background-image: radial-gradient(ellipse 70% 40% at 50% 0%, rgb(217 181 106 / 0.07), transparent 70%);
-    background-attachment: fixed;
+    background-repeat: no-repeat;
+}
+
+/*
+ * Moving between pages: a short cross-fade instead of a blank flash (cross-document View Transitions;
+ * browsers without it simply navigate). The header and the phone's tab bar stay put while the page
+ * beneath them changes.
+ */
+@view-transition {
+    navigation: auto;
+}
+
+.site-header {
+    view-transition-name: site-header;
+}
+
+.tab-bar {
+    view-transition-name: tab-bar;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+    animation-duration: 180ms;
+    animation-timing-function: ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    @view-transition {
+        navigation: none;
+    }
 }
 
 /* Share window: rises from the bottom on phones, fades in on wide screens. */
@@ -688,4 +717,10 @@ html.dark body {
         border-inline: 1px solid rgb(168 135 63 / 0.18);
         box-shadow: inset 6px 0 0 -5px rgb(168 135 63 / 0.18), inset -6px 0 0 -5px rgb(168 135 63 / 0.18);
     }
+}
+
+/* Long pages: sections below the fold are laid out and painted only as they come near the screen. */
+.paint-later {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 900px;
 }

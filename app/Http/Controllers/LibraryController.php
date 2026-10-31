@@ -30,6 +30,8 @@ class LibraryController extends Controller
 
         $works = Work::with(['poet', 'verses' => $threeVerses])->withCount('verses')->orderBy('poet_id')->orderBy('sort_order')->get();
 
+        $verseCount = Verse::count();
+
         return view('library.index', [
             'term' => $term,
             'results' => $term === '' ? null : Verse::with('work.poet')->search($term)->orderBy('work_id')->orderBy('sort_order')->limit(40)->get(),
@@ -45,10 +47,15 @@ class LibraryController extends Controller
             'sayings' => Saying::get()->shuffle(),
             'myWall' => $request->user()?->wallSayings()->pluck('sayings.id')->all() ?? [],
             'readersDiwans' => Diwan::where('is_public', true)->latest('updated_at')->take(6)->get(),
+            // The shelf and the poets' arcade are the same for everyone, so their HTML is cached; this key
+            // changes whenever a poet, work or verse does.
+            'collectionsVersion' => md5(implode('|', [
+                $poets->count(), $poets->max('updated_at'), $works->count(), $works->max('updated_at'), $verseCount, Verse::max('updated_at'),
+            ])),
             'counts' => [
                 'poets' => $poets->count(),
                 'works' => $works->count(),
-                'verses' => Verse::count(),
+                'verses' => $verseCount,
             ],
         ]);
     }

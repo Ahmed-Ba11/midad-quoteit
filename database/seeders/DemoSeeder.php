@@ -31,6 +31,11 @@ class DemoSeeder extends Seeder
      */
     public function run(): void
     {
+        // Demo readers (with a known password) must never exist on the public site.
+        if (app()->isProduction()) {
+            return;
+        }
+
         $this->call(LibrarySeeder::class);
 
         $users = collect([

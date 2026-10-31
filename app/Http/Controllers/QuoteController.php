@@ -223,7 +223,7 @@ class QuoteController extends Controller
     {
         $draft = collect($request->validated())
             ->put('kind', $request->input('kind'))
-            ->put('signature', $request->input('signature'))
+            ->put('signature', $request->validated('signature'))
             ->reject(fn ($value) => $value === null)
             ->all();
 

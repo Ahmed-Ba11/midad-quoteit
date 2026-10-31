@@ -48,6 +48,13 @@ class QuoteRequest extends FormRequest
             return;
         }
 
+        // Library text comes only with a new quote; editing one's own text never turns it into a library pick.
+        if ($editing instanceof Quote) {
+            $this->applyTextKind();
+
+            return;
+        }
+
         $verseIds = collect((array) $this->input('verses', []))->filter(fn ($id) => ctype_digit((string) $id))
             ->map(fn ($id) => (int) $id)->unique()->take(config('library.max_selection'));
 
@@ -87,7 +94,7 @@ class QuoteRequest extends FormRequest
     private function applyTextKind(): void
     {
         // A link typed into the source's name goes to the link field; the name must be words.
-        $source = trim((string) $this->input('source'));
+        $source = is_string($this->input('source')) ? trim($this->input('source')) : '';
 
         if (preg_match('#^https?://#i', $source)) {
             $this->merge(['source' => null, 'source_url' => $this->filled('source_url') ? $this->input('source_url') : $source]);
@@ -97,7 +104,7 @@ class QuoteRequest extends FormRequest
 
         match ($kind) {
             'original' => $this->merge(['kind' => 'original', 'is_original' => true, 'source' => null,
-                'author' => mb_substr(trim((string) $this->input('signature')), 0, 100) ?: null]),
+                'author' => is_string($this->input('signature')) ? (mb_substr(trim($this->input('signature')), 0, 100) ?: null) : null]),
             'anonymous' => $this->merge(['is_original' => false, 'author' => null]),
             // Always present, so "required" below cannot be skipped by a missing field.
             'quoted' => $this->merge(['is_original' => false, 'author' => $this->input('author')]),
@@ -131,6 +138,7 @@ class QuoteRequest extends FormRequest
             'source' => ['nullable', 'string', 'max:200'],
             'source_url' => ['sometimes', 'nullable', 'string', 'max:255', 'url:http,https'],
             'kind' => ['sometimes', 'nullable', Rule::in(['quoted', 'original', 'anonymous'])],
+            'signature' => ['sometimes', 'nullable', 'string', 'max:100'],
             'is_original' => ['sometimes', 'boolean'],
             'is_public' => ['sometimes', 'boolean'],
             'presentation' => ['sometimes', 'required', Rule::in(['card', 'text'])],

@@ -14,14 +14,22 @@ class LoginController extends Controller
      */
     private const MAX_ATTEMPTS = 5;
 
+    /**
+     * Wrong attempts allowed from one IP across all emails, so no one can try a password on many accounts.
+     */
+    private const MAX_ATTEMPTS_PER_IP = 20;
+
     public function login(LoginRequest $request): RedirectResponse
     {
         $throttleKey = 'login:'.$request->input('email').'|'.$request->ip();
+        $ipKey = 'login-ip:'.$request->ip();
 
-        if (RateLimiter::tooManyAttempts($throttleKey, self::MAX_ATTEMPTS)) {
-            return redirect()->back()
-                ->withInput($request->only('email'))
-                ->withErrors(['email' => 'محاولات كثيرة. حاول مرة أخرى بعد '.RateLimiter::availableIn($throttleKey).' ثانية.']);
+        foreach ([$throttleKey => self::MAX_ATTEMPTS, $ipKey => self::MAX_ATTEMPTS_PER_IP] as $key => $maxAttempts) {
+            if (RateLimiter::tooManyAttempts($key, $maxAttempts)) {
+                return redirect()->back()
+                    ->withInput($request->only('email'))
+                    ->withErrors(['email' => 'محاولات كثيرة. حاول مرة أخرى بعد '.RateLimiter::availableIn($key).' ثانية.']);
+            }
         }
 
         if (Auth::attempt($request->validated())) {
@@ -32,6 +40,7 @@ class LoginController extends Controller
         }
 
         RateLimiter::hit($throttleKey, 60);
+        RateLimiter::hit($ipKey, 60);
 
         return redirect()->back()
             ->withInput($request->only('email'))

@@ -38,13 +38,14 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'login']);
 });
 
-Route::middleware('auth')->group(function () {
+// Signed-in actions, at a human pace: 60 a minute overall, and publishing or drafting 20 a minute (no scripted spam).
+Route::middleware(['auth', 'throttle:60,1'])->group(function () {
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
     Route::patch('/profile/bio', [ProfileController::class, 'updateBio'])->name('profile.bio');
 
-    Route::post('/', [QuoteController::class, 'store'])->name('store_quote');
+    Route::post('/', [QuoteController::class, 'store'])->name('store_quote')->middleware('throttle:20,1');
     Route::get('/quotes/create', [QuoteController::class, 'create'])->name('quotes.create');
-    Route::post('/quotes/draft', [QuoteController::class, 'draft'])->name('quotes.draft');
+    Route::post('/quotes/draft', [QuoteController::class, 'draft'])->name('quotes.draft')->middleware('throttle:20,1');
     Route::get('/quote/{quote}/edit', [QuoteController::class, 'edit'])->name('quotes.edit')->can('update', 'quote');
     Route::put('/quote/{quote}', [QuoteController::class, 'update'])->name('edit_quote')->can('update', 'quote');
     Route::delete('/quote/{quote}', [QuoteController::class, 'destroy'])->name('delete_quote')->can('delete', 'quote');

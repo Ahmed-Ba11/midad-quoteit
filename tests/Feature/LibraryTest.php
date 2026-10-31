@@ -12,6 +12,7 @@ use App\Support\Aldiwan;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\DemoSeeder;
 use Database\Seeders\LibrarySeeder;
+use Illuminate\Support\Facades\DB;
 
 beforeEach(function () {
     $this->seed(LibrarySeeder::class);
@@ -327,4 +328,17 @@ test('every saying shows its meaning, and sourced ones link to the page that doc
         ->and(Saying::where('source', 'like', '%حديث%')->count())->toBe(0);
 
     $this->get(route('library.index'))->assertSee('اعرض كل المأثورات')->assertSee($documented->source_url, false);
+});
+
+test('every library link fits its column on MySQL (1000 characters), not only on SQLite', function () {
+    $this->seed(LibrarySeeder::class);
+
+    $longest = collect([
+        Poet::max(DB::raw('length(wikisource_url)')),
+        Work::max(DB::raw('length(wikisource_url)')),
+        Verse::max(DB::raw('length(source_url)')),
+        Saying::max(DB::raw('length(source_url)')),
+    ])->max();
+
+    expect($longest)->toBeGreaterThan(255)->toBeLessThanOrEqual(1000);
 });

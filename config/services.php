@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    /*
+     * خط ثمانية is not in the (public) repository. On the hosted site its files sit in a public
+     * Laravel Cloud bucket, and this is that bucket's address (see components/thmanyah-faces).
+     */
+    'thmanyah' => [
+        'url' => env('THMANYAH_FONTS_URL'),
+    ],
+
 ];

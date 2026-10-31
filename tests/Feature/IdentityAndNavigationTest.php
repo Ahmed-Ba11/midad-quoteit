@@ -134,3 +134,14 @@ test('the corner tab bar opens with the current tab scrolled into view', functio
         ->assertSee('data-center-current', false)->assertSee('aria-current="page"', false);
     expect(file_get_contents(resource_path('js/app.js')))->toContain("document.querySelectorAll('[data-center-current]')");
 });
+
+test('on the hosted site خط ثمانية comes from the fonts bucket; locally nothing extra is printed', function () {
+    $this->get(route('home'))->assertDontSee('thmanyahsans-Regular.woff2', false);
+
+    config(['services.thmanyah.url' => 'https://fonts.example.r2.dev/']);
+
+    $this->get(route('home'))
+        ->assertSee('<link rel="preload" href="https://fonts.example.r2.dev/thmanyahsans-Regular.woff2" as="font" type="font/woff2" crossorigin>', false)
+        ->assertSee("font-family: 'thmanyah serif display'; src: url('https://fonts.example.r2.dev/thmanyahserifdisplay-Black.woff2')", false)
+        ->assertSee("font-family: 'thmanyah serif text'; src: url('https://fonts.example.r2.dev/thmanyahseriftext-Medium.woff2')", false);
+});

@@ -28,3 +28,7 @@ Thumbs.db
 
 # thmanyah font files (license forbids redistribution)
 /resources/fonts/thmanyah/
+
+# Local helper to upload خط ثمانية to the Cloud bucket (run by the owner; never commit)
+/upload-thmanyah-fonts.ps1
+/.claude/launch.json

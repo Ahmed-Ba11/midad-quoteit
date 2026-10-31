@@ -244,13 +244,25 @@ class QuoteController extends Controller
         $quote->user()->associate($request->user())->save();
 
         // "أضف إلى": only into an anthology of my own; anything else is ignored.
-        if ($request->filled('anthology_id')) {
-            $request->user()->anthologies()->find($request->integer('anthology_id'))?->quotes()->attach($quote);
-        }
+        $anthology = $request->filled('anthology_id')
+            ? $request->user()->anthologies()->find($request->integer('anthology_id'))
+            : null;
+        $anthology?->quotes()->attach($quote);
 
-        return redirect()->route('quotes.show', $quote)->with('toast', $quote->is_public
-            ? 'رُقِم اقتباسك، وصار في لوح القرّاء.'
-            : 'رُقِم اقتباسك في ركنك، لا يراه غيرك.');
+        return redirect()->route('quotes.show', $quote)->with('toast', $this->publishedMessage($quote, $anthology?->title));
+    }
+
+    /**
+     * The toast after publishing says exactly what happened, from the reader's own choices: who can see
+     * the quote, and the anthology it was filed in, if any.
+     */
+    private function publishedMessage(Quote $quote, ?string $anthologyTitle): string
+    {
+        $message = $quote->is_public
+            ? 'أُضيف اقتباسك، ويراه القرّاء الآن.'
+            : 'أُضيف اقتباسك إلى ركنك، ولا يراه غيرك.';
+
+        return $anthologyTitle === null ? $message : $message.' وحُفظ في مختاراتك «'.$anthologyTitle.'».';
     }
 
     /**

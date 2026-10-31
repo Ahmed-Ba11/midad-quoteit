@@ -6,8 +6,7 @@
     invite them back to quote what they find, or to start a diwan for a poet who is not here.
 --}}
 @php
-    $aldiwan = 'https://www.aldiwan.net/search.php?'.http_build_query(['q' => $term]);
-    $wikisource = 'https://ar.wikisource.org/w/index.php?'.http_build_query(['search' => $term, 'fulltext' => 1]);
+    $aldiwan = \App\Support\Aldiwan::search($term);
     $google = 'https://www.google.com/search?'.http_build_query(['q' => '"'.$term.'" شعر']);
     $outLink = 'inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-sm font-medium transition';
 @endphp
@@ -26,9 +25,6 @@
     <div class="flex flex-wrap justify-center gap-2 border-t border-line bg-paper/60 px-6 py-5 md:justify-start">
         <a href="{{ $aldiwan }}" target="_blank" rel="noopener noreferrer external" class="{{ $outLink }} bg-accent text-paper hover:opacity-90">
             <x-icon name="search" class="size-4" /> ابحث في الديوان <span class="sr-only">(موقع خارجي)</span>
-        </a>
-        <a href="{{ $wikisource }}" target="_blank" rel="noopener noreferrer external" class="{{ $outLink }} border border-line hover:border-accent hover:text-accent">
-            ويكي مصدر <x-icon name="external" class="size-3.5" /><span class="sr-only">(موقع خارجي)</span>
         </a>
         <a href="{{ $google }}" target="_blank" rel="noopener noreferrer external" class="{{ $outLink }} border border-line hover:border-accent hover:text-accent">
             جوجل <x-icon name="external" class="size-3.5" /><span class="sr-only">(موقع خارجي)</span>

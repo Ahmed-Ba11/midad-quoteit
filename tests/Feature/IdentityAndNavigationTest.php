@@ -75,14 +75,34 @@ test("the studio's back link never leads to another site", function () {
         ->assertSee('href="'.route('library.index').'"', false);
 });
 
-test('after publishing, the reader lands on the new quote with a confirmation', function () {
+test('after publishing, the reader lands on the new quote with a confirmation of what they chose', function (string $isPublic, string $message) {
     $this->actingAs(User::factory()->create())
         ->followingRedirects()
-        ->post(route('store_quote'), ['content' => 'سطر جديد', 'is_public' => '0', 'kind' => 'original'])
+        ->post(route('store_quote'), ['content' => 'سطر جديد', 'is_public' => $isPublic, 'kind' => 'original'])
         ->assertOk()
         ->assertSee('سطر جديد')
-        ->assertSee('رُقِم اقتباسك في ركنك، لا يراه غيرك.')
+        ->assertSee($message)
         ->assertSee('data-toast', false);
+})->with([
+    'private' => ['0', 'أُضيف اقتباسك إلى ركنك، ولا يراه غيرك.'],
+    'public' => ['1', 'أُضيف اقتباسك، ويراه القرّاء الآن.'],
+]);
+
+test('the confirmation names the anthology the quote was filed in, and only one of my own', function () {
+    $reader = User::factory()->create();
+    $mine = $reader->anthologies()->create(['title' => 'أبيات الحكمة']);
+    $theirs = User::factory()->create()->anthologies()->create(['title' => 'ليست لي']);
+
+    $this->actingAs($reader)->followingRedirects()
+        ->post(route('store_quote'), ['content' => 'سطر جديد', 'is_public' => '1', 'kind' => 'original', 'anthology_id' => $mine->id])
+        ->assertSee('أُضيف اقتباسك، ويراه القرّاء الآن. وحُفظ في مختاراتك «أبيات الحكمة».');
+
+    $this->actingAs($reader)->followingRedirects()
+        ->post(route('store_quote'), ['content' => 'سطر آخر', 'is_public' => '1', 'kind' => 'original', 'anthology_id' => $theirs->id])
+        ->assertSee('أُضيف اقتباسك، ويراه القرّاء الآن.')
+        ->assertDontSee('ليست لي');
+
+    expect($theirs->quotes()->count())->toBe(0);
 });
 
 test('no hadith is listed among the sayings', function () {

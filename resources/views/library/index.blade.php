@@ -78,9 +78,7 @@
                                 <x-verse layout="paired" :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="text-lg" />
                                 <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
                                     <a href="{{ route('library.work', $verse->work) }}" class="text-sm text-muted hover:text-accent">{{ $verse->work->poet->name }}</a>
-                                    @if ($verse->source_url)
-                                        <x-external-link :href="$verse->source_url" class="inline-flex min-h-11 items-center text-xs text-muted">القصيدة كاملة</x-external-link>
-                                    @endif
+                                    <x-external-link :href="\App\Support\Aldiwan::verse($verse->sadr)" class="inline-flex min-h-11 items-center text-xs text-muted">أكمل القصيدة في الديوان</x-external-link>
                                     <x-pick-button :id="$verse->id" :text="$verse->sadr.' / '.$verse->ajuz" />
                                 </div>
                             </li>
@@ -145,12 +143,7 @@
                             </a>
                             <p class="mt-4 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-[#7A7068]">
                                 {{ $book->type === 'muallaqa' ? 'اقرأ المعلقة كاملة في' : 'أكمل قراءة الديوان في' }}
-                                @if ($book->wikisource_url ?? $book->poet->wikisource_url)
-                                    <x-external-link :href="$book->wikisource_url ?? $book->poet->wikisource_url" class="inline-flex min-h-11 items-center text-[#8A3324]">ويكي مصدر</x-external-link>
-                                @endif
-                                @if ($book->poet->aldiwan_url)
-                                    <x-external-link :href="$book->poet->aldiwan_url" class="inline-flex min-h-11 items-center text-[#8A3324]">الديوان</x-external-link>
-                                @endif
+                                <x-external-link :href="\App\Support\Aldiwan::poet($book->poet)" class="inline-flex min-h-11 items-center text-[#8A3324]">الديوان</x-external-link>
                             </p>
                         </div>
                         <div class="manuscript-page manuscript-page-end px-8 py-12 sm:px-12">
@@ -206,12 +199,7 @@
                         </div>
                         <p class="mt-4 flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted">
                             شعره كاملاً في
-                            @if ($poet->wikisource_url)
-                                <x-external-link :href="$poet->wikisource_url" class="inline-flex min-h-11 items-center text-accent">ويكي مصدر</x-external-link>
-                            @endif
-                            @if ($poet->aldiwan_url)
-                                <x-external-link :href="$poet->aldiwan_url" class="inline-flex min-h-11 items-center text-accent">الديوان</x-external-link>
-                            @endif
+                            <x-external-link :href="\App\Support\Aldiwan::poet($poet)" class="inline-flex min-h-11 items-center text-accent">الديوان</x-external-link>
                         </p>
                     </div>
                     <ul class="space-y-4">
@@ -335,7 +323,6 @@
                     </button>
                 </div>
             @endif
-            <p class="mt-6 text-center text-xs text-muted">الأمثال موثّقة من «مجمع الأمثال» للميداني وغيره؛ اضغط اسم المصدر لترى الصفحة.</p>
         </section>
 
         {{-- دواوين القرّاء: poets the readers brought, kept apart from the verified shelves above. --}}
@@ -365,9 +352,6 @@
             </div>
         </section>
 
-        <p class="border-t border-line py-8 text-center text-xs text-muted">
-            النصوص من ويكي مصدر وويكي الاقتباس، ومتاحة بترخيص المشاع الإبداعي (CC BY-SA).
-        </p>
     </div>
     </div>
 

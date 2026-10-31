@@ -56,9 +56,7 @@
                         <li class="py-6">
                             <x-verse layout="paired" :sadr="$verse->sadr" :ajuz="$verse->ajuz" class="text-lg" />
                             <div class="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-                                @if ($verse->source_url)
-                                    <x-external-link :href="$verse->source_url" class="inline-flex min-h-11 items-center text-xs text-muted">القصيدة كاملة</x-external-link>
-                                @endif
+                                <x-external-link :href="\App\Support\Aldiwan::verse($verse->sadr)" class="inline-flex min-h-11 items-center text-xs text-muted">أكمل القصيدة في الديوان</x-external-link>
                                 <x-pick-button :id="$verse->id" :text="$verse->sadr.' / '.$verse->ajuz" class="text-accent" />
                             </div>
                             <x-verse-explanation :verse="$verse" class="mx-auto mt-3 max-w-2xl" />
@@ -68,7 +66,6 @@
             </section>
         @endforeach
 
-        <p class="mt-12 text-center text-xs text-muted">النصوص من ويكي مصدر (CC BY-SA).</p>
     </div>
 
     <x-selection-bar />

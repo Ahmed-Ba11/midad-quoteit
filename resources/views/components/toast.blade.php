@@ -1,5 +1,5 @@
 {{--
-    A short confirmation after an action ("رُقِم اقتباسك"), from session('toast'). It floats above the
+    A short confirmation after an action ("أُضيف اقتباسك"), from session('toast'). It floats above the
     phone's tab bar, is announced to screen readers, and fades away by itself (resources/js/app.js).
 --}}
 @if (session('toast'))

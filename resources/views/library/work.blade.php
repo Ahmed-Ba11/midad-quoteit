@@ -30,9 +30,7 @@
                         @if ($verse->occasion)
                             <span class="text-xs text-[#7A7068]">{{ config('library.occasions.'.$verse->occasion) }}</span>
                         @endif
-                        @if ($verse->source_url)
-                            <x-external-link :href="$verse->source_url" class="inline-flex min-h-11 items-center text-xs text-[#7A7068]">القصيدة كاملة</x-external-link>
-                        @endif
+                        <x-external-link :href="\App\Support\Aldiwan::verse($verse->sadr)" class="inline-flex min-h-11 items-center text-xs text-[#7A7068]">أكمل القصيدة في الديوان</x-external-link>
                         <x-pick-button :id="$verse->id" :text="$verse->sadr.' / '.$verse->ajuz" class="text-[#8A3324]" />
                     </div>
                     <x-verse-explanation :verse="$verse" class="mx-auto mt-3 max-w-2xl" />
@@ -53,7 +51,6 @@
             </section>
         @endif
 
-        <p class="mt-12 text-center text-xs text-muted">النصوص من ويكي مصدر (CC BY-SA).</p>
     </div>
 
     <x-selection-bar />

@@ -7,6 +7,7 @@ use App\Models\Saying;
 use App\Models\User;
 use App\Models\Verse;
 use App\Models\Work;
+use App\Support\Aldiwan;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\LibrarySeeder;
 
@@ -209,6 +210,15 @@ test('diwan and poet pages offer "read the full diwan" links that open safely in
 
     $this->get(route('library.poet', 'al-khansa'))
         ->assertSee('https://www.aldiwan.net/cat-poet-al-khansa', false);
+});
+
+test('each verse is read on in الديوان, by a search for its first hemistich', function () {
+    $verse = Work::where('slug', 'diwan-al-mutanabbi')->sole()->verses()->first();
+
+    $this->get(route('library.work', 'diwan-al-mutanabbi'))
+        ->assertSee('أكمل القصيدة في الديوان')
+        ->assertSee(e(Aldiwan::verse($verse->sadr)), false)
+        ->assertDontSee('القصيدة كاملة');
 });
 
 test('every verse has an explanation, and the diwan page shows it with Lisan al-Arab lookups', function () {

@@ -2,7 +2,7 @@
 
 {{--
     When a search finds nothing: try the other parts of رقيم, search trusted sites (plain links that
-    open their own search — nothing is fetched from them), or quote the text yourself with its source.
+    open their own search — nothing is fetched from them; الديوان first), or quote the text yourself with its source.
 --}}
 @php
     $inside = array_filter([
@@ -10,9 +10,9 @@
         'library' => $here !== 'library' ? ['خزانة الأدب', route('library.index', ['q' => $term])] : null,
         'books' => $here !== 'books' ? ['رفوف القرّاء', route('books.index', ['q' => $term])] : null,
     ]);
+    // الديوان first: the trusted place to read whole poems; Google for books and prose.
     $outside = [
-        'ويكي مصدر' => 'https://ar.wikisource.org/w/index.php?'.http_build_query(['search' => $term, 'fulltext' => 1]),
-        'الديوان' => 'https://www.aldiwan.net/search.php?'.http_build_query(['q' => $term]),
+        'الديوان' => \App\Support\Aldiwan::search($term),
         'جوجل' => 'https://www.google.com/search?'.http_build_query(['q' => '"'.$term.'"']),
     ];
 @endphp

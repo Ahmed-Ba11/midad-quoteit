@@ -54,7 +54,15 @@
             <ul class="space-y-2.5 text-sm leading-relaxed text-muted">
                 <li class="flex gap-2">
                     <x-ornament name="star" class="mt-1.5 size-3 shrink-0 text-gold" />
-                    <span>أبيات خزانة الأدب منقولة من <x-external-link href="https://ar.wikisource.org" class="text-ink">ويكي مصدر</x-external-link> (CC BY-SA)، ومراجَعة بتشكيلها، مع رابط القصيدة كاملة لكل بيت.</span>
+                    <span>أبيات خزانة الأدب منقولة من <x-external-link href="https://ar.wikisource.org" class="text-ink">ويكي مصدر</x-external-link> (CC BY-SA)، ومراجَعة بتشكيلها؛ وتُكمَل قراءة القصائد في الديوان.</span>
+                </li>
+                <li class="flex gap-2">
+                    <x-ornament name="star" class="mt-1.5 size-3 shrink-0 text-gold" />
+                    <span>الأمثال من «مجمع الأمثال» للميداني وغيره، ولكلّ مثلٍ رابط صفحته في مصدره.</span>
+                </li>
+                <li class="flex gap-2">
+                    <x-ornament name="star" class="mt-1.5 size-3 shrink-0 text-gold" />
+                    <span>أصوات من الجزيرة: بيت أو بيتان للاستشهاد، طوبق كل منهما حرفياً في مصدرين مستقلّين، والحقوق محفوظة لأصحابها.</span>
                 </li>
                 <li class="flex gap-2">
                     <x-ornament name="star" class="mt-1.5 size-3 shrink-0 text-gold" />

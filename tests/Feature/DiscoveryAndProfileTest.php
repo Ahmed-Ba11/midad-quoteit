@@ -121,8 +121,8 @@ test('a search with no results points to the other sections, trusted sites and q
     $this->get(route('home', ['q' => 'بيت غير موجود']))
         ->assertSee('لا نتائج')
         ->assertSee(route('library.index', ['q' => 'بيت غير موجود']), false)
-        ->assertSee('https://ar.wikisource.org/w/index.php?', false)
-        ->assertSee('https://www.aldiwan.net/search.php?', false)
+        ->assertDontSee('https://ar.wikisource.org/w/index.php?', false)
+        ->assertSeeInOrder(['https://www.aldiwan.net/search.php?q=', 'https://www.google.com/search?'], false)
         ->assertSee('وجدتَه في مكان آخر؟')
         ->assertSee('rel="noopener noreferrer external"', false);
 });

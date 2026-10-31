@@ -2,7 +2,9 @@
 
 منصّة عربية لنشر الاقتباسات وتصميمها، فيها مكتبة لعيون الشعر العربي — مشروع معسكر القمّة (مسار البرمجة والتطوير).
 
-Laravel 13 · PHP 8.4 · Blade · Tailwind 4 · Vite · JavaScript · SQLite
+Laravel 13 · PHP 8.4 · Blade · Tailwind 4 · Vite · JavaScript · MySQL (الموقع المنشور) / SQLite (محلياً)
+
+الموقع المنشور: https://raqeem-production-mt79ly.laravel.cloud
 
 ## التشغيل
 

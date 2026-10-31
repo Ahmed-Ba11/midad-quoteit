@@ -803,3 +803,30 @@ html.dark body {
     }
 }
 
+
+/*
+ * Taps, not zooms. A quick second tap (two words in a row, + then +) must never zoom the page:
+ * `manipulation` drops double-tap zoom on every tappable thing, keeps pinch-zoom for whoever needs it,
+ * and removes the browser's wait for a second tap, so taps answer at once.
+ */
+html,
+a,
+button,
+label,
+summary,
+input,
+select,
+textarea,
+[role="button"],
+[role="tab"] {
+    touch-action: manipulation;
+}
+
+/* iOS zooms into any field whose text is under 16px when it is focused: phones get 16px fields. */
+@media (max-width: 767.98px) {
+    input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="hidden"]),
+    select,
+    textarea {
+        font-size: 16px;
+    }
+}

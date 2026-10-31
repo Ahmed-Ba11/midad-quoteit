@@ -11,6 +11,7 @@
         $tabs = [
             'background' => ['label' => 'الخلفية', 'icon' => 'drop'],
             'font' => ['label' => 'الخط', 'icon' => 'font'],
+            'emphasis' => ['label' => 'الإبراز', 'icon' => 'highlighter'],
             'box' => ['label' => 'الصندوق', 'icon' => 'square'],
         ];
         $chip = 'inline-flex h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-paper px-4 text-sm transition hover:border-accent has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-accent/30';
@@ -37,11 +38,15 @@
         <input type="hidden" name="texture" value="{{ $design['texture'] === 'none' ? 0 : 1 }}" data-legacy-texture>
 
         <div class="relative mx-auto grid max-w-6xl gap-5 px-4 pb-6 pt-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start">
+            {{-- On a phone the title bar and the card are one dock fixed at the top: the card stays in sight
+                 whatever tool is open. On wide screens the dock dissolves (display: contents) and the card
+                 sits beside the tools. --}}
+            <div class="workbench-dock">
             @include('quotes.partials.workbench-header', ['quote' => $quote, 'current' => 'card', 'title' => 'مرسم الحروف', 'backUrl' => $isEditing ? route('quotes.show', $quote) : $backUrl])
 
             {{-- The card. Its size follows the chosen shape but always fits the screen, so the tools stay in reach. --}}
-            <section aria-label="معاينة البطاقة" class="lg:sticky lg:top-36 lg:order-2">
-                <fieldset class="mb-1.5 flex items-center justify-center gap-1.5">
+            <section aria-label="معاينة البطاقة" class="workbench-preview lg:sticky lg:top-36 lg:order-2">
+                <fieldset class="mb-1 flex items-center justify-center gap-1.5">
                     <legend class="sr-only">المقاس</legend>
                     @foreach (config('quotes.ratios') as $key => $ratio)
                         <label class="inline-flex h-11 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-xs transition hover:border-accent has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper">
@@ -51,20 +56,21 @@
                         </label>
                     @endforeach
                 </fieldset>
-                <p class="mb-3 text-center text-xs text-muted">المقاس: شكل البطاقة، والخط يتكيّف معه</p>
+                <p class="mb-2 text-center text-xs text-muted lg:mb-3">المقاس: شكل البطاقة، والخط يتكيّف معه</p>
                 <div data-preview-stage class="flex justify-center">
                     <div data-preview-frame class="preview-stage w-full">
                         <x-quote-art :quote="$quote" class="rounded-2xl shadow-xl" />
                     </div>
                 </div>
             </section>
+            </div>
 
             {{-- Tools --}}
             <section class="min-w-0 space-y-4 lg:order-1">
                 @include('quotes.partials.details', ['quote' => $quote, 'draft' => $draft, 'withStory' => true])
 
                 <div class="rounded-3xl border border-line bg-surface">
-                    <div role="tablist" aria-label="أدوات التصميم" class="grid grid-cols-3 border-b border-line px-1">
+                    <div role="tablist" aria-label="أدوات التصميم" class="grid grid-cols-4 border-b border-line px-1">
                         @foreach ($tabs as $key => $tab)
                             <button type="button" role="tab" id="tab-{{ $key }}" data-tab="{{ $key }}"
                                 aria-controls="panel-{{ $key }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}"
@@ -168,9 +174,14 @@
                                 </div>
                                 <p class="mt-1.5 text-xs text-muted">الشعر صدرٌ وعجز، والنثر أسطر متصلة</p>
                             </fieldset>
+                        </div>
 
-                            <div class="space-y-3 rounded-2xl border border-line bg-paper p-3">
+                        {{-- الإبراز: tap words (they light up on the card above), then the style and colour --}}
+                        <div role="tabpanel" id="panel-emphasis" data-panel="emphasis" aria-labelledby="tab-emphasis" class="hidden">
+                            <div class="space-y-3">
                                 <p class="flex items-center gap-2 text-sm font-medium"><x-icon name="highlighter" class="size-4 text-accent" /> إبراز كلمات</p>
+                                <div data-word-picker class="flex flex-wrap gap-1.5"></div>
+                                <p class="text-xs text-muted">اضغط كلمة لإبرازها؛ الكلمات المتجاورة تُبرز قطعة واحدة</p>
                                 <div class="flex gap-1.5">
                                     @foreach (['mark' => 'تظليل', 'color' => 'تلوين'] as $key => $styleLabel)
                                         <label class="{{ $chip }}"><input type="radio" name="highlight_style" value="{{ $key }}" class="sr-only" @checked($value('highlight_style', $quote->highlight_style) === $key)>{{ $styleLabel }}</label>
@@ -185,8 +196,6 @@
                                         <input type="color" name="highlight_color" value="{{ $value('highlight_color', $quote->highlight_color) }}" aria-label="لون الإبراز" class="swatch-picker">
                                     </label>
                                 </div>
-                                <div data-word-picker class="flex flex-wrap gap-1.5"></div>
-                                <p class="text-xs text-muted">اضغط كلمة لإبرازها؛ الكلمات المتجاورة تُبرز قطعة واحدة</p>
                                 <div data-highlight-inputs>
                                     @foreach (old('highlights', $draft['highlights'] ?? $quote->highlights ?? []) as $index)
                                         <input type="hidden" name="highlights[]" value="{{ $index }}">
@@ -246,7 +255,7 @@
         </div>
 
         {{-- Publish: stays at the bottom of the screen while the form is in view (above the phone's tab bar). --}}
-        <div class="sticky bottom-0 z-30 border-t border-line bg-surface/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
+        <div class="workbench-actions sticky bottom-0 z-30 border-t border-line bg-surface px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
             <div class="mx-auto flex max-w-6xl items-center gap-2">
                 <x-button type="submit" icon="quill" class="h-12 flex-1 sm:flex-none sm:px-10">{{ $isEditing ? 'احفظ' : 'انشر البطاقة' }}</x-button>
                 <x-button variant="ghost" :href="$isEditing ? route('quotes.show', $quote) : route('home')" class="h-12">إلغاء</x-button>

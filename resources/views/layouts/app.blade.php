@@ -40,6 +40,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <x-thmanyah-faces />
+    @stack('head')
 
     {{--
         Start fetching a page the moment its link is pressed, so it opens sooner.

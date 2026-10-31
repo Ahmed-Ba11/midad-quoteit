@@ -70,6 +70,24 @@ document.querySelectorAll('[data-center-current]').forEach((bar) => {
     bar.scrollLeft += tabBox.left - barBox.left - (barBox.width - tabBox.width) / 2;
 });
 
+// «نص / بطاقة»: the switch goes to the server (to carry every choice), so it answers the tap at once —
+// the pill moves to the chosen way and pulses — and a second tap while it travels is ignored.
+document.querySelectorAll('[data-view-switch]').forEach((group) => {
+    group.addEventListener('click', (event) => {
+        const button = event.target.closest('button[name="switch_to"]');
+        if (!button) return;
+        if (group.dataset.switching) {
+            event.preventDefault();
+            return;
+        }
+        group.dataset.switching = button.value;
+        group.querySelector('[aria-current]')?.classList.remove('bg-ink', 'font-medium', 'text-paper');
+        button.classList.add('bg-ink', 'font-medium', 'text-paper', 'animate-pulse');
+        button.classList.remove('text-muted');
+    });
+});
+window.addEventListener('pageshow', () => document.querySelectorAll('[data-view-switch]').forEach((group) => delete group.dataset.switching));
+
 // "Show more": reveal hidden items (data-show-more="<selector>"), then the button retires.
 document.querySelectorAll('[data-show-more]').forEach((button) => {
     button.addEventListener('click', () => {

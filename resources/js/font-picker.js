@@ -5,22 +5,28 @@
 // family's real name and only holds a few letters; the browser then draws the reader's own text with
 // it, falling back letter by letter, and the words look scrambled.)
 
-const loaded = new Set();
+const loading = new Map();
 
 /**
- * Load one family in full (once), and resolve when the browser can draw it.
+ * Load one family in full (once), and resolve when the browser can really draw it. The stylesheet
+ * must arrive first: asking document.fonts before it is parsed resolves at once with nothing loaded,
+ * and the card would then flash the fallback font. Never waits more than 4 s (slow network).
  */
 export function loadFont(font) {
     if (!font?.google) return Promise.resolve();
-    if (!loaded.has(font.google)) {
-        loaded.add(font.google);
-        const link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = `https://fonts.googleapis.com/css2?family=${font.google}&display=swap`;
-        document.head.append(link);
+    if (!loading.has(font.google)) {
+        const family = font.stack.split(',')[0].trim();
+        const stylesheet = new Promise((resolve) => {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = `https://fonts.googleapis.com/css2?family=${font.google}&display=swap`;
+            link.onload = link.onerror = resolve;
+            document.head.append(link);
+        });
+        const ready = stylesheet.then(() => document.fonts.load(`1em ${family}`, 'بسم الله رقيم')).catch(() => {});
+        loading.set(font.google, Promise.race([ready, new Promise((resolve) => setTimeout(resolve, 4000))]));
     }
-    const family = font.stack.split(',')[0].trim();
-    return document.fonts.load(`1em ${family}`, 'بسم الله').catch(() => {});
+    return loading.get(font.google);
 }
 
 export function initFontPicker(picker, onChange) {

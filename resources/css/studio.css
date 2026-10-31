@@ -28,6 +28,58 @@
     pointer-events: none;
 }
 
+/*
+ * Phones and tablets (one column): the title bar and the preview are one dock fixed at the top, so the
+ * card is always in sight while the tools scroll beneath it, and the publish bar is fixed at the bottom.
+ * One sticky block and one fixed bar, on their own layers, solid (no see-through repaint): nothing
+ * shakes when the phone's address bar slides in and out. Wide screens: the dock dissolves.
+ */
+@media (max-width: 1023.98px) {
+    .workbench-dock {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        margin-inline: -1rem;
+        padding: 0 1rem 0.75rem;
+        background: var(--color-paper);
+        box-shadow: 0 12px 18px -18px rgb(0 0 0 / 0.55);
+        transform: translateZ(0);
+    }
+
+    .workbench-dock .workbench-preview {
+        margin-top: 0.6rem;
+    }
+
+    /* «محرّر النص»: the words keep to about a third of the screen, and scroll inside if longer. */
+    #text-editor .workbench-dock .preview-stage {
+        max-height: 34svh;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        border-radius: 1.5rem;
+    }
+
+    #text-editor .workbench-dock .preview-stage::before {
+        display: none;
+    }
+
+    .workbench-actions {
+        position: fixed;
+        inset-inline: 0;
+        bottom: 0;
+        transform: translateZ(0);
+    }
+
+    .writing-desk {
+        padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+    }
+}
+
+@media (min-width: 1024px) {
+    .workbench-dock {
+        display: contents;
+    }
+}
+
 /* The preview sits like a sheet on the desk. */
 .preview-stage {
     position: relative;

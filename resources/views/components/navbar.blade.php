@@ -14,7 +14,12 @@
     }
 @endphp
 
-<header class="site-header sticky top-0 z-40 bg-paper md:bg-paper/90 md:backdrop-blur-md">
+{{-- On a phone, «محرّر النص» and مرسم الحروف have their own title bar (back, name, نص / بطاقة) fixed with
+     the preview, so the site bar steps aside there and the card gets the room. --}}
+<header @class([
+    'site-header sticky top-0 z-40 bg-paper md:bg-paper/90 md:backdrop-blur-md',
+    'max-lg:hidden' => request()->routeIs('quotes.create', 'quotes.edit'),
+])>
     <nav aria-label="التنقّل الرئيسي" class="mx-auto flex h-16 max-w-6xl items-center gap-3 px-4 sm:gap-6">
         <a href="{{ route('home') }}" aria-label="رقيم، الصفحة الرئيسية">
             <x-logo class="text-[1.65rem]" />

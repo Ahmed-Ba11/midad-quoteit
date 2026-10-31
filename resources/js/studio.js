@@ -43,6 +43,7 @@ export function initStudio(form) {
 
     let highlighted = new Set([...highlightInputs.querySelectorAll('input')].map((input) => Number(input.value)));
     let lastWords = '';
+    let shownFont = checked('font');
     // A size the reader chose by hand is kept when the card is opened again (design[auto_size]).
     const autoSizeInput = form.querySelector('[data-auto-size]');
     let autoSize = autoSizeInput.value === '1';
@@ -111,12 +112,13 @@ export function initStudio(form) {
     }
 
     // The card always fits the screen whatever its shape: as wide as it can be, but never taller than
-    // about half the screen on a phone (two thirds on a wide screen), so the tools stay in reach.
+    // about a quarter of the screen on a phone (two thirds on a wide screen), so the tools stay in reach.
     function fitFrame(ratio) {
         const [w, h] = ratio.aspect.split('/').map(Number);
         // The small viewport height: it does not change when the phone's address bar slides away.
         const screenHeight = window.visualViewport ? Math.min(innerHeight, screen.height) : innerHeight;
-        const maxHeight = innerWidth >= 1024 ? Math.min(screenHeight * 0.68, 608) : Math.min(screenHeight * 0.5, 460);
+        // Phones: the card lives in the fixed dock above the tools, so it keeps to about a quarter of the screen.
+        const maxHeight = innerWidth >= 1024 ? Math.min(screenHeight * 0.68, 608) : Math.min(screenHeight * 0.28, 300);
         const width = Math.min(stage.clientWidth, ratio.width, maxHeight * (w / h));
         frame.style.width = `${Math.floor(width)}px`;
     }
@@ -174,7 +176,7 @@ export function initStudio(form) {
 
         // Design → the card's attributes, exactly as x-card-art writes them.
         const ratio = config.ratios[checked('ratio')] ?? config.ratios.wide;
-        const font = config.fonts[checked('font')] ?? config.fonts.amiri;
+        const font = config.fonts[shownFont] ?? config.fonts.amiri;
         Object.assign(art.dataset, {
             texture: checked('design[texture]') ?? 'none',
             divider: checked('design[divider]') ?? 'none',
@@ -206,7 +208,11 @@ export function initStudio(form) {
         if (summary && content.trim() !== '') summary.textContent = content.replace(/\s+/g, ' ').trim().slice(0, 60);
     }
 
-    initFontPicker(form.querySelector('[data-font-picker]'), render);
+    // The card changes font only once the new one is loaded: no fallback flash, no resize jump.
+    initFontPicker(form.querySelector('[data-font-picker]'), (key) => {
+        shownFont = key;
+        render();
+    });
     // One render per frame, however fast the reader types.
     let pending = false;
     function scheduleRender() {

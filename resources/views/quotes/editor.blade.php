@@ -31,7 +31,19 @@
         <input type="hidden" name="presentation" value="text">
 
         <div class="relative mx-auto grid max-w-6xl gap-5 px-4 pb-6 pt-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-start">
-            @include('quotes.partials.workbench-header', ['quote' => $quote, 'current' => 'text', 'title' => 'محرّر النص', 'backUrl' => $isEditing ? route('quotes.show', $quote) : $backUrl])
+            {{-- On a phone the title bar and the preview are one dock fixed at the top: the words stay in
+                 sight whatever tool is open. On wide screens the dock dissolves (display: contents) and
+                 the preview sits beside the tools. --}}
+            <div class="workbench-dock">
+                @include('quotes.partials.workbench-header', ['quote' => $quote, 'current' => 'text', 'title' => 'محرّر النص', 'backUrl' => $isEditing ? route('quotes.show', $quote) : $backUrl])
+
+                <section aria-label="معاينة" class="workbench-preview lg:sticky lg:top-36 lg:order-2">
+                    <div class="preview-stage">
+                        <x-quote-art :quote="$quote" class="rounded-3xl shadow-xl" />
+                    </div>
+                    <p class="mt-2 hidden text-center text-xs text-muted lg:block">المعاينة تتغيّر مع كل اختيار.</p>
+                </section>
+            </div>
 
             {{-- Tools --}}
             <section class="order-2 min-w-0 space-y-5 lg:order-1">
@@ -76,6 +88,17 @@
 
                         {{-- الإبراز: shading or coloured letters, in one of twelve colours or your own --}}
                         <div role="tabpanel" id="panel-emphasis" data-panel="emphasis" aria-labelledby="tab-emphasis" class="hidden space-y-5">
+                            <div>
+                                <p class="{{ $sectionTitle }}">الكلمات</p>
+                                <div data-word-picker class="flex flex-wrap gap-1.5"></div>
+                                <p class="mt-2 text-xs text-muted">اضغط كلمة لإبرازها؛ الكلمات المتجاورة تُبرز قطعة واحدة</p>
+                                <div data-highlight-inputs>
+                                    @foreach (old('highlights', $draft['highlights'] ?? $quote->highlights ?? []) as $index)
+                                        <input type="hidden" name="highlights[]" value="{{ $index }}">
+                                    @endforeach
+                                </div>
+                            </div>
+
                             <fieldset>
                                 <legend class="{{ $sectionTitle }}">نوع الإبراز</legend>
                                 <div class="grid grid-cols-2 gap-2">
@@ -105,17 +128,6 @@
                                 </div>
                                 <p class="mt-2 text-xs text-muted">لون الإبراز على الكلمات التي تختارها</p>
                             </fieldset>
-
-                            <div>
-                                <p class="{{ $sectionTitle }}">الكلمات</p>
-                                <div data-word-picker class="flex flex-wrap gap-1.5"></div>
-                                <p class="mt-2 text-xs text-muted">اضغط كلمة لإبرازها؛ الكلمات المتجاورة تُبرز قطعة واحدة</p>
-                                <div data-highlight-inputs>
-                                    @foreach (old('highlights', $draft['highlights'] ?? $quote->highlights ?? []) as $index)
-                                        <input type="hidden" name="highlights[]" value="{{ $index }}">
-                                    @endforeach
-                                </div>
-                            </div>
                         </div>
 
                         {{-- العلامة: the frame around the words, seen on your own text in the preview --}}
@@ -143,19 +155,10 @@
                     </div>
                 </div>
             </section>
-
-            {{-- Live preview: above the tools on phones (it scrolls away with the page, never over the tools);
-                 beside them on wide screens, where it stays in view. --}}
-            <section aria-label="معاينة" class="order-1 lg:sticky lg:top-36 lg:order-2">
-                <div class="preview-stage">
-                    <x-quote-art :quote="$quote" class="rounded-3xl shadow-xl" />
-                </div>
-                <p class="mt-2 hidden text-center text-xs text-muted lg:block">المعاينة تتغيّر مع كل اختيار.</p>
-            </section>
         </div>
 
-        {{-- Publish: stays at the bottom of the screen while the form is in view (above the phone's tab bar). --}}
-        <div class="sticky bottom-0 z-30 border-t border-line bg-surface/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
+        {{-- Publish: always at the bottom of the screen (fixed on phones, so it never shakes while scrolling). --}}
+        <div class="workbench-actions sticky bottom-0 z-30 border-t border-line bg-surface px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
             <div class="mx-auto flex max-w-6xl items-center gap-2">
                 <x-button type="submit" icon="quill" class="h-12 flex-1 sm:flex-none sm:px-10">{{ $isEditing ? 'احفظ' : 'انشر الاقتباس' }}</x-button>
                 <x-button variant="ghost" :href="$isEditing ? route('quotes.show', $quote) : route('home')" class="h-12">إلغاء</x-button>

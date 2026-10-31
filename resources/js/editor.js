@@ -20,6 +20,7 @@ export function initEditor(form) {
 
     const field = (name) => form.elements.namedItem(name);
     const checked = (name) => form.querySelector(`[name="${name}"]:checked`)?.value;
+    let shownFont = checked('font');
     let highlighted = new Set([...highlightInputs.querySelectorAll('input')].map((input) => Number(input.value)));
     let lastWords = '';
 
@@ -108,7 +109,7 @@ export function initEditor(form) {
             hint.textContent = (layout === 'auto' ? 'اكتُشف — ' : '') + describe(detected);
         }
 
-        const font = config.fonts[checked('font')] ?? config.fonts.amiri;
+        const font = config.fonts[shownFont] ?? config.fonts.amiri;
         words.style.fontFamily = font.stack;
         words.classList.toggle('italic', Boolean(font.italic));
         words.classList.toggle('hl-mark', checked('highlight_style') !== 'color');
@@ -124,7 +125,11 @@ export function initEditor(form) {
         if (summary && content.trim() !== '') summary.textContent = content.replace(/\s+/g, ' ').trim().slice(0, 60);
     }
 
-    initFontPicker(form.querySelector('[data-font-picker]'), render);
+    // The card changes font only once the new one is loaded: no fallback flash, no jump.
+    initFontPicker(form.querySelector('[data-font-picker]'), (key) => {
+        shownFont = key;
+        render();
+    });
     form.addEventListener('input', render);
     form.addEventListener('change', render);
     render();

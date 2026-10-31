@@ -11,7 +11,7 @@
     $labels = ['text' => ['type', 'نص'], 'card' => ['palette', 'بطاقة']];
 @endphp
 
-<header class="sticky top-16 z-20 -mx-4 border-b border-line bg-paper/95 px-4 py-2 lg:col-span-2 lg:mx-0 lg:rounded-2xl lg:border lg:px-3">
+<header class="border-b border-line py-2 lg:sticky lg:top-16 lg:z-20 lg:col-span-2 lg:rounded-2xl lg:border lg:bg-paper/95 lg:px-3">
     <div class="flex items-center gap-2">
         <a href="{{ $backUrl }}" data-back class="grid size-10 shrink-0 place-items-center rounded-full border border-line bg-surface text-muted transition hover:border-accent hover:text-accent" aria-label="رجوع" title="رجوع">
             <x-icon name="back" class="size-5" />
@@ -21,7 +21,7 @@
         @if (request()->boolean('draft'))
             <input type="hidden" name="from_draft" value="1">
         @endif
-        <div role="group" aria-label="طريقة العرض" class="flex w-44 shrink-0 rounded-full border border-line bg-surface p-1">
+        <div role="group" aria-label="طريقة العرض" data-view-switch class="flex w-44 shrink-0 rounded-full border border-line bg-surface p-1">
             @foreach (['text', 'card'] as $way)
                 @if ($way === $current)
                     <span aria-current="true" class="{{ $option }} bg-ink font-medium text-paper"><x-icon :name="$labels[$way][0]" class="size-4" /> {{ $labels[$way][1] }}</span>

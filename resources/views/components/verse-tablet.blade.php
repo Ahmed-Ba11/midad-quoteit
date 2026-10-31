@@ -6,6 +6,13 @@
     written in, stroke by stroke, by resources/js/app.js ([data-write]); the full text is in the page
     from the start, so screen readers and reduced-motion users get it at once.
 --}}
+{{-- The verse is set in Ruqʿa (Aref Ruqaa, OFL): a hand-written line of ink, as if just written on the
+     tablet. The whole family is loaded, never a `&text=` subset (that scrambles the letters). --}}
+@once
+    @push('head')
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap">
+    @endpush
+@endonce
 <aside {{ $attributes->class('tablet') }} aria-label="بيت شعر">
     <svg class="tab-mark" aria-hidden="true"><use href="#mark" /></svg>
     <svg class="arch" viewBox="0 0 400 560" preserveAspectRatio="none" aria-hidden="true">

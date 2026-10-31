@@ -43,19 +43,5 @@
         <figcaption data-text-byline @class(['relative mt-3 text-sm text-muted', 'hidden' => $byline === ''])>— {{ $byline }}</figcaption>
     </figure>
 @else
-    {{-- The same markup is rebuilt by resources/js/studio.js for the live preview in مرسم الحروف. --}}
-    <figure data-quote-art {{ $attributes->class('quote-art relative m-0 w-full overflow-hidden') }}
-        style="aspect-ratio: {{ $aspect }}; --base: {{ $base }}; --fs: {{ $fontSize }}; --bg: {{ $quote->bg_color }}; --ink: {{ $quote->text_color }}; --hl: {{ $quote->highlight_color }};">
-        <x-paper-texture data-art-texture @class(['hidden' => ! $quote->texture]) />
-
-        <div class="relative flex h-full flex-col items-center justify-center px-[10%] py-[9%] text-center">
-            <blockquote data-art-text @class(['quote-art-text', $highlightStyle, 'italic' => $font['italic'] ?? false])
-                style="font-family: {{ $font['stack'] }};"
-                @if (($font['lang'] ?? 'ar') === 'en') dir="auto" @endif>
-                <x-quote-words :quote="$quote" />
-            </blockquote>
-
-            <figcaption data-art-byline @class(['quote-art-byline', 'hidden' => $byline === ''])>— {{ $byline }}</figcaption>
-        </div>
-    </figure>
+    <x-card-art :quote="$quote" :uniform="$uniform" :byline="$byline" :font="$font" :font-size="$fontSize" :aspect="$aspect" :base="$base" {{ $attributes }} />
 @endif

@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import './backdrops.css';
 @import './studio.css';
+@import './card.css';
 
 @source '../../storage/framework/views/*.php';
 

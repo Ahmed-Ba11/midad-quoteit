@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\Quote;
 use App\Models\Saying;
 use App\Models\Verse;
+use App\Support\CardDesign;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -34,6 +35,11 @@ class QuoteRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
+        // مرسم الحروف's settings are whitelisted, never stored as sent (App\Support\CardDesign).
+        if ($this->has('design')) {
+            $this->merge(['design' => CardDesign::normalize(is_array($this->input('design')) ? $this->input('design') : [])]);
+        }
+
         $editing = $this->route('quote');
 
         if ($editing instanceof Quote && $editing->isFromLibrary()) {
@@ -129,6 +135,7 @@ class QuoteRequest extends FormRequest
             'is_public' => ['sometimes', 'boolean'],
             'presentation' => ['sometimes', 'required', Rule::in(['card', 'text'])],
             'layout' => ['sometimes', 'required', Rule::in(array_keys(config('quotes.layouts')))],
+            'design' => ['sometimes', 'array'],
             'mark_style' => ['sometimes', 'required', Rule::in(array_keys(config('quotes.marks')))],
             'anthology_id' => ['sometimes', 'nullable', 'integer'],
             'page' => ['sometimes', 'nullable', 'integer', 'between:1,9999'],

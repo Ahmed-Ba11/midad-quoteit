@@ -3,7 +3,7 @@
     (or a quote is being edited) they fold into one line — the words and who said them — with
     «تعديل» to open them; nothing is asked twice. A fresh start opens it. Library text is locked:
     it is published exactly as in the diwan (QuoteRequest rebuilds it on the server).
-    Needs: $quote, $draft, $myAnthologies (optional), $categories, $bookTitles.
+    Needs: $quote, $draft, $myAnthologies (optional), $categories, $bookTitles; $withStory adds حكاية الاقتباس.
 --}}
 @php
     $isEditing = $quote->exists;
@@ -42,6 +42,13 @@
                 </p>
                 <p class="mt-3 whitespace-pre-line text-center font-text text-lg leading-loose">{{ $quote->content }}</p>
                 <p class="mt-2 text-center text-sm text-muted">— {{ collect([$quote->author, $quote->book])->filter()->implode('، ') }}</p>
+
+                @if (! $isEditing)
+                    <div class="mt-4 flex flex-wrap justify-center gap-2 text-sm">
+                        <a href="{{ route('library.index') }}#shelf" class="rounded-full border border-line px-4 py-2 transition hover:border-accent hover:text-accent">اختر بيتاً آخر</a>
+                        <a href="{{ route('quotes.create') }}" class="rounded-full border border-line px-4 py-2 transition hover:border-accent hover:text-accent">اكتب نصك الخاص</a>
+                    </div>
+                @endif
             </div>
 
             <textarea name="content" hidden readonly>{{ $quote->content }}</textarea>
@@ -58,6 +65,11 @@
                 maxlength="155" required :value="old('content', $quote->content)" />
 
             @include('quotes.partials.text-origin', ['quote' => $quote, 'withBook' => true, 'anthologies' => $myAnthologies ?? collect(), 'defaults' => $draft])
+        @endif
+
+        @if ($withStory ?? false)
+            <x-textarea name="story" label="حكاية الاقتباس" hint="اختياري، حتى ٥٠٠ حرف: أين قرأته؟ ولماذا بقي معك؟"
+                rows="3" maxlength="500" :value="old('story', $draft['story'] ?? $quote->story)" />
         @endif
 
         <div>

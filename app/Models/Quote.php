@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\NormalizesArabic;
+use App\Support\CardDesign;
 use App\Support\QuoteLayout;
 use Database\Factories\QuoteFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -323,6 +324,17 @@ class Quote extends Model
             'paragraphs' => $paragraphs,
             'attribution' => $layout['attribution'],
         ];
+    }
+
+    /**
+     * The card's design (quotes.design) with every key present and valid. A card from before the studio
+     * had settings keeps its paper texture as it was.
+     *
+     * @return array<string, mixed>
+     */
+    public function cardDesign(): array
+    {
+        return CardDesign::normalize($this->design ?? ['texture' => $this->texture ? 'paper' : 'none']);
     }
 
     /**

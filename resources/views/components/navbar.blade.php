@@ -69,6 +69,7 @@
 </header>
 
 {{-- Phones: the same places as a tab bar at the bottom, within thumb's reach; sharing sits in the middle. --}}
+@unless (request()->routeIs('quotes.create', 'quotes.edit'))
 <nav aria-label="التنقّل السريع" class="tab-bar fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper pb-[env(safe-area-inset-bottom)] md:hidden">
     <ul class="mx-auto flex max-w-md items-stretch">
         @foreach ($places as $place)
@@ -94,3 +95,4 @@
         @endforeach
     </ul>
 </nav>
+@endunless

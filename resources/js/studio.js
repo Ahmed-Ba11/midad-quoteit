@@ -108,7 +108,9 @@ export function initStudio(form) {
     // about half the screen on a phone (two thirds on a wide screen), so the tools stay in reach.
     function fitFrame(ratio) {
         const [w, h] = ratio.aspect.split('/').map(Number);
-        const maxHeight = innerWidth >= 1024 ? Math.min(innerHeight * 0.68, 608) : Math.min(innerHeight * 0.5, 460);
+        // The small viewport height: it does not change when the phone's address bar slides away.
+        const screenHeight = window.visualViewport ? Math.min(innerHeight, screen.height) : innerHeight;
+        const maxHeight = innerWidth >= 1024 ? Math.min(screenHeight * 0.68, 608) : Math.min(screenHeight * 0.5, 460);
         const width = Math.min(stage.clientWidth, ratio.width, maxHeight * (w / h));
         frame.style.width = `${Math.floor(width)}px`;
     }
@@ -199,11 +201,27 @@ export function initStudio(form) {
     }
 
     initFontPicker(form.querySelector('[data-font-picker]'), render);
+    // One render per frame, however fast the reader types.
+    let pending = false;
+    function scheduleRender() {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(() => {
+            pending = false;
+            render();
+        });
+    }
     form.addEventListener('input', (event) => {
-        if (!event.target.matches('[data-font-size]')) render();
+        if (!event.target.matches('[data-font-size]')) scheduleRender();
     });
-    form.addEventListener('change', render);
-    window.addEventListener('resize', render);
+    form.addEventListener('change', scheduleRender);
+    let lastWidth = innerWidth;
+    window.addEventListener('resize', () => {
+        if (innerWidth !== lastWidth) {
+            lastWidth = innerWidth;
+            scheduleRender();
+        }
+    });
     // Size the words again once the chosen font is really drawn (its letters are wider or narrower).
     loadFont(config.fonts[checked('font')]).then(render);
     render();

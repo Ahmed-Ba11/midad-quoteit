@@ -33,7 +33,7 @@ document.querySelectorAll('[data-copy]').forEach((button) => {
         setTimeout(() => {
             button.querySelector('[data-copy-icon]').classList.remove('hidden');
             button.querySelector('[data-copied-icon]').classList.add('hidden');
-            label.textContent = 'نسخ';
+            label.textContent = 'انسخ النص';
         }, 2000);
     });
 });

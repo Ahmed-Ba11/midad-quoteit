@@ -80,3 +80,14 @@ test('a text quote opens in the editor to edit, and can be reopened as a card', 
     $this->actingAs($owner)->get(route('quotes.edit', [$quote, 'as' => 'card']))->assertOk()->assertSee('مرسم الحروف');
     $this->actingAs(User::factory()->create())->get(route('quotes.edit', $quote))->assertForbidden();
 });
+
+test('saving from the editor lands on the quote with a confirmation, and «عدّل النص» opens the editor away from home', function () {
+    $quote = Quote::factory()->for($owner = User::factory()->create())->create(['presentation' => 'text', 'content' => 'نص قديم', 'is_original' => true]);
+
+    $this->actingAs($owner)->from(route('quotes.edit', $quote))
+        ->put(route('edit_quote', $quote), ['_form' => 'editor', 'content' => 'نص جديد', 'kind' => 'original', 'presentation' => 'text'])
+        ->assertRedirect(route('quotes.show', $quote))
+        ->assertSessionHas('toast', 'حُفظت تعديلاتك.');
+
+    $this->actingAs($owner)->get(route('quotes.show', $quote))->assertSee(e(route('quotes.edit', [$quote, 'as' => 'text'])), false);
+});

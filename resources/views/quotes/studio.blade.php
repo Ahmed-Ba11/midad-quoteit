@@ -234,7 +234,7 @@
         </div>
 
         {{-- Publish: stays at the bottom of the screen while the form is in view (above the phone's tab bar). --}}
-        <div class="sticky bottom-16 z-30 border-t border-line bg-surface/95 px-4 py-3 md:bottom-0">
+        <div class="sticky bottom-0 z-30 border-t border-line bg-surface/95 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
             <div class="mx-auto flex max-w-6xl items-center gap-2">
                 <x-button type="submit" icon="quill" class="h-12 flex-1 sm:flex-none sm:px-10">{{ $isEditing ? 'احفظ' : 'انشر البطاقة' }}</x-button>
                 <x-button variant="ghost" :href="$isEditing ? route('quotes.show', $quote) : route('home')" class="h-12">إلغاء</x-button>

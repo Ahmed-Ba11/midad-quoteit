@@ -62,7 +62,7 @@
     --color-paper: #F5EFE4;
     --color-surface: #FBF8F3;
     --color-ink: #2B2520;
-    --color-muted: #7A7068;
+    --color-muted: #6E645C;
     --color-line: #E6DED2;
     --color-accent: #8A3324;
     --color-accent-soft: #F2E6DC;
@@ -654,7 +654,7 @@ html.dark body {
     --color-paper: #f5efe4;
     --color-surface: #fbf8f3;
     --color-ink: #2b2520;
-    --color-muted: #7a7068;
+    --color-muted: #6e645c;
     --color-line: #e6ded2;
     --color-accent: #8a3324;
     --color-accent-soft: #f2e6dc;

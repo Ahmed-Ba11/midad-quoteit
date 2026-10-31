@@ -60,7 +60,7 @@
     </script>
 </head>
 
-<body class="flex min-h-screen flex-col bg-paper pb-16 font-sans text-ink antialiased md:pb-0">
+<body class="flex min-h-screen flex-col bg-paper pb-[calc(4rem+env(safe-area-inset-bottom))] font-sans text-ink antialiased md:pb-0">
     <x-brand-mark-defs />
     @yield('backdrop')
     <x-navbar />

@@ -29,7 +29,7 @@
         @can('update', $quote)
             <div class="my-1 border-t border-line"></div>
             @unless ($quote->isFromLibrary())
-                <a href="{{ request()->fullUrlWithQuery(['edit' => $quote->id]) }}" class="{{ $item }}">
+                <a href="{{ request()->routeIs('home') ? request()->fullUrlWithQuery(['edit' => $quote->id]) : route('quotes.edit', [$quote, 'as' => 'text']) }}" class="{{ $item }}">
                     <x-icon name="pencil" class="size-[18px]" /> عدّل النص
                 </a>
             @endunless

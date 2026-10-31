@@ -310,9 +310,10 @@ class QuoteController extends Controller
         $this->linkBook($quote, $request);
         $quote->save();
 
-        return $request->input('_form') === 'studio'
-            ? redirect()->route('quotes.show', $quote)->with('toast', 'حُفظ تصميمك الجديد.')
-            : $this->backTo();
+        return match ($request->input('_form')) {
+            'studio', 'editor' => redirect()->route('quotes.show', $quote)->with('toast', 'حُفظت تعديلاتك.'),
+            default => redirect()->to(preg_replace('/([?&])edit=\d+&?/', '$1', $this->previousOnSite()))->with('toast', 'حُفظت تعديلاتك.'),
+        };
     }
 
     /**

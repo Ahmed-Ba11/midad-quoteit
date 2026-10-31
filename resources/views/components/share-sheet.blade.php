@@ -2,7 +2,7 @@
     "شارك اقتباساً": step one — the words and where they come from, typed once. Two clear ways on,
     both through QuoteController@draft, which checks the details here so mistakes show in this window:
       • انشره نصاً   — «محرّر النص»: font, verse/prose format, emphasis and quote marks, with a live preview;
-      • صمّمه بطاقة  — مرسم الحروف: a designed card, saved as an image too.
+      • صمّمه بطاقة  — مرسم الحروف: a designed card.
     Every choice there has a ready default, so a first quote still takes well under a minute (NFR).
     On phones it rises from the bottom like a sheet; on wide screens it sits in the middle.
 --}}

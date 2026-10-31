@@ -64,7 +64,7 @@ export function initEditor(form) {
                 button.type = 'button';
                 button.dataset.word = index;
                 button.textContent = word;
-                button.className = 'rounded-lg border border-line bg-paper px-2.5 py-1 text-sm transition hover:border-accent aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-paper';
+                button.className = 'min-h-11 rounded-lg border border-line bg-paper px-3 py-1.5 text-sm transition hover:border-accent aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-paper';
                 return button;
             }));
         }

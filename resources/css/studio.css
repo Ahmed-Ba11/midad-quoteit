@@ -190,3 +190,18 @@ button.swatch {
     border: 0;
 }
 
+/* The dots look 36px but take a 44px tap, as phones need. */
+.swatch:not(.swatch-custom)::after,
+.palette-dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 999px;
+}
+
+.swatch-custom .swatch-picker {
+    inset: -4px;
+    width: calc(100% + 8px);
+    height: calc(100% + 8px);
+}
+

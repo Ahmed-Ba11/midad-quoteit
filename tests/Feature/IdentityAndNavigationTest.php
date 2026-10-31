@@ -111,3 +111,26 @@ test('no hadith is listed among the sayings', function () {
     expect(Saying::where('source', 'like', '%حديث%')->exists())->toBeFalse();
     $this->get(route('library.index'))->assertDontSee('حديث شريف');
 });
+
+test('phone tap targets are at least 44px: category chips, colour dots, word buttons and occasion tabs', function () {
+    $this->get(route('home'))->assertSee('h-11 sm:h-9', false);
+
+    $this->seed(LibrarySeeder::class);
+    $this->get(route('library.index'))->assertSee('data-occasion="', false)
+        ->assertSee('class="h-11 rounded-full border border-line bg-surface px-5', false);
+
+    // The dots look 36px; an invisible ring takes the tap out to 44px.
+    expect(file_get_contents(resource_path('css/studio.css')))->toContain(".palette-dot::after {\n    content: '';\n    position: absolute;\n    inset: -4px;");
+
+    foreach (['studio.js', 'editor.js'] as $script) {
+        expect(file_get_contents(resource_path('js/'.$script)))->toContain("button.className = 'min-h-11 rounded-lg");
+    }
+});
+
+test('the corner tab bar opens with the current tab scrolled into view', function () {
+    $owner = User::factory()->create();
+
+    $this->actingAs($owner)->get(route('profile.show', [$owner, 'tab' => 'anthologies']))
+        ->assertSee('data-center-current', false)->assertSee('aria-current="page"', false);
+    expect(file_get_contents(resource_path('js/app.js')))->toContain("document.querySelectorAll('[data-center-current]')");
+});

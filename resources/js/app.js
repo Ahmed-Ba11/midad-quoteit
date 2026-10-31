@@ -60,6 +60,16 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
+// Sideways tab bars (data-center-current) open with the current tab in view, not cut off at the edge.
+// Measured from the screen, so it works the same right-to-left; only the bar scrolls, never the page.
+document.querySelectorAll('[data-center-current]').forEach((bar) => {
+    const current = bar.querySelector('[aria-current]');
+    if (!current) return;
+    const barBox = bar.getBoundingClientRect();
+    const tabBox = current.getBoundingClientRect();
+    bar.scrollLeft += tabBox.left - barBox.left - (barBox.width - tabBox.width) / 2;
+});
+
 // "Show more": reveal hidden items (data-show-more="<selector>"), then the button retires.
 document.querySelectorAll('[data-show-more]').forEach((button) => {
     button.addEventListener('click', () => {

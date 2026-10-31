@@ -18,6 +18,9 @@
         </a>
         <h1 class="min-w-0 flex-1 truncate font-display text-xl font-bold sm:text-2xl">{{ $title }}</h1>
 
+        @if (request()->boolean('draft'))
+            <input type="hidden" name="from_draft" value="1">
+        @endif
         <div role="group" aria-label="طريقة العرض" class="flex w-44 shrink-0 rounded-full border border-line bg-surface p-1">
             @foreach (['text', 'card'] as $way)
                 @if ($way === $current)

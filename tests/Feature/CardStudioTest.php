@@ -140,3 +140,9 @@ test('the library selection offers both ways: as text or as a card', function ()
         ->assertSee('انشره نصاً')
         ->assertSee('صمّمه بطاقة');
 });
+
+test('leftovers of the old studio are gone from config, CSS and the share partials', function () {
+    expect(config('quotes.text_fonts'))->toBeNull()
+        ->and(file_get_contents(resource_path('css/app.css')))->not->toContain('.quote-art-line')->not->toContain('.brass-plaque')
+        ->and(file_get_contents(resource_path('views/quotes/partials/text-origin.blade.php')))->not->toContain('withPresentation');
+});

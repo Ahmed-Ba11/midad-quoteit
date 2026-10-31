@@ -13,7 +13,7 @@
             'font' => ['label' => 'الخط', 'icon' => 'font'],
             'box' => ['label' => 'الصندوق', 'icon' => 'square'],
         ];
-        $chip = 'inline-flex h-10 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-paper px-4 text-sm transition hover:border-accent has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-accent/30';
+        $chip = 'inline-flex h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-paper px-4 text-sm transition hover:border-accent has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-accent/30';
         $row = 'flex flex-wrap gap-2';
         $label = 'mb-2 block text-xs font-medium text-muted';
         $toggle = 'flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-line bg-paper px-4 py-3 has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-accent/30';
@@ -44,7 +44,7 @@
                 <fieldset class="mb-1.5 flex items-center justify-center gap-1.5">
                     <legend class="sr-only">المقاس</legend>
                     @foreach (config('quotes.ratios') as $key => $ratio)
-                        <label class="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-xs transition hover:border-accent has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper">
+                        <label class="inline-flex h-11 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface px-3 text-xs transition hover:border-accent has-[:checked]:border-ink has-[:checked]:bg-ink has-[:checked]:text-paper">
                             <input type="radio" name="ratio" value="{{ $key }}" class="sr-only" @checked($value('ratio', $quote->ratio) === $key)>
                             <span aria-hidden="true" class="inline-block w-2.5 rounded-[2px] border border-current" style="aspect-ratio: {{ $ratio['aspect'] }}"></span>
                             {{ $ratio['label'] }}

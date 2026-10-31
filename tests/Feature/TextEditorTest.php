@@ -101,6 +101,21 @@ test('switching a saved quote between «نص» and «بطاقة» keeps the unsa
         ->put(route('quotes.redraft', $quote), ['content' => 'ليس لي', 'switch_to' => 'text'])->assertForbidden();
 });
 
+test('card → text → card keeps the card choices the text editor has no fields for', function () {
+    $quote = Quote::factory()->for($owner = User::factory()->create())->create(['presentation' => 'card', 'is_original' => true]);
+
+    $this->actingAs($owner)->put(route('quotes.redraft', $quote), [
+        'content' => 'نص قصير', 'kind' => 'original', 'font_size' => 56, 'design' => ['auto_size' => '0', 'divider' => 'star'], 'switch_to' => 'text',
+    ]);
+    // «محرّر النص» sends no design: the earlier choices must survive the trip back.
+    $this->actingAs($owner)->put(route('quotes.redraft', $quote), ['content' => 'نص قصير', 'kind' => 'original', 'from_draft' => 1, 'switch_to' => 'card']);
+
+    $this->actingAs($owner)->get(route('quotes.edit', [$quote, 'as' => 'card', 'draft' => 1]))
+        ->assertSee('name="font_size" value="56"', false)
+        ->assertSee('name="design[auto_size]" value="0"', false)
+        ->assertSee('name="design[divider]" value="star" class="sr-only" checked', false);
+});
+
 test('switching an empty form just opens the other view, with no «required» error', function () {
     $this->actingAs(User::factory()->create())
         ->post(route('quotes.draft'), ['_form' => 'studio', 'content' => '', 'switch_to' => 'text'])

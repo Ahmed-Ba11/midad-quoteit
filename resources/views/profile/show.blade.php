@@ -143,7 +143,7 @@
         </div>
 
         {{-- Tabs: scroll sideways on small screens. --}}
-        <nav aria-label="أقسام الركن" class="relative -mx-4 mt-10 overflow-x-auto px-4">
+        <nav aria-label="أقسام الركن" data-center-current class="relative -mx-4 mt-10 overflow-x-auto px-4">
             <div class="flex min-w-max border-b border-line">
                 @foreach ($tabItems as $key => $item)
                     <a href="{{ route('profile.show', $key === 'quotes' ? $user : [$user, 'tab' => $key]) }}"

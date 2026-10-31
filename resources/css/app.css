@@ -382,8 +382,7 @@ html.dark body {
 }
 
 .quote-words .hemi,
-.quote-words .line,
-.quote-art-line {
+.quote-words .line {
     text-wrap: balance;
 }
 
@@ -451,8 +450,7 @@ html.dark body {
 }
 
 /* Verses: balance the words of a hemistich so no single word drops to its own line. */
-.hemistich,
-.quote-art-line {
+.hemistich {
     text-wrap: balance;
 }
 
@@ -578,12 +576,6 @@ html.dark body {
     border-radius: 2px;
     background: linear-gradient(180deg, #7a5536 0%, #5c3e27 45%, #3d2818 100%);
     box-shadow: 0 1px 0 rgb(255 255 255 / 0.12) inset, 0 14px 20px -8px rgb(0 0 0 / 0.75);
-}
-
-.brass-plaque {
-    background: linear-gradient(180deg, #e2c27e 0%, #b8924a 55%, #9c7a37 100%);
-    color: #2b1f17;
-    box-shadow: 0 1px 0 rgb(255 255 255 / 0.5) inset, 0 2px 6px rgb(0 0 0 / 0.5);
 }
 
 /* A leather-bound book seen from its spine: rounded with light, gold tooling bands top and bottom. */

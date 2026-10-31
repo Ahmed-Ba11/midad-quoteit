@@ -110,9 +110,6 @@ return [
         'quote' => ['label' => 'علامة الاقتباس', 'group' => 'أختام'],
     ],
 
-    // Fonts offered for text-only quotes in the quick-share window (a subset of "fonts").
-    'text_fonts' => ['amiri', 'naskh', 'thmanyah-text', 'ruqaa', 'messiri'],
-
     // Book shelves (رفوف القرّاء): reading statuses and genres a reader can pick.
     'reading_statuses' => [
         'reading' => 'أقرؤه الآن',

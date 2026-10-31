@@ -103,7 +103,7 @@
                 @foreach ($occasions as $key => $label)
                     @if ($occasionVerses->has($key))
                         <button type="button" role="tab" data-occasion="{{ $key }}" aria-selected="{{ $loop->first ? 'true' : 'false' }}"
-                            class="h-10 rounded-full border border-line bg-surface px-5 text-sm transition hover:border-accent aria-selected:border-ink aria-selected:bg-ink aria-selected:text-paper">
+                            class="h-11 rounded-full border border-line bg-surface px-5 text-sm transition hover:border-accent aria-selected:border-ink aria-selected:bg-ink aria-selected:text-paper">
                             {{ $label }}
                         </button>
                     @endif

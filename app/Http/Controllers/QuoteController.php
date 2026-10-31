@@ -233,7 +233,8 @@ class QuoteController extends Controller
         }
 
         // Resolving the form request validates it, exactly as when publishing.
-        $request->session()->put('quote_draft', $this->draftFrom(app(QuoteRequest::class), $way));
+        $previous = $request->boolean('from_draft') ? Arr::except((array) $request->session()->get('quote_draft'), ['quote_id']) : [];
+        $request->session()->put('quote_draft', $this->draftFrom(app(QuoteRequest::class), $way, $previous));
 
         return redirect()->route('quotes.create', ['draft' => 1, 'as' => $way, ...$library]);
     }
@@ -244,23 +245,29 @@ class QuoteController extends Controller
     public function redraft(QuoteRequest $request, Quote $quote): RedirectResponse
     {
         $way = $request->input('switch_to') === 'text' ? 'text' : 'card';
+        $stored = (array) $request->session()->get('quote_draft');
+        $previous = $request->boolean('from_draft') && ($stored['quote_id'] ?? null) === $quote->id ? $stored : [];
 
-        $request->session()->put('quote_draft', [...$this->draftFrom($request, $way), 'quote_id' => $quote->id]);
+        $request->session()->put('quote_draft', [...$this->draftFrom($request, $way, $previous), 'quote_id' => $quote->id]);
 
         return redirect()->route('quotes.edit', [$quote, 'as' => $way, 'draft' => 1]);
     }
 
     /**
-     * What was chosen so far, checked, to refill the next view.
+     * What was chosen so far, checked, to refill the next view. Choices this view has no field for
+     * (the card's design in «محرّر النص», the quote marks in مرسم الحروف) stay from the earlier draft.
      *
+     * @param  array<string, mixed>  $previous
      * @return array<string, mixed>
      */
-    private function draftFrom(QuoteRequest $request, string $way): array
+    private function draftFrom(QuoteRequest $request, string $way, array $previous = []): array
     {
-        return collect($request->validated())
+        $fresh = collect($request->validated())
             ->put('kind', $request->input('kind'))
             ->put('signature', $request->validated('signature'))
-            ->put('presentation', $way)
+            ->put('presentation', $way);
+
+        return collect($previous)->except($fresh->keys()->all())->merge($fresh)
             ->reject(fn ($value) => $value === null)
             ->all();
     }

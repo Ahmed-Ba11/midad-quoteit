@@ -55,27 +55,40 @@ Image upload to the server / avatar upload, delete confirmation, saved "my color
 
 **Tried and withdrawn (31 Oct 2026):** saving a card as a PNG and a photo from the device were built client-side, then removed at the owner's request: the saved image could not be guaranteed to match the card on every phone (fonts in Safari). Back to: no image saving, no photo.
 
-## 4. Database (target ERD)
+## 4. Database (ERD, as built — 31 Oct 2026)
 ```
-users        id, name(50), email UQ, password, bio(160)?, timestamps
-categories   id, name(30), slug UQ, timestamps
-quotes       id, user_id FK→users (cascade), category_id FK→categories (nullOnDelete)?,
-             verse_id FK→verses (nullOnDelete)?, saying_id FK→sayings (nullOnDelete)?,
-             content(155), author(100)?, book(150)?, story(500)?,
-             font(20) default 'amiri', bg_color(7), text_color(7), highlight_color(7),
-             highlight_style enum(color,mark) default 'mark', highlights json?  (array of word indexes),
-             texture bool default true, ratio enum(wide,square,tall) default 'wide',
-             font_size tinyint default 34, timestamps
-likes        id, user_id FK (cascade), quote_id FK (cascade), UQ(user_id,quote_id), timestamps
-bookmarks    id, user_id FK (cascade), quote_id FK (cascade), UQ(user_id,quote_id), timestamps
-replies      id, user_id FK (cascade), quote_id FK (cascade), body(300), timestamps
-poets        id, name, slug UQ, era, years, region, bio, is_peninsula bool, color(7), sort_order
-works        id, poet_id FK (cascade), title, slug UQ, type enum(diwan,muallaqa,collection), color(7), ink(7)
-verses       id, work_id FK (cascade), sadr, ajuz, occasion(20), timestamps
-sayings      id, text, source, timestamps
+users           id, name(50), email UQ, password, bio(160)?, accent?, badge?, pinned_quote_id FK→quotes (nullOnDelete)?,
+                show_poets bool, show_wall bool, remember_token?, timestamps
+categories      id, name(30), slug UQ, timestamps
+quotes          id, user_id FK→users (cascade), category_id FK→categories (nullOnDelete)?,
+                verse_id FK→verses (nullOnDelete)?, saying_id FK→sayings (nullOnDelete)?, book_id FK→books (nullOnDelete)?,
+                content(155), author(100)?, book(150)?, page?, source(200)?, source_url(255)?, story(500)?,
+                is_original bool, is_public bool, presentation enum(card,text), layout enum(auto,verse,prose),
+                mark_style (config quotes.marks), font, bg_color(7), text_color(7), highlight_color(7),
+                highlight_style enum(color,mark), highlights json? (word indexes), texture bool,
+                ratio enum(wide,square,tall,story), font_size, design json? (App\Support\CardDesign whitelist),
+                search_text? (normalised Arabic), timestamps
+likes           id, user_id FK (cascade), quote_id FK (cascade), UQ(user_id,quote_id), timestamps
+bookmarks       id, user_id FK (cascade), quote_id FK (cascade), UQ(user_id,quote_id), timestamps
+replies         id, user_id FK (cascade), quote_id FK (cascade), body(300), timestamps
+books           id, title, author?, genre?, match_key UQ, added_by FK→users (nullOnDelete)?, timestamps
+book_user       id, user_id FK (cascade), book_id FK (cascade), status (reading/read/want), UQ(user_id,book_id), timestamps
+anthologies     id, user_id FK (cascade), title, description?, palette, is_public bool, timestamps
+anthology_quote id, anthology_id FK (cascade), quote_id FK (cascade), UQ(anthology_id,quote_id), timestamps
+diwans          id, user_id FK (cascade), poet_name, poet_death_year?, title, about?, source, color, is_public bool, timestamps
+diwan_verses    id, diwan_id FK (cascade), sadr, ajuz?, note?, timestamps
+poets           id, name, slug UQ, era, years, region?, bio, is_peninsula bool, color(7), sort_order, wikisource_url?, aldiwan_url?
+works           id, poet_id FK (cascade), title, slug UQ, type enum(diwan,muallaqa,collection), color(7), ink(7), sort_order, wikisource_url?
+verses          id, work_id FK (cascade), sadr, ajuz, occasion?, sort_order, source_url?, explanation?, glossary?, search_text?
+sayings         id, text, source, meaning?, source_url?, timestamps
+poet_user       id, user_id FK (cascade), poet_id FK (cascade), UQ(user_id,poet_id), timestamps   (favourite poets)
+saying_user     id, user_id FK (cascade), saying_id FK (cascade), UQ(user_id,saying_id), timestamps (my wall of sayings)
 ```
 Relations: User 1:N Quote, User 1:N Reply, User M:N Quote via likes & bookmarks, Category 1:N Quote,
-Quote 1:N Reply, Poet 1:N Work, Work 1:N Verse, Verse 1:N Quote (optional), Saying 1:N Quote (optional).
+Quote 1:N Reply, Poet 1:N Work, Work 1:N Verse, Verse 1:N Quote (optional), Saying 1:N Quote (optional),
+Book 1:N Quote (optional), User M:N Book via book_user, User 1:N Anthology, Anthology M:N Quote via anthology_quote,
+User 1:N Diwan, Diwan 1:N DiwanVerse, User M:N Poet via poet_user, User M:N Saying via saying_user,
+User → one pinned Quote (optional).
 
 Occasions keys: `himma, najah, sabr, hikma, ilm, hubb, hanin, wafa`.
 
@@ -113,7 +126,9 @@ Toggle routes (POST), counts with `withCount`, quote show page with story, repli
 ### Phase 6 — Library (2 h)
 Migrations poets/works/verses/sayings. `database/data/library.json` (≈ 100–150 verified verses from the 11 poets + 8–12 sayings)
 → `LibrarySeeder`. Verify verse text against ar.wikisource.org where possible; mark doubtful ones for human review.
-Library page with shelf/arcade/occasions/sayings (DESIGN.md). Selecting verses → `/quotes/create?verse=ID` or `?saying=ID` → locked text.
+Library page with shelf/arcade/occasions/sayings (DESIGN.md). Selecting 1–2 verses or a saying → `/quotes/create?verses[]=ID&as=text|card`
+or `?saying=ID` → locked text (rebuilt on the server by `QuoteRequest`), with «من يرى الاقتباس» and «أضفه إلى» like any quote.
+`LibrarySeeder` uses `updateOrCreate`, so it is safe to run on every deploy. Poets and works link to Wikisource and aldiwan.net (`App\Support\Aldiwan`).
 Footer attribution: "النصوص من ويكي مصدر وويكي الاقتباس (CC BY-SA)".
 
 ### Phase 7 — Demo data, polish, mobile, tests (45 min)

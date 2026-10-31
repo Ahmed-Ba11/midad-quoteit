@@ -62,7 +62,8 @@
     </script>
 </head>
 
-<body class="flex min-h-screen flex-col bg-paper pb-[calc(4rem+env(safe-area-inset-bottom))] font-sans text-ink antialiased md:pb-0">
+@php($isWorkbench = request()->routeIs('quotes.create', 'quotes.edit'))
+<body @class(['flex min-h-screen flex-col bg-paper font-sans text-ink antialiased md:pb-0', 'pb-[calc(4rem+env(safe-area-inset-bottom))]' => ! $isWorkbench])>
     <x-brand-mark-defs />
     @yield('backdrop')
     <x-navbar />
@@ -71,7 +72,8 @@
         @yield('content')
     </main>
 
-    <x-site-footer />
+    {{-- On a phone «محرّر النص» and مرسم الحروف end with their own fixed publish bar: no footer under it. --}}
+    <x-site-footer @class(['max-lg:hidden' => $isWorkbench]) />
 
     <x-toast />
 

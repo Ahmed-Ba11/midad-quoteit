@@ -86,7 +86,23 @@ document.querySelectorAll('[data-view-switch]').forEach((group) => {
         button.classList.remove('text-muted');
     });
 });
-window.addEventListener('pageshow', () => document.querySelectorAll('[data-view-switch]').forEach((group) => delete group.dataset.switching));
+// Back to a page kept by the browser (bfcache): the pill must show the real current way again.
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted && document.querySelector('[data-view-switch][data-switching]')) location.reload();
+});
+
+// «انشر» / «احفظ» once: a quick double tap must not publish the same quote twice.
+document.querySelectorAll('#studio, #text-editor').forEach((form) => {
+    form.addEventListener('submit', (event) => {
+        if (event.submitter?.name === 'switch_to') return;
+        if (form.dataset.submitting) {
+            event.preventDefault();
+            return;
+        }
+        form.dataset.submitting = '1';
+    });
+});
+window.addEventListener('pageshow', () => document.querySelectorAll('#studio, #text-editor').forEach((form) => delete form.dataset.submitting));
 
 // "Show more": reveal hidden items (data-show-more="<selector>"), then the button retires.
 document.querySelectorAll('[data-show-more]').forEach((button) => {

@@ -89,11 +89,45 @@ test('the sign-in tablet writes its verse in Ruqʿa, loaded once and whole', fun
         ->and(file_get_contents(resource_path('css/backdrops.css')))->toContain("font-family: 'Aref Ruqaa', 'Amiri', serif;");
 });
 
-test('the footer closes with its maker: أحمد, software engineering student, GitHub and LinkedIn', function () {
+test('the footer closes with its maker: أحمد, software engineering student, X and LinkedIn', function () {
     $this->get(route('home'))
         ->assertSee('رَقَمَه')->assertSee('أحمد')->assertSee('هندسة البرمجيات')
-        ->assertSee('href="https://github.com/Ahmed-Ba11"', false)
+        ->assertSee('href="https://x.com/SWEa_7"', false)->assertDontSee('github.com/Ahmed-Ba11', false)
         ->assertSee('href="https://www.linkedin.com/in/ahmed-basharaf-9633b6435"', false)
         ->assertDontSee('utm_source', false)
         ->assertSee('rel="me noopener noreferrer"', false);
+});
+
+test('on a phone the footer and the tab-bar padding step aside on the workbench, and stay everywhere else', function () {
+    $html = $this->actingAs(User::factory()->create())->get(route('quotes.create', ['as' => 'card']))->getContent();
+
+    expect($html)->toContain('<footer class="foot mt-20 pt-6 max-lg:hidden">')
+        ->and($html)->not->toContain('pb-[calc(4rem+env(safe-area-inset-bottom))]');
+
+    $this->get(route('home'))->assertSee('<footer class="foot mt-20 pt-6">', false)
+        ->assertSee('pb-[calc(4rem+env(safe-area-inset-bottom))]', false);
+});
+
+test('typing, short screens and the font list never squeeze or hide the tools on a phone', function () {
+    $css = file_get_contents(resource_path('css/studio.css'));
+
+    expect($css)->toContain('.writing-desk:has(textarea:focus')
+        ->toContain('@media (max-width: 1023.98px) and (max-height: 520px)')
+        ->toContain(".writing-desk .font-list {\n        max-height: none;")
+        ->toContain("@media (hover: hover) {\n    .swatch:hover {");
+});
+
+test('the card is sized once per width, fonts never race, and publishing happens once', function () {
+    expect(file_get_contents(resource_path('js/studio.js')))->toContain('const screenHeight = stableHeight;')
+        ->and(file_get_contents(resource_path('js/font-picker.js')))->toContain('if (choice.checked) onChange?.(choice.value);')
+        ->toContain('// ثمانية has no Google stylesheet')
+        ->and(file_get_contents(resource_path('js/app.js')))->toContain('form.dataset.submitting')
+        ->toContain('event.persisted');
+});
+
+test('the font filters, back button and the «نص / بطاقة» switch are 44px taps', function () {
+    $this->actingAs(User::factory()->create())->get(route('quotes.create', ['as' => 'text']))
+        ->assertSee('class="h-11 shrink-0 rounded-full border border-line px-3.5', false)
+        ->assertSee('data-back class="grid size-11', false)
+        ->assertSee('inline-flex h-11 flex-1 items-center', false);
 });

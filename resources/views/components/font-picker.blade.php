@@ -10,7 +10,7 @@
     $fonts = config('quotes.fonts');
     $groups = collect(config('quotes.font_groups'))->filter(fn (string $label, string $group) => collect($fonts)->contains('group', $group));
     $best = ['verse' => 'للشعر', 'prose' => 'للنثر', 'both' => 'للشعر والنثر'];
-    $chip = 'h-8 shrink-0 rounded-full border border-line px-3 text-xs transition hover:border-accent aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper';
+    $chip = 'h-11 shrink-0 rounded-full border border-line px-3.5 text-xs transition hover:border-accent aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-paper';
 @endphp
 
 <div data-font-picker data-fonts="{{ json_encode(collect($fonts)->map(fn (array $font) => ['google' => $font['google'] ?? null, 'stack' => $font['stack']])) }}" {{ $attributes }}>

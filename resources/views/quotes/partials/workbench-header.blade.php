@@ -7,13 +7,13 @@
 --}}
 @php
     $switchAction = $quote->exists ? route('quotes.redraft', $quote) : route('quotes.draft');
-    $option = 'inline-flex h-10 flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-sm transition';
+    $option = 'inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full px-4 text-sm transition';
     $labels = ['text' => ['type', 'نص'], 'card' => ['palette', 'بطاقة']];
 @endphp
 
 <header class="border-b border-line py-2 lg:sticky lg:top-16 lg:z-20 lg:col-span-2 lg:rounded-2xl lg:border lg:bg-paper/95 lg:px-3">
     <div class="flex items-center gap-2">
-        <a href="{{ $backUrl }}" data-back class="grid size-10 shrink-0 place-items-center rounded-full border border-line bg-surface text-muted transition hover:border-accent hover:text-accent" aria-label="رجوع" title="رجوع">
+        <a href="{{ $backUrl }}" data-back class="grid size-11 shrink-0 place-items-center rounded-full border border-line bg-surface text-muted transition hover:border-accent hover:text-accent" aria-label="رجوع" title="رجوع">
             <x-icon name="back" class="size-5" />
         </a>
         <h1 class="min-w-0 flex-1 truncate font-display text-xl font-bold sm:text-2xl">{{ $title }}</h1>

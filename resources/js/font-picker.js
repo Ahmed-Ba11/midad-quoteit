@@ -13,7 +13,12 @@ const loading = new Map();
  * and the card would then flash the fallback font. Never waits more than 4 s (slow network).
  */
 export function loadFont(font) {
-    if (!font?.google) return Promise.resolve();
+    if (!font) return Promise.resolve();
+    // ثمانية has no Google stylesheet (its @font-face is already in the page): just wait for its file.
+    if (!font.google) {
+        const local = document.fonts.load(`1em ${font.stack.split(',')[0].trim()}`, 'بسم الله رقيم').catch(() => {});
+        return Promise.race([local, new Promise((resolve) => setTimeout(resolve, 4000))]);
+    }
     if (!loading.has(font.google)) {
         const family = font.stack.split(',')[0].trim();
         const stylesheet = new Promise((resolve) => {
@@ -40,7 +45,8 @@ export function initFontPicker(picker, onChange) {
             loadFont(fonts[entry.target.querySelector('input').value]);
             observer.unobserve(entry.target);
         });
-    }, { root: picker.querySelector('.font-list') });
+    // On phones the list scrolls with the page (no inner scroll), so "in view" means on the screen.
+    }, { root: matchMedia('(max-width: 1023.98px)').matches ? null : picker.querySelector('.font-list') });
     rows.forEach((row) => observer.observe(row));
 
     filters.forEach((filter) => {
@@ -54,7 +60,11 @@ export function initFontPicker(picker, onChange) {
 
     picker.addEventListener('change', (event) => {
         if (event.target.name !== 'font') return;
-        loadFont(fonts[event.target.value]).then(() => onChange?.(event.target.value));
+        // Two quick picks: only the one still chosen when its font arrives reaches the card.
+        const choice = event.target;
+        loadFont(fonts[choice.value]).then(() => {
+            if (choice.checked) onChange?.(choice.value);
+        });
     });
 
     const checked = picker.querySelector('input:checked');

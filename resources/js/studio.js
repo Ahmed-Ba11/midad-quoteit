@@ -44,6 +44,7 @@ export function initStudio(form) {
     let highlighted = new Set([...highlightInputs.querySelectorAll('input')].map((input) => Number(input.value)));
     let lastWords = '';
     let shownFont = checked('font');
+    let stableHeight = Math.min(innerHeight, screen.height);
     // A size the reader chose by hand is kept when the card is opened again (design[auto_size]).
     const autoSizeInput = form.querySelector('[data-auto-size]');
     let autoSize = autoSizeInput.value === '1';
@@ -115,8 +116,9 @@ export function initStudio(form) {
     // about a quarter of the screen on a phone (two thirds on a wide screen), so the tools stay in reach.
     function fitFrame(ratio) {
         const [w, h] = ratio.aspect.split('/').map(Number);
-        // The small viewport height: it does not change when the phone's address bar slides away.
-        const screenHeight = window.visualViewport ? Math.min(innerHeight, screen.height) : innerHeight;
+        // Measured once (and again only when the width changes): innerHeight changes whenever the
+        // phone's address bar slides in or out, and the card must not resize under the reader's finger.
+        const screenHeight = stableHeight;
         // Phones: the card lives in the fixed dock above the tools, so it keeps to about a quarter of the screen.
         const maxHeight = innerWidth >= 1024 ? Math.min(screenHeight * 0.68, 608) : Math.min(screenHeight * 0.28, 300);
         const width = Math.min(stage.clientWidth, ratio.width, maxHeight * (w / h));
@@ -231,6 +233,7 @@ export function initStudio(form) {
     window.addEventListener('resize', () => {
         if (innerWidth !== lastWidth) {
             lastWidth = innerWidth;
+            stableHeight = Math.min(innerHeight, screen.height);
             scheduleRender();
         }
     });

@@ -88,7 +88,7 @@
 
         <div>
             <label for="category_id" class="mb-1.5 block text-sm font-medium">التصنيف</label>
-            <select id="category_id" name="category_id"
+            <select id="category_id" name="category_id" aria-describedby="category_id-hint"
                 class="block h-12 w-full rounded-xl border border-line bg-white px-4 text-ink focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/20 dark:bg-surface">
                 <option value="">بدون تصنيف</option>
                 @foreach ($categories as $category)
@@ -97,7 +97,7 @@
                     </option>
                 @endforeach
             </select>
-            <p class="mt-1.5 text-xs text-muted">اختياري، يساعد القرّاء على التصفية</p>
+            <p id="category_id-hint" class="mt-1.5 text-xs text-muted">اختياري، يساعد القرّاء على التصفية</p>
         </div>
             </div>
         </details>

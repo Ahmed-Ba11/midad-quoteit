@@ -72,6 +72,29 @@
     .writing-desk {
         padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
     }
+
+    /* The font list scrolls with the page here (an inner scroll would trap the swipe in the small tools area). */
+    .writing-desk .font-list {
+        max-height: none;
+        overflow: visible;
+    }
+
+    /* Typing: the keyboard takes half the screen, so the dock and the publish bar step aside and the
+       field being typed in is never hidden behind them. */
+    .writing-desk:has(textarea:focus, input:not([type="radio"], [type="checkbox"], [type="range"], [type="color"]):focus) .workbench-dock {
+        position: static;
+    }
+
+    .writing-desk:has(textarea:focus, input:not([type="radio"], [type="checkbox"], [type="range"], [type="color"]):focus) .workbench-actions {
+        display: none;
+    }
+}
+
+/* A phone on its side (or any short screen): too little height for a fixed dock, so it scrolls normally. */
+@media (max-width: 1023.98px) and (max-height: 520px) {
+    .workbench-dock {
+        position: static;
+    }
 }
 
 @media (min-width: 1024px) {
@@ -186,8 +209,11 @@
     transition: transform 150ms ease;
 }
 
-.swatch:hover {
-    transform: scale(1.08);
+/* Mouse only: on a phone a tapped swatch would stay enlarged. */
+@media (hover: hover) {
+    .swatch:hover {
+        transform: scale(1.08);
+    }
 }
 
 .swatch:has(:checked) {
@@ -225,8 +251,10 @@
     transition: transform 150ms ease;
 }
 
-.palette-dot:hover {
-    transform: scale(1.08);
+@media (hover: hover) {
+    .palette-dot:hover {
+        transform: scale(1.08);
+    }
 }
 
 .palette-dot:has(:checked) {

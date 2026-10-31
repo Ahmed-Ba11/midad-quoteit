@@ -74,7 +74,7 @@ class ProfileController extends Controller
                 : collect(),
             // كتبي (owner only): the reader's shelf grouped by reading status.
             'shelf' => $tab === 'books'
-                ? $user->books()->withCount('quotes')->orderByPivot('updated_at', 'desc')->get()->groupBy('pivot.status')
+                ? $user->books()->withCount(['quotes' => fn ($quotes) => $quotes->public()])->orderByPivot('updated_at', 'desc')->get()->groupBy('pivot.status')
                 : collect(),
             // Counted over what this viewer may see, so private quotes leave no trace for visitors.
             'stats' => [

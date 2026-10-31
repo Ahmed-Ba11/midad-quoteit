@@ -49,6 +49,8 @@ and a built-in poetry library (classical Arab and Arabian-Peninsula poets) users
     - Sections: diwan shelf with open-book animation, poets arcade by era, "لكل مقامٍ مقال" occasion slider, sayings wall, search.
     - User selects 1–2 verses or a saying → opens رواق الحرف **pre-filled and locked** (library text can't be edited) → designs → publishes, attributed automatically.
 12. Light/dark mode toggle (persist in `localStorage`), copy-quote button.
+13. **ركني (reader's corner)** — added with the owner's approval during development (document in SRS v1.3): مختاراتي (anthologies), دواوين القرّاء (a reader's copied-out diwans, public only for poets dead 50+ years), كتبي (book shelf: reading / read / want), favourite poets, a wall of sayings, a pinned quote, a badge and accent colour.
+14. **Fonts are served, not called:** Google Fonts (OFL) and خط ثمانية (from a public Laravel Cloud bucket) are static font files from a CDN — not an external API at runtime.
 
 ### Explicitly NOT doing (out of scope)
 Image upload to the server / avatar upload, delete confirmation, saved "my colors" list, following users, DMs, external APIs at runtime.

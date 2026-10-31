@@ -45,7 +45,7 @@
 
         {{-- Two ways on, always in reach. Both carry the details just typed — nothing is asked twice:
              «انشره نصاً» opens «محرّر النص» (font, format, emphasis, marks); «صمّمه بطاقة» opens مرسم الحروف. --}}
-        <div class="sticky bottom-0 z-10 -mx-5 border-t border-line bg-surface/95 px-5 pb-3 pt-3 sm:-mx-8 sm:px-8">
+        <div class="sticky bottom-0 z-10 -mx-5 border-t border-line bg-surface px-5 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 sm:-mx-8 sm:px-8">
             <div class="grid grid-cols-2 gap-3">
                 <x-button type="submit" name="presentation" value="text" icon="type" class="h-12 w-full">انشره نصاً</x-button>
                 <x-button type="submit" name="presentation" value="card" variant="secondary" icon="palette" class="h-12 w-full">صمّمه بطاقة</x-button>

@@ -104,3 +104,14 @@ test('"add a quote from this book" opens the studio with the book filled in', fu
         ->assertSee('value="الأيام"', false)
         ->assertSee('value="طه حسين"', false);
 });
+
+test('my shelf counts only public quotes of a book, never other readers\' private ones', function () {
+    $owner = User::factory()->create();
+    $book = Book::factory()->create();
+    $owner->books()->attach($book, ['status' => 'read']);
+    Quote::factory()->create(['book_id' => $book->id, 'is_public' => false]);
+    Quote::factory()->create(['book_id' => $book->id, 'is_public' => true]);
+
+    $this->actingAs($owner)->get(route('profile.show', [$owner, 'tab' => 'books']))
+        ->assertSee('1 اقتباس')->assertDontSee('2 اقتباس');
+});

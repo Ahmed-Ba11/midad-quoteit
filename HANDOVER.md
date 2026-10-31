@@ -4,7 +4,8 @@
 
 ## الحالة الآن
 - **المشروع:** منصة اقتباس عربية (RTL)، مشروع تخرّج معسكر طويق. Laravel 13 + Blade + Tailwind 4 + Pest + SQLite محلياً.
-- **الاختبارات:** 283 اختباراً تنجح (`php artisan test --compact`).
+- **الاختبارات:** 285 اختباراً تنجح (`php artisan test --compact`).
+- **الموقع المنشور:** https://raqeem-production-mt79ly.laravel.cloud (Laravel Cloud، فرانكفورت، MySQL 8.4، بخط ثمانية).
 - **الشعار النصي:** «حيثُ يُرقَمُ الأثر». الهوية: «رأس القلم» (حرف ر بشكل سنّ قلم)، اللون القاني `#8A3324`.
 
 ## التشغيل محلياً
@@ -54,7 +55,18 @@ composer run dev                # افتح http://127.0.0.1:8000 (لا localhost
    - حُذفت البقايا (`text_fonts`، `.quote-art-line`، `.brass-plaque`، `withPresentation`)، وحُدّث ERD وPhase 6 في PROJECT.md حسب قاعدة البيانات الفعلية.
    - **لم يُعالج:** مؤثرات الورق المكررة في المكتبة على الجوالات الضعيفة (تحتاج قياساً على جهاز حقيقي).
    - **محلياً:** صفحات أكبر من 126KB تتوقف أحياناً ~19 ثانية (خادم PHP على Windows أو فحص Avast لـ localhost)، ليس من الكود.
-2. **النشر على Laravel Cloud (اختيار المالك):**
+2. **النشر على Laravel Cloud: تمّ (31 أكتوبر).** ما أُنشئ فعلاً:
+   - المؤسسة `ahmd-khald`، التطبيق `raqeem` (من `Ahmed-Ba11/midad-quoteit` فرع `main`، النشر عند كل push مفعّل)، البيئة `production` في EU Central (Frankfurt)، PHP 8.4، Node 24، حوسبة Flex 512MB مع النوم عند الخمول.
+   - قاعدة البيانات: Laravel MySQL 8.4، الإعداد Dev (حتى 8.30$ شهرياً)، مرتبطة بالبيئة.
+   - **خط ثمانية:** المستودع عام فلا تُرفع ملفاته. الملفات في مخزن عام `raqeem-fonts` (Org › Resources › Object storage)، رفعها المالك من «File explorer» (ملف واحد في كل مرة). المخزن **غير مرتبط** بالبيئة عمداً: الربط يشترط مكتبة `league/flysystem-aws-s3-v3`، والموقع لا يحتاجها. عنوان الموقع مضاف في «Allowed origins» للمخزن (ضروري للخطوط). `THMANYAH_FONTS_URL` يشير إلى عنوانه العام، و`components/thmanyah-faces.blade.php` يطبع `@font-face` منه. **إن تغيّر نطاق الموقع** (نطاق خاص مثلاً): أضفه إلى Allowed origins وإلا لن يظهر الخط.
+   - المتغيرات المضافة: `APP_KEY` (ولّده Cloud)، `APP_NAME=Raqeem`، `APP_ENV=production`، `APP_DEBUG=false`، `APP_LOCALE=ar`، `APP_URL`، `SESSION_DRIVER=database`، `SESSION_SECURE_COOKIE=true`، `CACHE_STORE=database`، `QUEUE_CONNECTION=sync`، `LOG_LEVEL=warning`، `THMANYAH_FONTS_URL`.
+   - البناء: `composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader` ثم `npm ci --audit false` ثم `npm run build` ثم `php artisan optimize`. النشر: `php artisan migrate --force` ثم `php artisan db:seed --force`.
+   - **ما ظهر على MySQL فقط:** رابط مصدر أحد المأثورات طوله 332 حرفاً، فرفضه MySQL (SQLite لا يتحقق من الطول). أصلحته migration `widen_library_source_urls` (روابط المكتبة حتى 1000 حرف) مع اختبار. بقية الـ migrations نجحت على MySQL.
+   - **تحقّقت منه بعد النشر:** `/up` يرجع 200؛ الرئيسية والمكتبة تعملان على الجوال والكمبيوتر بخط ثمانية (الملفات السبعة تأتي من المخزن)؛ `X-Frame-Options` و`Strict-Transport-Security` و`nosniff` موجودة؛ ملفات تعريف الارتباط `secure`؛ `/_boost` يرجع 404؛ في القاعدة 0 مستخدمين و0 اقتباسات و138 بيتاً و29 قولاً، `debug=false`، `env=production`.
+   - **بقي على المالك:** إنشاء حساب حقيقي ونشر اقتباس عام وآخر خاص، ثم التحقق أن الخاص لا يظهر للزوار.
+   - أداة سطر الأوامر `laravel/cloud-cli` مثبّتة عالمياً على جهاز المالك لكنها لا تعمل في هذه البيئة (تخرج بصمت)؛ كل الإعداد تمّ من لوحة Cloud.
+
+   **الخطوات الأصلية (مرجع):**
    - **على المالك وحده (لا تفعله الأداة):** إنشاء حساب Laravel Cloud، وإدخال الدفع (الشهر الأول ورصيد 5$ مجاناً، ثم 5$ شهرياً + الاستهلاك)، وربط GitHub بالمستودع `Ahmed-Ba11/midad-quoteit` فرع `main`.
    - **تم التحقق منه:** البناء ينجح بدون خطوط ثمانية؛ `LibrarySeeder` آمن للتكرار (updateOrCreate)؛ في الإنتاج تُزرع المكتبة فقط؛ `trustProxies` وترويسات الأمان مضبوطة.
    - **الإعدادات:**

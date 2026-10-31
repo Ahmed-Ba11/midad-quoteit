@@ -15,43 +15,43 @@
     font-family: 'thmanyah sans';
     src: url('../fonts/thmanyah/thmanyahsans-Regular.woff2') format('woff2');
     font-weight: 400;
-    font-display: swap;
+    font-display: block;
 }
 @font-face {
     font-family: 'thmanyah sans';
     src: url('../fonts/thmanyah/thmanyahsans-Medium.woff2') format('woff2');
     font-weight: 500;
-    font-display: swap;
+    font-display: block;
 }
 @font-face {
     font-family: 'thmanyah sans';
     src: url('../fonts/thmanyah/thmanyahsans-Bold.woff2') format('woff2');
     font-weight: 700;
-    font-display: swap;
+    font-display: block;
 }
 @font-face {
     font-family: 'thmanyah serif display';
     src: url('../fonts/thmanyah/thmanyahserifdisplay-Bold.woff2') format('woff2');
     font-weight: 700;
-    font-display: swap;
+    font-display: block;
 }
 @font-face {
     font-family: 'thmanyah serif display';
     src: url('../fonts/thmanyah/thmanyahserifdisplay-Black.woff2') format('woff2');
     font-weight: 900;
-    font-display: swap;
+    font-display: block;
 }
 @font-face {
     font-family: 'thmanyah serif text';
     src: url('../fonts/thmanyah/thmanyahseriftext-Regular.woff2') format('woff2');
     font-weight: 400;
-    font-display: swap;
+    font-display: block;
 }
 @font-face {
     font-family: 'thmanyah serif text';
     src: url('../fonts/thmanyah/thmanyahseriftext-Medium.woff2') format('woff2');
     font-weight: 500;
-    font-display: swap;
+    font-display: block;
 }
 
 @theme {

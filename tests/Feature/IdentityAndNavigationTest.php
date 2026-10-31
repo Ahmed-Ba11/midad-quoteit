@@ -6,6 +6,7 @@ use App\Models\Quote;
 use App\Models\Saying;
 use App\Models\User;
 use Database\Seeders\LibrarySeeder;
+use Illuminate\Support\Facades\Http;
 
 test('every page carries the رقيم name, the documentation footer and the installable-app tags', function () {
     $this->get(route('home'))
@@ -135,13 +136,43 @@ test('the corner tab bar opens with the current tab scrolled into view', functio
     expect(file_get_contents(resource_path('js/app.js')))->toContain("document.querySelectorAll('[data-center-current]')");
 });
 
-test('on the hosted site خط ثمانية comes from the fonts bucket; locally nothing extra is printed', function () {
-    $this->get(route('home'))->assertDontSee('thmanyahsans-Regular.woff2', false);
+test('on the hosted site خط ثمانية comes from the site itself, drawn only once loaded; locally nothing extra is printed', function () {
+    $this->get(route('home'))->assertDontSee(route('fonts.thmanyah', 'thmanyahsans-Regular'), false);
 
     config(['services.thmanyah.url' => 'https://fonts.example.r2.dev/']);
 
     $this->get(route('home'))
-        ->assertSee('<link rel="preload" href="https://fonts.example.r2.dev/thmanyahsans-Regular.woff2" as="font" type="font/woff2" crossorigin>', false)
-        ->assertSee("font-family: 'thmanyah serif display'; src: url('https://fonts.example.r2.dev/thmanyahserifdisplay-Black.woff2')", false)
-        ->assertSee("font-family: 'thmanyah serif text'; src: url('https://fonts.example.r2.dev/thmanyahseriftext-Medium.woff2')", false);
+        ->assertSee('<link rel="preload" href="'.route('fonts.thmanyah', 'thmanyahsans-Regular').'" as="font" type="font/woff2" crossorigin>', false)
+        ->assertSee("font-family: 'thmanyah serif display'; src: url('".route('fonts.thmanyah', 'thmanyahserifdisplay-Black')."') format('woff2'); font-weight: 900; font-display: block;", false)
+        ->assertSee("font-family: 'thmanyah serif text'; src: url('".route('fonts.thmanyah', 'thmanyahseriftext-Medium')."')", false)
+        ->assertDontSee('fonts.example.r2.dev', false)
+        ->assertDontSee('font-display: swap', false);
+});
+
+test('the local stylesheet draws ثمانية only once it is loaded, never a fallback first', function () {
+    $css = file_get_contents(resource_path('css/app.css'));
+
+    expect($css)->not->toContain('font-display: swap')
+        ->and(substr_count($css, 'font-display: block'))->toBe(7);
+});
+
+test('a Thmanyah face is served from the site with a year cache and no cookie', function () {
+    config(['services.thmanyah.url' => 'https://fonts.example.r2.dev/']);
+    Http::fake(['fonts.example.r2.dev/*' => Http::response('wOF2-font-bytes')]);
+
+    $response = $this->get(route('fonts.thmanyah', 'thmanyahsans-Regular'))->assertOk();
+
+    expect($response->headers->get('Content-Type'))->toBe('font/woff2')
+        ->and($response->headers->get('Cache-Control'))->toContain('max-age=31536000')
+        ->and($response->headers->get('Cache-Control'))->toContain('immutable')
+        ->and($response->headers->getCookies())->toBeEmpty();
+});
+
+test('only the seven Thmanyah faces can be fetched from the font route', function () {
+    config(['services.thmanyah.url' => 'https://fonts.example.r2.dev/']);
+    Http::fake();
+
+    $this->get('/fonts/thmanyah/secret')->assertNotFound();
+    $this->get('/fonts/thmanyah/..%2F..%2F.env')->assertNotFound();
+    Http::assertNothingSent();
 });

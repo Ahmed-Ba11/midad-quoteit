@@ -10,7 +10,7 @@
      tablet. The whole family is loaded, never a `&text=` subset (that scrambles the letters). --}}
 @once
     @push('head')
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=block">
     @endpush
 @endonce
 <aside {{ $attributes->class('tablet') }} aria-label="بيت شعر">

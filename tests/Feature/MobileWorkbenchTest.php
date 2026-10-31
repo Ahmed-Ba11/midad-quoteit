@@ -84,7 +84,7 @@ test('the sign-in tablet writes its verse in Ruqʿa, loaded once and whole', fun
     Cache::flush();
     $html = $this->get(route('login'))->assertOk()->getContent();
 
-    expect(substr_count($html, 'family=Aref+Ruqaa:wght@400;700&display=swap'))->toBe(1)
+    expect(substr_count($html, 'family=Aref+Ruqaa:wght@400;700&display=block'))->toBe(1)
         ->and(strpos($html, 'Aref+Ruqaa'))->toBeLessThan(strpos($html, '</head>'))
         ->and(file_get_contents(resource_path('css/backdrops.css')))->toContain("font-family: 'Aref Ruqaa', 'Amiri', serif;");
 });

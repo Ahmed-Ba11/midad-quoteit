@@ -38,6 +38,6 @@ class PageFonts
             ->map(fn (string $key) => 'family='.config("quotes.fonts.$key.google"))
             ->implode('&');
 
-        return 'https://fonts.googleapis.com/css2?'.$families.'&display=swap';
+        return 'https://fonts.googleapis.com/css2?'.$families.'&display=block';
     }
 }

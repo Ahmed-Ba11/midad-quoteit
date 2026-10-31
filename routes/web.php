@@ -5,6 +5,7 @@ use App\Http\Controllers\BookController;
 use App\Http\Controllers\BookmarkController;
 use App\Http\Controllers\DiwanController;
 use App\Http\Controllers\FavoritePoetController;
+use App\Http\Controllers\FontController;
 use App\Http\Controllers\LibraryController;
 use App\Http\Controllers\LikeController;
 use App\Http\Controllers\LoginController;
@@ -14,7 +15,16 @@ use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\WallController;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
+
+// خط ثمانية from the site's own address, cached for a year (no session, no cookie: shared caches may keep it).
+Route::get('/fonts/thmanyah/{file}', [FontController::class, 'thmanyah'])->name('fonts.thmanyah')
+    ->withoutMiddleware([StartSession::class, ShareErrorsFromSession::class, AddQueuedCookiesToResponse::class, EncryptCookies::class, PreventRequestForgery::class]);
 
 Route::get('/', [QuoteController::class, 'index'])->name('home');
 Route::get('/quote/{quote}', [QuoteController::class, 'show'])->name('quotes.show')->can('view', 'quote');

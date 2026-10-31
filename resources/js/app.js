@@ -1,3 +1,4 @@
+import { initEditor } from './editor';
 import { initLibrary } from './library';
 import { initStudio } from './studio';
 import { initTextOrigin } from './text-origin';
@@ -8,6 +9,11 @@ initTextOrigin();
 const studio = document.getElementById('studio');
 if (studio) {
     initStudio(studio);
+}
+
+const editor = document.getElementById('text-editor');
+if (editor) {
+    initEditor(editor);
 }
 
 // Copy-quote button: copies the text, then shows "نُسخ" for two seconds.

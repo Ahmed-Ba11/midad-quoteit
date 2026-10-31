@@ -1,0 +1,161 @@
+/*
+ * «محرّر النص» and مرسم الحروف: a writing desk — a warm sheet with faint ruled lines, a soft lamp light
+ * from the top corner and the رقيم mark pressed into the paper — so the page reads as a place to make
+ * something, without competing with the work.
+ */
+.writing-desk {
+    isolation: isolate;
+    /* clip, not hidden: keeps the watermark inside without breaking the sticky preview */
+    overflow-x: clip;
+    background:
+        radial-gradient(ellipse 55% 45% at 85% 0%, var(--sun), transparent 70%),
+        radial-gradient(ellipse 80% 60% at 0% 100%, rgb(138 51 36 / 0.05), transparent 70%),
+        repeating-linear-gradient(180deg, transparent 0 35px, rgb(168 135 63 / 0.06) 35px 36px);
+}
+
+.writing-desk::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset-block-start: 3rem;
+    inset-inline-end: -4rem;
+    width: 22rem;
+    height: 22rem;
+    background: var(--color-gold);
+    opacity: 0.05;
+    -webkit-mask: url("/icons/favicon.svg") center / contain no-repeat;
+    mask: url("/icons/favicon.svg") center / contain no-repeat;
+    pointer-events: none;
+}
+
+/* The preview sits like a sheet on the desk. */
+.preview-stage {
+    position: relative;
+}
+
+.preview-stage::before {
+    content: "";
+    position: absolute;
+    inset: 6% -2% -3% 4%;
+    border-radius: 1.75rem;
+    background: rgb(110 74 40 / 0.08);
+    rotate: -1.6deg;
+    z-index: -1;
+}
+
+/* ---------- «بأيّ قلمٍ تكتب؟» ---------- */
+.font-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "sample check" "meta check";
+    align-items: center;
+    column-gap: 0.75rem;
+    padding: 0.7rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--color-line);
+    transition: background-color 150ms ease;
+}
+
+.font-row:last-child {
+    border-bottom: 0;
+}
+
+.font-row:hover {
+    background: var(--color-surface);
+}
+
+.font-row-sample {
+    grid-area: sample;
+    font-size: 1.35rem;
+    line-height: 1.6;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.font-row-meta {
+    grid-area: meta;
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--color-muted);
+}
+
+.font-row-check {
+    grid-area: check;
+    color: var(--color-accent);
+    opacity: 0;
+    transition: opacity 150ms ease;
+}
+
+/* The chosen pen: a line of ink drawn under it from right to left. */
+.font-row::after {
+    content: "";
+    position: absolute;
+    inset-inline: 1rem;
+    bottom: 0.35rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--color-accent);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.font-row:has(:checked) {
+    background: var(--color-accent-soft);
+}
+
+.font-row:has(:checked)::after {
+    transform: scaleX(1);
+}
+
+.font-row:has(:checked) .font-row-check {
+    opacity: 1;
+}
+
+.font-row:has(:focus-visible) {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+}
+
+/* ---------- colour swatches ---------- */
+.swatch {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 999px;
+    background: var(--swatch);
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+    transition: transform 150ms ease;
+}
+
+.swatch:hover {
+    transform: scale(1.08);
+}
+
+.swatch:has(:checked) {
+    box-shadow: 0 0 0 2px var(--color-paper), 0 0 0 4px var(--color-ink);
+}
+
+.swatch:has(:focus-visible) {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 4px;
+}
+
+.swatch-custom {
+    background: conic-gradient(from 0deg, #c0392b, #e3b448, #6e8b3d, #3e8e7e, #3a6ea5, #5b4b8a, #b0577e, #c0392b);
+}
+
+.swatch-picker {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}

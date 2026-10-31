@@ -118,12 +118,20 @@ class QuoteController extends Controller
     }
 
     /**
-     * مرسم الحروف — design a new quote.
+     * A new quote: «محرّر النص» (?as=text) to publish the words themselves with their format, or
+     * مرسم الحروف to design a card. The details typed in «شارك اقتباساً» arrive as the draft (?draft=1),
+     * so nothing is asked twice.
      */
     public function create(Request $request): View
     {
-        return view('quotes.studio', [
-            'quote' => $this->withTemplate($this->draftFromLibrary($request), $request),
+        $draft = $request->boolean('draft') && is_array($stored = $request->session()->get('quote_draft')) ? $stored : [];
+        $quote = $this->withTemplate($this->draftFromLibrary($request, $draft), $request);
+        $asText = $request->query('as', $draft['presentation'] ?? null) === 'text';
+        $quote->presentation = $asText ? 'text' : 'card';
+
+        return view($asText ? 'quotes.editor' : 'quotes.studio', [
+            'quote' => $quote,
+            'draft' => $draft,
             'backUrl' => $this->previousOnSite(),
             'myAnthologies' => $request->user()->anthologies()->latest('updated_at')->get(['id', 'title']),
             'categories' => Category::orderBy('id')->get(),
@@ -135,7 +143,7 @@ class QuoteController extends Controller
      * A new quote pre-filled from خزانة الأدب (?verses[]=…, up to 2, or ?saying=…).
      * The text is locked; QuoteRequest rebuilds it on the server when publishing.
      */
-    private function draftFromLibrary(Request $request): Quote
+    private function draftFromLibrary(Request $request, array $draft = []): Quote
     {
         $quote = new Quote;
         $verseIds = collect($request->query('verses', []))->filter(fn ($id) => ctype_digit((string) $id))
@@ -177,8 +185,8 @@ class QuoteController extends Controller
                 'source_url' => $voice['read_more'],
                 'category_id' => Category::where('slug', 'shir')->value('id'),
             ]);
-        } elseif (is_array($draft = $request->session()->get('quote_draft'))) {
-            // "صمّمه بطاقة" from the quick-share window: the words come along into the studio.
+        } elseif ($draft !== []) {
+            // From «شارك اقتباساً»: the words and their details come along, already checked.
             $quote->fill($draft);
         } elseif ($request->filled('book')) {
             // "أضف اقتباساً من هذا الكتاب" on a book page.
@@ -192,26 +200,21 @@ class QuoteController extends Controller
     }
 
     /**
-     * "صمّمه بطاقة" in the quick-share window: keep what was typed (in the session, not the URL)
-     * and open مرسم الحروف with it, so nothing has to be typed twice.
+     * «انشره نصاً» / «صمّمه بطاقة» in «شارك اقتباساً», and switching between the editor and the studio:
+     * the details are checked here with the same rules as publishing (so a missing author or source is
+     * caught in the window itself), kept in the session — never the URL — and the chosen page opens.
      */
-    public function draft(Request $request): RedirectResponse
+    public function draft(QuoteRequest $request): RedirectResponse
     {
-        $draft = $request->validate([
-            'content' => ['required', 'string', 'min:3', 'max:155'],
-            'author' => ['nullable', 'string', 'max:100'],
-            'source' => ['nullable', 'string', 'max:200'],
-            'source_url' => ['nullable', 'string', 'max:255', 'url:http,https'],
-            'is_public' => ['nullable', 'boolean'],
-        ], [
-            'content.required' => 'اكتب النص أولاً، ثم صمّمه.',
-            'content.min' => 'الاقتباس من ٣ إلى ١٥٥ حرفاً.',
-            'content.max' => 'الاقتباس من ٣ إلى ١٥٥ حرفاً.',
-        ]);
+        $draft = collect($request->validated())
+            ->put('kind', $request->input('kind'))
+            ->put('signature', $request->input('signature'))
+            ->reject(fn ($value) => $value === null)
+            ->all();
 
-        $request->session()->flash('quote_draft', array_filter($draft, fn ($value) => $value !== null));
+        $request->session()->put('quote_draft', $draft);
 
-        return redirect()->route('quotes.create');
+        return redirect()->route('quotes.create', ['draft' => 1, 'as' => $draft['presentation'] ?? 'card']);
     }
 
     /**
@@ -242,6 +245,7 @@ class QuoteController extends Controller
         $quote = new Quote([...$this->validatedWithHighlights($request), ...$request->libraryLink()]);
         $this->linkBook($quote, $request);
         $quote->user()->associate($request->user())->save();
+        $request->session()->forget('quote_draft');
 
         // "أضف إلى": only into an anthology of my own; anything else is ignored.
         $anthology = $request->filled('anthology_id')
@@ -268,10 +272,15 @@ class QuoteController extends Controller
     /**
      * مرسم الحروف — redesign an existing quote (authorized by QuotePolicy@update on the route).
      */
-    public function edit(Quote $quote): View
+    public function edit(Quote $quote, Request $request): View
     {
-        return view('quotes.studio', [
+        // A text quote opens in «محرّر النص», a card in مرسم الحروف; ?as= switches between them.
+        $asText = $request->query('as', $quote->presentation) === 'text';
+        $quote->presentation = $asText ? 'text' : 'card';
+
+        return view($asText ? 'quotes.editor' : 'quotes.studio', [
             'quote' => $quote,
+            'draft' => [],
             'categories' => Category::orderBy('id')->get(),
             'bookTitles' => Book::whereHas('quotes', fn ($quotes) => $quotes->public())->latest()->limit(300)->pluck('title'),
         ]);

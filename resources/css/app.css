@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import './backdrops.css';
+@import './studio.css';
 
 @source '../../storage/framework/views/*.php';
 
@@ -310,6 +311,20 @@ html.dark body {
     background-image:
         repeating-linear-gradient(180deg, transparent 0 31px, rgb(168 135 63 / 0.09) 31px 32px),
         radial-gradient(ellipse at 50% 0%, rgb(168 135 63 / 0.1), transparent 60%);
+}
+
+/* Only the frame the quote's data-mark names is shown. */
+.quote-text [data-for-mark] {
+    display: none;
+}
+
+.quote-text[data-mark="arch"] [data-for-mark="arch"],
+.quote-text[data-mark="curly"] [data-for-mark="curly"] {
+    display: block;
+}
+
+.quote-text[data-mark="ornament"] [data-for-mark="ornament"] {
+    display: inline-block;
 }
 
 /* Frame: the arch of the رقيم tablet, a thin gold outline with a diamond at its crown. */

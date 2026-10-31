@@ -29,25 +29,18 @@
     @endphp
     <figure data-mark="{{ $markStyle }}" {{ $attributes->class(['quote-text relative m-0 flex w-full flex-col items-center justify-center overflow-hidden bg-surface text-center', $markStyle === 'arch' ? 'px-[17%] pb-[7%] pt-[11%]' : 'px-[10%] py-[8%]']) }}
         style="{{ $uniform ? 'aspect-ratio: 4 / 3;' : 'min-height: 16rem;' }} --hl: {{ $quote->highlight_color }};">
-        @if ($markStyle === 'arch')
-            <span aria-hidden="true" class="quote-text-arch"></span>
-        @elseif ($markStyle === 'curly')
-            <span aria-hidden="true" class="quote-text-curly">❝</span>
-        @elseif ($markStyle === 'ornament')
-            <x-quote-mark style="ornament" class="relative mb-[4%] h-[1.4em] text-gold" />
-        @endif
+        {{-- All frames are in the markup; the stylesheet shows the one named by data-mark (so «محرّر النص» switches instantly). --}}
+        <span aria-hidden="true" class="quote-text-arch" data-for-mark="arch"></span>
+        <span aria-hidden="true" class="quote-text-curly" data-for-mark="curly">❝</span>
+        <x-quote-mark style="ornament" class="relative mb-[4%] h-[1.4em] text-gold" data-for-mark="ornament" />
 
-        <blockquote @class(['quote-text-words relative m-0 leading-[1.9] text-ink', $highlightStyle, 'text-2xl sm:text-3xl' => ! $uniform, 'italic' => $font['italic'] ?? false])
+        <blockquote data-text-words @class(['quote-text-words relative m-0 leading-[1.9] text-ink', $highlightStyle, 'text-[clamp(1.15rem,5.4cqi,1.9rem)]' => ! $uniform, 'italic' => $font['italic'] ?? false])
             style="font-family: {{ $font['stack'] }};@if ($uniform) font-size: {{ $textSize }};@endif">
             <x-quote-words :quote="$quote" :marks="$markStyle === 'guillemets' ? ['«', '»'] : null" />
         </blockquote>
 
-        @if ($markStyle === 'ornament')
-            <x-quote-mark style="ornament" class="relative mt-[4%] h-[1.4em] rotate-180 text-gold" />
-        @endif
-        @if ($byline !== '')
-            <figcaption class="relative mt-3 text-sm text-muted">— {{ $byline }}</figcaption>
-        @endif
+        <x-quote-mark style="ornament" class="relative mt-[4%] h-[1.4em] rotate-180 text-gold" data-for-mark="ornament" />
+        <figcaption data-text-byline @class(['relative mt-3 text-sm text-muted', 'hidden' => $byline === ''])>— {{ $byline }}</figcaption>
     </figure>
 @else
     {{-- The same markup is rebuilt by resources/js/studio.js for the live preview in مرسم الحروف. --}}

@@ -326,6 +326,21 @@ class Quote extends Model
     }
 
     /**
+     * The words as plain text for titles, copying and sharing: a verse as «صدر … عجز» on its own
+     * line, free verse line by line, prose as written — the separators the reader typed left out.
+     */
+    public function readableText(): string
+    {
+        $layout = QuoteLayout::parse((string) $this->content, $this->layout ?? 'auto');
+
+        return match ($layout['mode']) {
+            'verse' => collect($layout['verses'])->map(fn (array $verse) => trim($verse['sadr'].($verse['ajuz'] !== '' ? ' … '.$verse['ajuz'] : '')))->implode("\n"),
+            'lines' => implode("\n", $layout['lines']),
+            default => implode("\n\n", $layout['paragraphs']),
+        };
+    }
+
+    /**
      * All pieces of a one-line text (see contentLines()).
      *
      * @return list<array{text: string, highlighted: bool}>

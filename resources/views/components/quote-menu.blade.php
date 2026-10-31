@@ -6,7 +6,7 @@
 --}}
 @php
     $signature = $quote->is_original && blank($quote->author) ? 'بقلم '.$quote->user->name : $quote->author;
-    $copyText = $quote->content.($signature ? ' — '.$signature : '').($quote->sourceLabel() && ! $quote->is_original ? ' ('.$quote->sourceLabel().')' : '');
+    $copyText = $quote->readableText().($signature ? ' — '.$signature : '').($quote->sourceLabel() && ! $quote->is_original ? ' ('.$quote->sourceLabel().')' : '');
     $item = 'flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-start text-sm transition hover:bg-accent-soft hover:text-accent';
 @endphp
 

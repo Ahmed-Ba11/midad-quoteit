@@ -4,7 +4,8 @@
       quoted    — someone else's words: the author and the source's name are required; a link is optional;
       original  — my own writing: signed with my signature, no source;
       anonymous — a proverb or saying with no known author: source optional.
-    $prefix keeps ids unique when both forms are on one page; $useOld refills the form after a failed submit.
+    $prefix keeps ids unique when both forms are on one page; $useOld refills the form after a failed submit;
+    $defaults carries the draft from «شارك اقتباساً» (kind, signature, anthology…) into the editor and studio.
 --}}
 @php
     $prefix ??= '';
@@ -12,13 +13,15 @@
     $withBook ??= false;
     $withPresentation ??= true;
     $anthologies ??= collect();
-    $old = fn (string $field, $default) => $useOld ? old($field, $default) : $default;
+    $defaults ??= [];
+    $old = fn (string $field, $default) => $useOld ? old($field, $defaults[$field] ?? $default) : ($defaults[$field] ?? $default);
     $currentKind = $old('kind', match (true) {
         (bool) $quote->is_original => 'original',
         filled($quote->author) || ! $quote->exists => 'quoted',
         default => 'anonymous',
     });
-    $mySignature = $quote->is_original && filled($quote->author) ? $quote->author : 'بقلم '.auth()->user()->name;
+    $mySignature = $defaults['signature'] ?? ($quote->is_original && filled($quote->author) ? $quote->author : 'بقلم '.auth()->user()->name);
+    $chip = 'inline-flex h-10 cursor-pointer items-center gap-1.5 rounded-full border border-line bg-paper px-4 text-sm transition hover:border-accent has-[:checked]:border-accent has-[:checked]:bg-accent has-[:checked]:text-paper has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-accent/30';
     $choice = 'flex h-full cursor-pointer flex-col gap-1 rounded-2xl border border-line bg-paper p-3 transition hover:border-accent has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:focus-visible]:ring-3 has-[:focus-visible]:ring-accent/30';
     $kinds = [
         'quoted' => ['icon' => 'book-open', 'title' => 'نقلته عن غيري', 'text' => 'بيت شاعر أو جملة كاتب'],
@@ -71,7 +74,7 @@
                         class="block h-12 w-full rounded-xl border border-line bg-white px-3 text-ink focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/20 dark:bg-surface">
                         <option value="">—</option>
                         @foreach (config('quotes.book_genres') as $key => $label)
-                            <option value="{{ $key }}" @selected(old('book_genre', $quote->bookRecord?->genre) === $key)>{{ $label }}</option>
+                            <option value="{{ $key }}" @selected($old('book_genre', $quote->bookRecord?->genre) === $key)>{{ $label }}</option>
                         @endforeach
                     </select>
                     <p id="book_genre-hint" class="mt-1.5 text-xs text-muted">اختياري، يرتّب الكتاب في الرفوف</p>
@@ -129,17 +132,23 @@
 </fieldset>
 @endif
 
-{{-- "أضف إلى": file it straight into one of my anthologies. --}}
+{{-- «أضفه إلى»: file it straight into one of my anthologies, or nowhere; each is a clear chip. --}}
 @if ($anthologies->isNotEmpty())
-    <div class="mt-5">
-        <label for="{{ $prefix }}anthology_id" class="mb-1.5 flex items-center gap-1.5 text-sm font-medium"><x-icon name="layers" class="size-4 text-accent" /> أضفه إلى مختاراتي</label>
-        <select id="{{ $prefix }}anthology_id" name="anthology_id" aria-describedby="{{ $prefix }}anthology_id-hint"
-            class="block h-12 w-full rounded-xl border border-line bg-white px-3 text-ink focus:border-accent focus:outline-none focus:ring-3 focus:ring-accent/20 dark:bg-surface">
-            <option value="">— لا —</option>
+    @php $chosenAnthology = (string) $old('anthology_id', ''); @endphp
+    <fieldset class="mt-5">
+        <legend class="mb-2 flex items-center gap-1.5 text-sm font-medium"><x-icon name="layers" class="size-4 text-accent" /> أضفه إلى</legend>
+        <div class="flex flex-wrap gap-2">
+            <label class="{{ $chip }}">
+                <input type="radio" name="anthology_id" value="" class="sr-only" @checked($chosenAnthology === '')>
+                لا شيء
+            </label>
             @foreach ($anthologies as $anthology)
-                <option value="{{ $anthology->id }}" @selected((string) $old('anthology_id', '') === (string) $anthology->id)>{{ $anthology->title }}</option>
+                <label class="{{ $chip }}">
+                    <input type="radio" name="anthology_id" value="{{ $anthology->id }}" class="sr-only" @checked($chosenAnthology === (string) $anthology->id)>
+                    <x-icon name="layers" class="size-3.5 opacity-60" /> {{ $anthology->title }}
+                </label>
             @endforeach
-        </select>
-        <p id="{{ $prefix }}anthology_id-hint" class="mt-1.5 text-xs text-muted">اختياري؛ تجده بعد النشر في مختاراتك أيضاً</p>
-    </div>
+        </div>
+        <p class="mt-1.5 text-xs text-muted">اختياري: يُحفظ في مختاراتك التي تختارها، ويبقى في ركنك على كل حال</p>
+    </fieldset>
 @endif

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', \Illuminate\Support\Str::limit($quote->content, 40))
+@section('title', \Illuminate\Support\Str::limit(str_replace("\n", ' ', $quote->readableText()), 40))
 
 @section('content')
     @php

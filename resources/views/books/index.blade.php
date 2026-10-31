@@ -7,7 +7,26 @@
         $genres = config('quotes.book_genres');
     @endphp
 
-    <div class="mx-auto max-w-6xl px-4 py-10">
+    <section class="shelves relative overflow-hidden">
+    {{-- The wall: light from a window falls on it with the shadow of a shelf of books, the mark standing among them. --}}
+    <div class="wall" aria-hidden="true">
+        <div class="shafts"></div>
+        <div class="cast">
+            <svg viewBox="0 0 520 330">
+                <rect class="glow" x="10" y="10" width="500" height="310" rx="6" />
+                <g class="bk">
+                    <rect x="40" y="250" width="440" height="12" />
+                    <rect x="62" y="120" width="30" height="130" /><rect x="96" y="96" width="24" height="154" /><rect x="124" y="140" width="36" height="110" />
+                    <rect x="164" y="108" width="22" height="142" /><rect x="190" y="126" width="30" height="124" />
+                    <rect x="236" y="112" width="26" height="140" transform="rotate(-14 236 252)" />
+                    <rect x="300" y="132" width="34" height="118" /><rect x="338" y="104" width="24" height="146" /><rect x="366" y="122" width="30" height="128" />
+                    <svg x="400" y="150" width="100" height="100"><use href="#mark" /></svg>
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <div class="wall-content mx-auto max-w-6xl px-4 py-10">
         <header class="flex flex-wrap items-end justify-between gap-6">
             <div class="max-w-2xl">
                 <h1 class="font-display text-4xl font-bold sm:text-5xl">رفوف القـــرّاء</h1>
@@ -68,12 +87,15 @@
                 @if ($books->isNotEmpty())
                     <section class="mt-12" aria-label="{{ $shelfTitle }}">
                         <h2 class="font-display text-2xl font-bold">{{ $shelfTitle }}</h2>
-                        <ul class="mt-5 flex gap-5 overflow-x-auto pb-4">
-                            @foreach ($books as $book)
-                                <li class="w-36 shrink-0 sm:w-40"><x-book-tile :book="$book" /></li>
-                            @endforeach
-                        </ul>
-                        <div class="shelf-plank -mt-3 opacity-70"></div>
+                        {{-- The covers (2:3, 144px wide; 160px from sm) stand on a wooden ledge the width of the row. --}}
+                        <div class="relative mt-5">
+                            <div class="ledge absolute inset-x-0 top-[216px] sm:top-[240px]" aria-hidden="true"></div>
+                            <ul class="relative flex overflow-x-auto pb-4">
+                                @foreach ($books as $book)
+                                    <li class="w-41 shrink-0 px-2.5 sm:w-45"><x-book-tile :book="$book" /></li>
+                                @endforeach
+                            </ul>
+                        </div>
                     </section>
                 @endif
             @endforeach
@@ -85,4 +107,5 @@
             @endif
         @endif
     </div>
+    </section>
 @endsection

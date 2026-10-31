@@ -24,5 +24,5 @@
 @endsection
 
 @section('verse')
-    <x-epigraph context="return" layout="verse" class="text-3xl" />
+    <x-epigraph context="return" layout="tablet" />
 @endsection

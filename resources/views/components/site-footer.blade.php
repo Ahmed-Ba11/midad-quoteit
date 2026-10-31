@@ -7,7 +7,12 @@
     $link = 'transition hover:text-accent';
 @endphp
 
-<footer class="mt-20 border-t border-line bg-surface">
+<footer class="foot mt-20 pt-6">
+    {{-- A sheet of paper with a hand-cut top edge, the mark engraved faintly in its corner. --}}
+    <svg class="edge" viewBox="0 0 1200 26" preserveAspectRatio="none" aria-hidden="true"><path fill="currentColor" d="M0 0H1200V8C1170 14 1150 6 1120 11S1070 16 1040 9 990 13 960 10 905 17 870 11 820 7 790 13 735 16 700 10 650 6 620 12 565 17 530 11 480 7 450 12 395 16 360 10 310 6 280 13 225 17 190 11 140 7 110 12 55 16 0 10Z" /></svg>
+    <svg class="wm" aria-hidden="true"><use href="#mark" /></svg>
+    <div class="foot-glow" aria-hidden="true"></div>
+
     <div class="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1.4fr]">
         {{-- The name and its meaning. --}}
         <section aria-labelledby="footer-about">

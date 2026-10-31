@@ -1,0 +1,523 @@
+/*
+ * Backdrops: the light and paper behind the pages (see the owner's raqeem-visual-CHANGES.md).
+ * Every layer here is decoration only — aria-hidden in the markup and pointer-events: none — laid
+ * around the content, never over its meaning. The رقيم mark comes from <x-brand-mark-defs> (#mark).
+ */
+
+:root {
+    --sun: rgb(255 238 205 / 0.75);
+    --shade: rgb(110 74 40 / 0.16);
+    --sheet: #FBF6EC;
+    --sheet-edge: #E2D6C2;
+    --tab: #17120F;
+    --tab-ink: #EFE6D6;
+    --tab-gold: #C9A45C;
+    --tab-muted: #A3968A;
+    --ledge-a: #EADFCB;
+    --ledge-b: #D9C8AB;
+    --foot: #ECE2D0;
+    --foot-mark: rgb(138 51 36 / 0.06);
+}
+
+.dark {
+    --sun: rgb(201 164 92 / 0.10);
+    --shade: rgb(0 0 0 / 0.45);
+    --sheet: #2A241F;
+    --sheet-edge: #3A322B;
+    --tab: #0E0B09;
+    --ledge-a: #2C2520;
+    --ledge-b: #221C18;
+    --foot: #100D0B;
+    --foot-mark: rgb(201 164 92 / 0.06);
+}
+
+/* ---------- the reading room (sign in, sign up) ---------- */
+.room {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* paper wall: warm falloff and a faint laid-paper texture */
+.room::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 70% 60% at 18% 8%, var(--sun), transparent 70%),
+        radial-gradient(ellipse 120% 90% at 50% 120%, rgb(110 74 40 / 0.10), transparent 60%),
+        repeating-linear-gradient(90deg, transparent 0 5px, rgb(110 74 40 / 0.018) 5px 6px);
+}
+
+/* sun shafts from the upper left */
+.room .shafts {
+    position: absolute;
+    inset: -20%;
+    opacity: 0.9;
+    filter: blur(18px);
+    background: repeating-linear-gradient(118deg, transparent 0 140px, var(--sun) 140px 230px, transparent 230px 420px);
+    -webkit-mask: linear-gradient(160deg, #000 0%, rgb(0 0 0 / 0.5) 40%, transparent 70%);
+    mask: linear-gradient(160deg, #000 0%, rgb(0 0 0 / 0.5) 40%, transparent 70%);
+}
+
+/* the window's light patch, skewed onto the wall, with the mark standing in it */
+.room .window {
+    position: absolute;
+    width: 230px;
+    height: 500px;
+    left: max(12px, calc(50vw - 470px - 250px));
+    top: 190px;
+    transform: skewX(-9deg);
+    transform-origin: bottom left;
+}
+
+.room .window svg,
+.cast svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.room .window .glow {
+    fill: var(--sun);
+}
+
+.room .window .bars {
+    fill: var(--shade);
+}
+
+.room .window .mk {
+    color: var(--shade);
+    filter: blur(4px);
+}
+
+.room .window .soft {
+    filter: blur(2.5px);
+}
+
+.room .window .softer {
+    filter: blur(7px);
+}
+
+/* loose pages in the corners */
+.room .pages {
+    position: absolute;
+    width: 360px;
+    height: 260px;
+}
+
+.room .pages.br {
+    right: -40px;
+    bottom: -40px;
+}
+
+.room .pages.bl {
+    left: -60px;
+    bottom: -60px;
+    transform: scaleX(-1) rotate(-6deg);
+    width: 300px;
+    height: 220px;
+    opacity: 0.85;
+}
+
+.room .pages path.s {
+    fill: var(--sheet);
+    stroke: var(--sheet-edge);
+    stroke-width: 1;
+}
+
+.room .pages path.l {
+    fill: none;
+    stroke: var(--sheet-edge);
+    stroke-width: 1;
+}
+
+.room .pages .sh {
+    fill: rgb(80 50 25 / 0.12);
+    filter: blur(10px);
+}
+
+.glare {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    mix-blend-mode: soft-light;
+    opacity: 0.55;
+    background: linear-gradient(118deg, transparent 18%, rgb(255 236 200 / 0.9) 26%, transparent 34%, transparent 44%, rgb(255 236 200 / 0.6) 50%, transparent 56%);
+}
+
+.dark .glare {
+    opacity: 0.18;
+}
+
+/* ---------- the tablet (لوح) beside the sign-in form ---------- */
+.tablet {
+    position: relative;
+    background: var(--tab);
+    color: var(--tab-ink);
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 34px;
+    isolation: isolate;
+    overflow: hidden;
+    border-radius: 1.5rem;
+}
+
+.tablet::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background:
+        radial-gradient(ellipse 60% 45% at 50% 20%, rgb(201 164 92 / 0.22), transparent 70%),
+        radial-gradient(ellipse 90% 70% at 50% 112%, rgb(138 51 36 / 0.30), transparent 70%);
+}
+
+.tablet::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.35;
+    mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.6'/%3E%3C/svg%3E");
+}
+
+/* the app mark, engraved large behind the verse */
+.tablet .tab-mark {
+    position: absolute;
+    z-index: -1;
+    width: 92%;
+    height: auto;
+    aspect-ratio: 1;
+    left: 50%;
+    bottom: -14%;
+    translate: -50% 0;
+    color: var(--tab-gold);
+    opacity: 0.11;
+    -webkit-mask: linear-gradient(to bottom, #000 25%, rgb(0 0 0 / 0.35) 70%, transparent 95%);
+    mask: linear-gradient(to bottom, #000 25%, rgb(0 0 0 / 0.35) 70%, transparent 95%);
+}
+
+.tablet .arch {
+    position: absolute;
+    inset: 26px;
+    width: calc(100% - 52px);
+    height: calc(100% - 52px);
+}
+
+.tablet .arch path {
+    fill: none;
+    stroke: var(--tab-gold);
+}
+
+.tablet .arch .o {
+    stroke-width: 1.2;
+    opacity: 0.55;
+}
+
+.tablet .arch .i {
+    stroke-width: 0.8;
+    opacity: 0.3;
+}
+
+.tablet .verse-box {
+    position: relative;
+    width: min(100%, 360px);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    padding-top: 50px;
+    text-align: center;
+}
+
+.tablet .eyebrow {
+    font-size: 12.5px;
+    letter-spacing: 0.14em;
+    color: var(--tab-gold);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tablet .eyebrow::before,
+.tablet .eyebrow::after {
+    content: "";
+    width: 22px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.6;
+}
+
+.tablet .bayt {
+    width: 100%;
+    margin: 10px 0 2px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.tablet .bayt .sh {
+    margin: 0;
+    font-family: 'Amiri', serif;
+    font-size: clamp(19px, 5.4vw, 30px);
+    line-height: 1.9;
+    width: 88%;
+    white-space: nowrap;
+    text-align: justify;
+    text-align-last: justify;
+}
+
+.tablet .bayt .ink {
+    display: block;
+}
+
+.tablet .bayt .sadr {
+    align-self: flex-start;
+}
+
+.tablet .bayt .ajz {
+    align-self: flex-end;
+}
+
+.tablet .bayt .sep {
+    align-self: center;
+    width: 7px;
+    height: 7px;
+    background: var(--tab-gold);
+    transform: rotate(45deg);
+    opacity: 0.9;
+}
+
+.tablet .poet {
+    font-family: 'Noto Naskh Arabic', serif;
+    font-size: 17px;
+    opacity: 0.92;
+}
+
+/*
+ * The verse writes itself: a soft-edged ink front moves from right to left across the صدر, then the
+ * عجز, then the poet's name fades in — the text itself never moves, so nothing reflows.
+ */
+@media (prefers-reduced-motion: no-preference) {
+    .tablet [data-write] .ink {
+        -webkit-mask: linear-gradient(to left, #000 40%, transparent 60%) right / 260% 100% no-repeat;
+        mask: linear-gradient(to left, #000 40%, transparent 60%) right / 260% 100% no-repeat;
+        -webkit-mask-position: 0 0;
+        mask-position: 0 0;
+        animation: ink-write 1.9s cubic-bezier(0.45, 0.05, 0.4, 1) 0.5s forwards;
+    }
+
+    .tablet [data-write] .ajz .ink {
+        animation-delay: 2.5s;
+    }
+
+    .tablet [data-write] .sep {
+        opacity: 0;
+        animation: ink-fade 500ms ease 2.3s forwards;
+    }
+
+    .tablet [data-write] ~ .poet {
+        opacity: 0;
+        animation: ink-fade 700ms ease 4.4s forwards;
+    }
+}
+
+@keyframes ink-write {
+    to {
+        -webkit-mask-position: 100% 0;
+        mask-position: 100% 0;
+    }
+}
+
+@keyframes ink-fade {
+    to {
+        opacity: 0.92;
+    }
+}
+
+/* ---------- phones ---------- */
+@media (max-width: 767px) {
+    .auth-card .tablet {
+        order: -1;
+        min-height: 320px;
+        margin-bottom: 1rem;
+    }
+
+    .room .window,
+    .room .pages.bl {
+        display: none;
+    }
+}
+
+@media (min-width: 768px) {
+    .auth-card .tablet {
+        border-start-start-radius: 0;
+        border-end-start-radius: 0;
+    }
+}
+
+/* ---------- the wall: shared by the latest quotes and the readers' shelves ---------- */
+.wall {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.wall::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 60% 55% at 12% 0%, var(--sun), transparent 70%),
+        radial-gradient(ellipse 120% 80% at 50% 115%, rgb(110 74 40 / 0.08), transparent 60%),
+        repeating-linear-gradient(90deg, transparent 0 5px, rgb(110 74 40 / 0.018) 5px 6px);
+}
+
+.wall .shafts {
+    position: absolute;
+    inset: -20% -10% 30% -10%;
+    filter: blur(18px);
+    background: repeating-linear-gradient(118deg, transparent 0 140px, var(--sun) 140px 230px, transparent 230px 420px);
+    -webkit-mask: linear-gradient(165deg, #000, rgb(0 0 0 / 0.45) 35%, transparent 60%);
+    mask: linear-gradient(165deg, #000, rgb(0 0 0 / 0.45) 35%, transparent 60%);
+}
+
+.cast {
+    position: absolute;
+    transform-origin: bottom left;
+}
+
+.cast .glow {
+    fill: var(--sun);
+    filter: blur(7px);
+}
+
+.cast .bars {
+    fill: var(--shade);
+    filter: blur(2.5px);
+}
+
+.cast .mk {
+    color: var(--shade);
+    filter: blur(4px);
+}
+
+.cast .bk {
+    fill: var(--shade);
+    color: var(--shade);
+    filter: blur(3px);
+}
+
+.wall-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* the latest quotes: window light with the mark standing on the sill */
+.feed .cast {
+    width: 210px;
+    height: 315px;
+    left: 7%;
+    top: -130px;
+    transform: skewX(-12deg);
+}
+
+/* a warm pool where the cards rest */
+.feed .wall::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 520px;
+    height: 520px;
+    background: radial-gradient(ellipse 55% 50% at 50% 50%, var(--sun), transparent 75%);
+    opacity: 0.7;
+}
+
+/* the readers' shelves: a shelf's shadow on the wall, the mark standing among the books */
+.shelves .cast {
+    width: 440px;
+    height: 280px;
+    left: 6%;
+    top: 0;
+    transform: skewX(-14deg);
+}
+
+.ledge {
+    position: relative;
+    height: 14px;
+    margin-top: -2px;
+    border-radius: 3px;
+    background: linear-gradient(var(--ledge-a), var(--ledge-b));
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.4) inset, 0 18px 24px -14px rgb(60 30 10 / 0.45);
+}
+
+.ledge::after {
+    content: "";
+    position: absolute;
+    inset-inline: 2%;
+    top: 100%;
+    height: 50px;
+    background: linear-gradient(var(--shade), transparent);
+    filter: blur(6px);
+    opacity: 0.7;
+}
+
+@media (max-width: 860px) {
+    .feed .cast,
+    .shelves .cast {
+        opacity: 0.55;
+        left: -120px;
+    }
+}
+
+/* ---------- the footer: a sheet with a hand-cut (deckle) top edge and the mark engraved ---------- */
+.foot {
+    position: relative;
+    z-index: 1;
+    background: var(--foot);
+    overflow: hidden;
+}
+
+.foot .edge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -1px;
+    height: 26px;
+    width: 100%;
+    display: block;
+    color: var(--color-paper);
+}
+
+.foot .wm {
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    left: -110px;
+    bottom: -190px;
+    color: var(--foot-mark);
+    pointer-events: none;
+}
+
+.foot .foot-glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 50% 70% at 85% 0%, var(--sun), transparent 70%);
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.foot > :not(.edge, .wm, .foot-glow) {
+    position: relative;
+}

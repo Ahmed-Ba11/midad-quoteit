@@ -23,6 +23,20 @@ test('every page carries the رقيم name, the documentation footer and the ins
         ->and(file_get_contents(public_path('sw.js')))->toContain("event.request.mode !== 'navigate'");
 });
 
+test('sign in and sign up set the verse on the tablet, whole in the page, with the room as decoration only', function (string $page) {
+    $this->seed(LibrarySeeder::class);
+
+    $html = $this->get(route($page))->assertOk()
+        ->assertSee('<div class="room" aria-hidden="true">', false)
+        ->assertSee('<div class="glare" aria-hidden="true"></div>', false)
+        ->assertSee('<symbol id="mark"', false)
+        ->assertSee('data-write', false)
+        ->getContent();
+
+    // Both hemistichs are in the markup from the start; only their reveal is animated.
+    expect(substr_count($html, 'class="ink"'))->toBe(2);
+})->with(['login', 'signup']);
+
 test('the service worker never caches pages, only the offline page and icons', function () {
     $worker = file_get_contents(public_path('sw.js'));
 

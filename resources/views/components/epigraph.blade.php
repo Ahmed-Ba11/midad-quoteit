@@ -4,7 +4,8 @@
     An epigraph: one verse from خزانة الأدب, different on each visit. "context" picks from the verses
     chosen for that page (config/library.php → epigraphs); "occasion" from one occasion. Only verified
     library verses are ever shown, and the ~140 verses are cached, so picking one costs no query.
-    layout: "line" — صدر ◆ عجز — poet, in one line;  "verse" — the large stacked verse (x-verse).
+    layout: "line" — صدر ◆ عجز — poet, in one line;  "verse" — the large stacked verse (x-verse);
+            "tablet" — the verse written in on the dark tablet beside the sign-in form (x-verse-tablet).
 --}}
 @php
     $verses = \Illuminate\Support\Facades\Cache::remember('epigraph-verses.v2', now()->addHour(), fn () => \App\Models\Verse::query()
@@ -23,7 +24,9 @@
     $epigraph = $pool === [] ? null : $pool[array_rand($pool)];
 @endphp
 
-@if ($epigraph && $layout === 'verse')
+@if ($epigraph && $layout === 'tablet')
+    <x-verse-tablet {{ $attributes }} :sadr="$epigraph['sadr']" :ajuz="$epigraph['ajuz']" :poet="$epigraph['poet']" />
+@elseif ($epigraph && $layout === 'verse')
     <x-verse {{ $attributes }} :sadr="$epigraph['sadr']" :ajuz="$epigraph['ajuz']" :poet="$epigraph['poet']" />
 @elseif ($epigraph)
     <p {{ $attributes->class(['font-text text-sm leading-relaxed text-gold', 'text-center' => $align === 'center']) }}>

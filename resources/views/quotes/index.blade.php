@@ -78,7 +78,24 @@
         @endif
     @endif
 
-    <div class="mx-auto max-w-6xl px-4 py-10">
+    <section class="feed relative overflow-hidden">
+    {{-- The wall behind the quotes: afternoon light, an arched window, and the mark's shadow on its sill. --}}
+    <div class="wall" aria-hidden="true">
+        <div class="shafts"></div>
+        <div class="cast">
+            <svg viewBox="0 0 600 900">
+                <path class="glow" d="M60 900 V330 C60 170 180 70 300 30 C420 70 540 170 540 330 V900 Z" />
+                <g class="bars">
+                    <rect x="288" y="40" width="24" height="860" />
+                    <rect x="60" y="440" width="480" height="22" />
+                    <path d="M60 330 C60 170 180 70 300 30 C420 70 540 170 540 330 L520 330 C520 182 410 92 300 54 C190 92 80 182 80 330 Z" />
+                </g>
+                <g class="mk"><svg x="110" y="520" width="380" height="380"><use href="#mark" /></svg></g>
+            </svg>
+        </div>
+    </div>
+
+    <div class="wall-content mx-auto max-w-6xl px-4 py-10">
         <header class="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
                 <h2 class="font-display text-4xl font-bold">{{ $isFrontPage ? 'أحدث الاقتباســات' : 'الاقتباســات' }}</h2>
@@ -179,4 +196,5 @@
             @endif
         </div>
     </div>
+    </section>
 @endsection

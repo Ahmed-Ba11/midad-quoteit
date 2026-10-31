@@ -94,7 +94,7 @@ class QuoteController extends Controller
                 ->withExists(['quotes as has_quote' => fn ($quotes) => $quotes->whereKey($quote->id)])
                 ->latest('updated_at')->get() ?? collect(),
             // Public anthologies by other readers that include this quote.
-            'inAnthologies' => $quote->anthologies()->where('is_public', true)->with('user')
+            'inAnthologies' => $quote->anthologies()->public()->with('user')
                 ->when($request->user(), fn ($others, $viewer) => $others->whereNot('anthologies.user_id', $viewer->id))
                 ->latest('anthologies.updated_at')->take(6)->get(),
         ]);
@@ -152,8 +152,7 @@ class QuoteController extends Controller
             'draft' => $draft,
             'backUrl' => $fromLibrary && $backUrl === route('home') ? route('library.index') : $backUrl,
             'myAnthologies' => $request->user()->anthologies()->latest('updated_at')->get(['id', 'title']),
-            'categories' => Category::orderBy('id')->get(),
-            'bookTitles' => Book::whereHas('quotes', fn ($quotes) => $quotes->public())->latest()->limit(300)->pluck('title'),
+            ...$this->formOptions(),
         ]);
     }
 
@@ -164,21 +163,12 @@ class QuoteController extends Controller
     private function draftFromLibrary(Request $request, array $draft = []): Quote
     {
         $quote = new Quote;
-        $verseIds = collect($request->query('verses', []))->filter(fn ($id) => ctype_digit((string) $id))
-            ->map(fn ($id) => (int) $id)->unique()->take(config('library.max_selection'));
+        $poetry = fn () => Category::where('slug', 'shir')->value('id');
+        $verses = Verse::picked($request->query('verses', []));
 
-        if ($verseIds->isNotEmpty()) {
-            $verses = Verse::with('work.poet')->findMany($verseIds)->sortBy(fn (Verse $verse) => $verseIds->search($verse->id))->values();
-
-            if ($verses->isNotEmpty()) {
-                $quote->fill([
-                    'content' => $verses->map->asText()->implode("\n"),
-                    'author' => $verses->pluck('work.poet.name')->unique()->implode(' و'),
-                    'book' => $verses->pluck('work.title')->unique()->count() === 1 ? $verses->first()->work->title : null,
-                    'category_id' => Category::where('slug', 'shir')->value('id'),
-                ]);
-                $quote->setRelation('libraryVerses', $verses);
-            }
+        if ($verses->isNotEmpty()) {
+            $quote->fill([...Verse::quoteText($verses), 'category_id' => $poetry()]);
+            $quote->setRelation('libraryVerses', $verses);
         } elseif ($saying = Saying::find($request->query('saying'))) {
             $quote->fill(['content' => $saying->text, 'author' => $saying->attribution()]);
             $quote->setRelation('saying', $saying);
@@ -190,7 +180,7 @@ class QuoteController extends Controller
                 'content' => $diwanVerse->asText(),
                 'author' => $diwanVerse->diwan->poet_name,
                 'source' => $diwanVerse->diwan->source,
-                'category_id' => Category::where('slug', 'shir')->value('id'),
+                'category_id' => $poetry(),
             ]);
         } elseif (is_array($voice = config('library.peninsula_voices.'.$request->query('voice')))
             && isset($voice['verses'][(int) $request->query('line')])) {
@@ -201,7 +191,7 @@ class QuoteController extends Controller
                 'author' => $voice['poet'],
                 'source' => 'قصيدة «'.$voice['poem'].'»',
                 'source_url' => $voice['read_more'],
-                'category_id' => Category::where('slug', 'shir')->value('id'),
+                'category_id' => $poetry(),
             ]);
         } elseif ($draft !== []) {
             // From «شارك اقتباساً»: the words and their details come along, already checked.
@@ -273,7 +263,7 @@ class QuoteController extends Controller
     }
 
     /**
-     * "استخدم التصميم": start a new quote with the look (font, colours, frame…) of one I can see —
+     * "استخدم التصميم": start a new quote with the look (font, colours, texture, box…) of one I can see —
      * never its words, author or story.
      */
     private function withTemplate(Quote $quote, Request $request): Quote
@@ -341,8 +331,7 @@ class QuoteController extends Controller
         return view($asText ? 'quotes.editor' : 'quotes.studio', [
             'quote' => $quote,
             'draft' => $draft,
-            'categories' => Category::orderBy('id')->get(),
-            'bookTitles' => Book::whereHas('quotes', fn ($quotes) => $quotes->public())->latest()->limit(300)->pluck('title'),
+            ...$this->formOptions(),
         ]);
     }
 
@@ -375,10 +364,19 @@ class QuoteController extends Controller
     }
 
     /**
-     * Validated data plus the cleaned highlight indexes from QuoteRequest::passedValidation().
+     * What «محرّر النص» and مرسم الحروف offer: the categories, and the titles of books quoted publicly
+     * (suggested while typing the book's name).
      *
-     * @return array<string, mixed>
+     * @return array{categories: \Illuminate\Database\Eloquent\Collection<int, Category>, bookTitles: Collection<int, string>}
      */
+    private function formOptions(): array
+    {
+        return [
+            'categories' => Category::orderBy('id')->get(),
+            'bookTitles' => Book::whereHas('quotes', fn ($quotes) => $quotes->public())->latest()->limit(300)->pluck('title'),
+        ];
+    }
+
     /**
      * A reader's quote from a book joins that book's page (رفوف القرّاء): the named book is reused
      * if it already exists, otherwise added. Library diwans are not reader books.
@@ -404,6 +402,11 @@ class QuoteController extends Controller
         $quote->book_id = $book->id;
     }
 
+    /**
+     * Validated data plus the cleaned highlight indexes from QuoteRequest::passedValidation().
+     *
+     * @return array<string, mixed>
+     */
     private function validatedWithHighlights(QuoteRequest $request): array
     {
         $data = collect($request->validated())->except(['book_genre', 'kind', 'signature', 'anthology_id'])->all();

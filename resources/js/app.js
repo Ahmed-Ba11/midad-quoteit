@@ -38,7 +38,6 @@ document.querySelectorAll('[data-copy]').forEach((button) => {
     });
 });
 
-// Light/dark toggle — the initial class is set by an inline script in the layout <head> to avoid a flash.
 // PWA: the service worker only provides an offline page (public/sw.js); pages always come from the network.
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));

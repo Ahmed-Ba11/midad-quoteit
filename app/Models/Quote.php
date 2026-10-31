@@ -244,44 +244,10 @@ class Quote extends Model
     }
 
     /**
-     * The text as lines (a verse has صدر and عجز on separate lines), each split into words on
-     * whitespace. Word indexes run across all lines; neighbouring words in a line that share the
-     * same highlight state are merged, so adjacent highlighted words render as ONE highlight.
-     *
-     * @return list<list<array{text: string, highlighted: bool}>>
-     */
-    public function contentLines(): array
-    {
-        $highlighted = array_flip($this->highlights ?? []);
-        $index = 0;
-        $lines = [];
-
-        foreach (preg_split('/\R/u', trim((string) $this->content)) as $line) {
-            $pieces = [];
-
-            foreach (preg_split('/\s+/u', trim($line), -1, PREG_SPLIT_NO_EMPTY) as $word) {
-                $isHighlighted = isset($highlighted[$index++]);
-                $last = array_key_last($pieces);
-
-                if ($last !== null && $pieces[$last]['highlighted'] === $isHighlighted) {
-                    $pieces[$last]['text'] .= ' '.$word;
-                } else {
-                    $pieces[] = ['text' => $word, 'highlighted' => $isHighlighted];
-                }
-            }
-
-            if ($pieces !== []) {
-                $lines[] = $pieces;
-            }
-        }
-
-        return $lines;
-    }
-
-    /**
      * The words set as the reader asked (App\Support\QuoteLayout): verses of صدر and عجز, free lines,
-     * or paragraphs of lines. Every hemistich, line and paragraph line comes as pieces (see
-     * contentLines()); word indexes for highlights run through them in reading order, separators left out.
+     * or paragraphs of lines. Every hemistich, line and paragraph line comes as pieces: neighbouring words with the same
+     * highlight state are merged, so adjacent highlighted words render as ONE highlight. Word indexes
+     * for highlights run through them in reading order, separators left out.
      *
      * @return array{mode: 'verse'|'lines'|'prose', verses: list<array{sadr: list<array{text: string, highlighted: bool}>, ajuz: list<array{text: string, highlighted: bool}>}>, lines: list<list<array{text: string, highlighted: bool}>>, paragraphs: list<list<list<array{text: string, highlighted: bool}>>>, attribution: ?string}
      */
@@ -350,15 +316,5 @@ class Quote extends Model
             'lines' => implode("\n", $layout['lines']),
             default => implode("\n\n", $layout['paragraphs']),
         };
-    }
-
-    /**
-     * All pieces of a one-line text (see contentLines()).
-     *
-     * @return list<array{text: string, highlighted: bool}>
-     */
-    public function contentPieces(): array
-    {
-        return array_merge(...$this->contentLines() ?: [[]]);
     }
 }

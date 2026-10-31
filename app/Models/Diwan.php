@@ -41,11 +41,6 @@ class Diwan extends Model
         return $deathYear !== null && $deathYear + self::PROTECTION_YEARS < (int) now()->year;
     }
 
-    public function canBePublic(): bool
-    {
-        return static::isInPublicDomain($this->poet_death_year);
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -57,14 +52,13 @@ class Diwan extends Model
     }
 
     /**
-     * Diwans the viewer may see: public ones (still in the public domain), plus their own.
+     * Only the ones their owners made public.
      *
      * @param  Builder<Diwan>  $query
      */
-    public function scopeVisibleTo(Builder $query, ?User $viewer): void
+    public function scopePublic(Builder $query): void
     {
-        $query->where(fn (Builder $visible) => $visible->where('is_public', true)
-            ->when($viewer, fn (Builder $own) => $own->orWhere('user_id', $viewer->id)));
+        $query->where('is_public', true);
     }
 
     /**

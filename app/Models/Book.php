@@ -30,6 +30,16 @@ class Book extends Model
     }
 
     /**
+     * A book is seen once someone quoted it publicly; a book known only from private quotes is seen
+     * only by a reader who quoted it or has it on their shelf (a private quote never reveals a title).
+     */
+    public function isVisibleTo(?User $user): bool
+    {
+        return $this->quotes()->public()->exists()
+            || ($user !== null && ($this->quotes()->whereBelongsTo($user)->exists() || $user->books()->whereKey($this->id)->exists()));
+    }
+
+    /**
      * The same book written two ways ("الأيام" / "الايام", with or without tashkeel) is one book.
      */
     public static function matchKey(string $title, ?string $author): string

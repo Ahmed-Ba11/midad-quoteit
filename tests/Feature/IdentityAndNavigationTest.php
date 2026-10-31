@@ -123,8 +123,10 @@ test('phone tap targets are at least 44px: category chips, colour dots, word but
     // The dots look 36px; an invisible ring takes the tap out to 44px.
     expect(file_get_contents(resource_path('css/studio.css')))->toContain(".palette-dot::after {\n    content: '';\n    position: absolute;\n    inset: -4px;");
 
+    // The word buttons of the editor and the studio come from one shared picker.
+    expect(file_get_contents(resource_path('js/workbench.js')))->toContain('button.className = `min-h-11 rounded-lg');
     foreach (['studio.js', 'editor.js'] as $script) {
-        expect(file_get_contents(resource_path('js/'.$script)))->toContain("button.className = 'min-h-11 rounded-lg");
+        expect(file_get_contents(resource_path('js/'.$script)))->toContain('createWordPicker(form');
     }
 });
 
@@ -175,4 +177,10 @@ test('only the seven Thmanyah faces can be fetched from the font route', functio
     $this->get('/fonts/thmanyah/secret')->assertNotFound();
     $this->get('/fonts/thmanyah/..%2F..%2F.env')->assertNotFound();
     Http::assertNothingSent();
+});
+
+test('any other error page is in Arabic inside the site layout, e.g. opening the log-out link directly', function () {
+    $this->get('/logout')->assertStatus(405)
+        ->assertSee('تعذّر فتح الصفحة')->assertSee('(405)')->assertSee('رقيم')
+        ->assertDontSee('Method Not Allowed');
 });

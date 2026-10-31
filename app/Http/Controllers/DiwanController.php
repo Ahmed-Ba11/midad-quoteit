@@ -23,7 +23,7 @@ class DiwanController extends Controller
 
         return view('diwans.index', [
             'term' => $term,
-            'diwans' => Diwan::where('is_public', true)->tap($search)
+            'diwans' => Diwan::public()->tap($search)
                 ->with('user')->withCount('verses')->latest('updated_at')->paginate(12)->withQueryString(),
             'mine' => $request->user()?->diwans()->tap($search)->withCount('verses')->latest('updated_at')->get() ?? collect(),
         ]);

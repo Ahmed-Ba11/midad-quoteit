@@ -52,8 +52,8 @@
                 "where": {
                     "and": [
                         { "href_matches": "/*" },
-                        { "not": { "href_matches": ["/logout", "/login", "/signup", "/quotes/create", "/diwans/create", "/*/edit", "/_boost/*"] } },
-                        { "not": { "selector_matches": "[target=_blank], [data-no-prefetch]" } }
+                        { "not": { "href_matches": ["/logout", "/login", "/signup", "/quotes/create", "/diwans/create", "/*/edit"] } },
+                        { "not": { "selector_matches": "[target=_blank]" } }
                     ]
                 },
                 "eagerness": "conservative"

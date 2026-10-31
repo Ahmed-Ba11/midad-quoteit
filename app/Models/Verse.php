@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\NormalizesArabic;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -74,6 +75,36 @@ class Verse extends Model
     public function asText(): string
     {
         return $this->sadr."\n".$this->ajuz;
+    }
+
+    /**
+     * The verses a reader picked in the library (?verses[]=…), in the order picked, at most
+     * config('library.max_selection'); ids that are not whole numbers are ignored.
+     *
+     * @return Collection<int, Verse>
+     */
+    public static function picked(mixed $ids): Collection
+    {
+        $ids = collect((array) $ids)->filter(fn ($id) => ctype_digit((string) $id))
+            ->map(fn ($id) => (int) $id)->unique()->take(config('library.max_selection'));
+
+        return $ids->isEmpty() ? new Collection : static::with('work.poet')->findMany($ids)
+            ->sortBy(fn (Verse $verse) => $ids->search($verse->id))->values();
+    }
+
+    /**
+     * The locked quote text of picked verses: the lines, their poet(s), and the diwan when it is one.
+     *
+     * @param  Collection<int, Verse>  $verses
+     * @return array{content: string, author: string, book: ?string}
+     */
+    public static function quoteText(Collection $verses): array
+    {
+        return [
+            'content' => $verses->map->asText()->implode("\n"),
+            'author' => $verses->pluck('work.poet.name')->unique()->implode(' و'),
+            'book' => $verses->pluck('work.title')->unique()->count() === 1 ? $verses->first()->work->title : null,
+        ];
     }
 
     /**

@@ -47,8 +47,7 @@ class BookController extends Controller
     public function show(Request $request, Book $book): View
     {
         $viewer = $request->user();
-        $isKnownToViewer = $viewer && ($book->quotes()->whereBelongsTo($viewer)->exists() || $viewer->books()->whereKey($book->id)->exists());
-        abort_unless($book->quotes()->public()->exists() || $isKnownToViewer, 404);
+        abort_unless($book->isVisibleTo($viewer), 404);
 
         $book->loadCount(['quotes' => fn ($quotes) => $quotes->public(), 'readers']);
 
@@ -66,8 +65,8 @@ class BookController extends Controller
      */
     public function shelf(ReadingStatusRequest $request, Book $book): RedirectResponse
     {
-        // Only a book I can see: one quoted publicly, or one I quoted myself.
-        abort_unless($book->quotes()->public()->exists() || $book->quotes()->whereBelongsTo($request->user())->exists(), 404);
+        // The same rule as the book page: a book I can see is one I can take off my shelf.
+        abort_unless($book->isVisibleTo($request->user()), 404);
 
         $status = $request->validated('status');
 

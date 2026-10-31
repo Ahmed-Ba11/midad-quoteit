@@ -55,19 +55,10 @@ class QuoteRequest extends FormRequest
             return;
         }
 
-        $verseIds = collect((array) $this->input('verses', []))->filter(fn ($id) => ctype_digit((string) $id))
-            ->map(fn ($id) => (int) $id)->unique()->take(config('library.max_selection'));
-
-        $verses = $verseIds->isEmpty() ? collect() : Verse::with('work.poet')->findMany($verseIds)
-            ->sortBy(fn (Verse $verse) => $verseIds->search($verse->id))->values();
+        $verses = Verse::picked($this->input('verses', []));
 
         if ($verses->isNotEmpty()) {
-            $this->merge([
-                'content' => $verses->map->asText()->implode("\n"),
-                'author' => $verses->pluck('work.poet.name')->unique()->implode(' و'),
-                'book' => $verses->pluck('work.title')->unique()->count() === 1 ? $verses->first()->work->title : null,
-                'is_original' => false,
-            ]);
+            $this->merge([...Verse::quoteText($verses), 'is_original' => false]);
             $this->libraryLink = ['verse_id' => $verses->first()->id, 'saying_id' => null];
 
             return;
@@ -219,7 +210,7 @@ class QuoteRequest extends FormRequest
             'highlight_style.in' => 'نوع الإبراز غير صحيح.',
             'highlights.*' => 'الكلمات المبرزة غير صحيحة.',
             'ratio.in' => 'اختر مقاساً من القائمة.',
-            'font_size.between' => 'حجم الخط من ٢٠ إلى ٥٦.',
+            'font_size.between' => strtr('حجم الخط من '.config('quotes.font_size.min').' إلى '.config('quotes.font_size.max').'.', array_combine(range(0, 9), mb_str_split('٠١٢٣٤٥٦٧٨٩'))),
         ];
     }
 

@@ -80,6 +80,22 @@ test('a reader can shelve a book, change its status and remove it', function () 
     $this->actingAs($reader)->post(route('books.shelf', $book), ['status' => 'stolen'])->assertSessionHasErrors('status');
 });
 
+test('a reader can still take a book off the shelf after its last public quote turns private', function () {
+    $reader = User::factory()->create();
+    $book = Book::factory()->create();
+    $quote = Quote::factory()->create();
+    $quote->forceFill(['book_id' => $book->id])->save();
+
+    $this->actingAs($reader)->post(route('books.shelf', $book), ['status' => 'want']);
+    $quote->update(['is_public' => false]);
+
+    $this->actingAs($reader)->get(route('books.show', $book))->assertOk();
+    $this->actingAs($reader)->post(route('books.shelf', $book), ['status' => ''])->assertRedirect();
+    expect($reader->books()->count())->toBe(0);
+
+    $this->actingAs(User::factory()->create())->post(route('books.shelf', $book), ['status' => 'read'])->assertNotFound();
+});
+
 test('guests cannot change a shelf', function () {
     $this->post(route('books.shelf', Book::factory()->create()), ['status' => 'read'])->assertRedirect(route('login'));
 });

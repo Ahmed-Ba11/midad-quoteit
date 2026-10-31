@@ -46,7 +46,7 @@ class LibraryController extends Controller
                 ->groupBy('occasion')->map(fn ($verses) => $verses->shuffle()->take(6)->values()),
             'sayings' => Saying::get()->shuffle(),
             'myWall' => $request->user()?->wallSayings()->pluck('sayings.id')->all() ?? [],
-            'readersDiwans' => Diwan::where('is_public', true)->latest('updated_at')->take(6)->get(),
+            'readersDiwans' => Diwan::public()->latest('updated_at')->take(6)->get(),
             // The shelf and the poets' arcade are the same for everyone, so their HTML is cached; this key
             // changes whenever a poet, work or verse does — or the view that draws them.
             'collectionsVersion' => md5(implode('|', [

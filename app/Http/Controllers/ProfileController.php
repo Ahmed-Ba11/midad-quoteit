@@ -59,9 +59,9 @@ class ProfileController extends Controller
             'tabs' => $allowedTabs,
             'isOwner' => $isOwner,
             'quotes' => $quotes?->withCardData($viewer)->paginate(12)->withQueryString(),
-            'pinned' => $user->pinned_quote_id ? Quote::visibleTo($viewer)->withCardData($viewer)->find($user->pinned_quote_id) : null,
+            'pinned' => $user->pinnedQuote()->visibleTo($viewer)->withCardData($viewer)->first(),
             'anthologies' => $tab === 'anthologies'
-                ? $user->anthologies()->when(! $isOwner, fn ($public) => $public->where('is_public', true))
+                ? $user->anthologies()->when(! $isOwner, fn ($public) => $public->public())
                     ->withCount(['quotes' => fn ($quotes) => $quotes->visibleTo($viewer)])
                     ->with(['quotes' => fn ($quotes) => $quotes->visibleTo($viewer)->latest('anthology_quote.created_at')->limit(3)])
                     ->latest('updated_at')->get()
@@ -69,7 +69,7 @@ class ProfileController extends Controller
             'wall' => $tab === 'wall' ? $user->wallSayings()->orderByPivot('created_at', 'desc')->get() : collect(),
             'poets' => $tab === 'poets' ? $user->favoritePoets()->withCount('verses')->orderBy('sort_order')->get() : collect(),
             'diwans' => $tab === 'diwans'
-                ? $user->diwans()->when(! $isOwner, fn ($public) => $public->where('is_public', true))
+                ? $user->diwans()->when(! $isOwner, fn ($public) => $public->public())
                     ->withCount('verses')->latest('updated_at')->get()
                 : collect(),
             // كتبي (owner only): the reader's shelf grouped by reading status.

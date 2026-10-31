@@ -38,14 +38,13 @@ class Anthology extends Model
     }
 
     /**
-     * Anthologies the viewer may see: every public one, plus their own private ones.
+     * Only the ones their owners made public.
      *
      * @param  Builder<Anthology>  $query
      */
-    public function scopeVisibleTo(Builder $query, ?User $viewer): void
+    public function scopePublic(Builder $query): void
     {
-        $query->where(fn (Builder $visible) => $visible->where('is_public', true)
-            ->when($viewer, fn (Builder $own) => $own->orWhere('user_id', $viewer->id)));
+        $query->where('is_public', true);
     }
 
     /**

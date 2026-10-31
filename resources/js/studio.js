@@ -3,8 +3,8 @@
 // quotes.design, so what you see is what is published.
 import { initFontPicker, loadFont } from './font-picker';
 import { layoutWords, renderWords } from './quote-words';
+import { PLACEHOLDER, createWordPicker, initTabs } from './workbench';
 
-const PLACEHOLDER = 'اكتب اقتباسك ليظهر هنا…';
 const INK = '#1E1A17';
 const PAPER = '#F5EFE4';
 
@@ -33,16 +33,12 @@ export function initStudio(form) {
     const stage = form.querySelector('[data-preview-stage]');
     const frame = form.querySelector('[data-preview-frame]');
     const sizeInput = form.querySelector('[data-font-size]');
-    const wordPicker = form.querySelector('[data-word-picker]');
-    const highlightInputs = form.querySelector('[data-highlight-inputs]');
     const summary = form.querySelector('[data-details-summary]');
 
     const field = (name) => form.elements.namedItem(name);
     const checked = (name) => form.querySelector(`[name="${name}"]:checked`)?.value;
     const isOn = (name) => form.querySelector(`input[type="checkbox"][name="${name}"]`)?.checked ?? false;
 
-    let highlighted = new Set([...highlightInputs.querySelectorAll('input')].map((input) => Number(input.value)));
-    let lastWords = '';
     let shownFont = checked('font');
     let stableHeight = Math.min(innerHeight, screen.height);
     // A size the reader chose by hand is kept when the card is opened again (design[auto_size]).
@@ -53,12 +49,9 @@ export function initStudio(form) {
         autoSizeInput.value = on ? '1' : '0';
     };
 
-    // Tabs
-    const tabs = [...form.querySelectorAll('[data-tab]')];
-    tabs.forEach((tab) => tab.addEventListener('click', () => tabs.forEach((other) => {
-        other.setAttribute('aria-selected', String(other === tab));
-        form.querySelector(`[data-panel="${other.dataset.tab}"]`).classList.toggle('hidden', other !== tab);
-    })));
+    initTabs(form);
+    // Words to highlight
+    const picker = createWordPicker(form, { surface: 'bg-surface', onChange: () => render() });
 
     // A palette sets the background, the box and the accent, and a text colour that reads on them.
     function applyPalette(key) {
@@ -79,38 +72,6 @@ export function initStudio(form) {
         field(button.dataset.set).value = button.dataset.value;
         render();
     }));
-
-    // Words to highlight
-    wordPicker.addEventListener('click', (event) => {
-        const button = event.target.closest('[data-word]');
-        if (!button) return;
-        const index = Number(button.dataset.word);
-        highlighted.has(index) ? highlighted.delete(index) : highlighted.add(index);
-        render();
-    });
-
-    function syncWordPicker(list) {
-        highlighted = new Set([...highlighted].filter((index) => index < list.length));
-        highlightInputs.replaceChildren(...[...highlighted].sort((a, b) => a - b).map((index) => {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'highlights[]';
-            input.value = index;
-            return input;
-        }));
-        if (list.join(' ') !== lastWords) {
-            lastWords = list.join(' ');
-            wordPicker.replaceChildren(...list.map((word, index) => {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.dataset.word = index;
-                button.textContent = word;
-                button.className = 'min-h-11 rounded-lg border border-line bg-surface px-3 py-1.5 text-sm transition hover:border-accent aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-paper';
-                return button;
-            }));
-        }
-        wordPicker.querySelectorAll('[data-word]').forEach((button) => button.setAttribute('aria-pressed', String(highlighted.has(Number(button.dataset.word)))));
-    }
 
     // The card always fits the screen whatever its shape: as wide as it can be, but never taller than
     // about a quarter of the screen on a phone (two thirds on a wide screen), so the tools stay in reach.
@@ -162,13 +123,13 @@ export function initStudio(form) {
             ?? (field('author')?.value.trim() ?? '');
         const book = kind === 'anonymous' ? '' : (field('book')?.value.trim() ?? '');
 
-        syncWordPicker(layoutWords(content, layout));
+        picker.sync(layoutWords(content, layout));
         if (content.trim() === '') {
             text.replaceChildren(PLACEHOLDER);
             text.style.opacity = '0.45';
         } else {
             text.style.opacity = '';
-            renderWords(text, content, { layout, highlighted, author });
+            renderWords(text, content, { layout, highlighted: picker.highlighted, author });
         }
 
         const page = field('page')?.value.trim();

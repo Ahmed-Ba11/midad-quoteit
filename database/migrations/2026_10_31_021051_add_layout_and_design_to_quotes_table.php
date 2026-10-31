@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 /**
  * layout — how the words are set: auto (detected), verse (صدر / عجز) or prose (App\Support\QuoteLayout).
- * design — مرسم الحروف's card settings beyond colours and font: background, box, frame, seal…
+ * design — مرسم الحروف's card settings beyond colours and font: texture, dim, divider, inner box…
  *          (whitelisted by QuoteRequest; see config/quotes.php → design). Never HTML.
  * ratio  — a free string now, so the tall story size (9:16) can join wide, square and tall.
  */
@@ -31,6 +31,7 @@ return new class extends Migration
     {
         Schema::table('quotes', function (Blueprint $table) {
             $table->dropColumn(['layout', 'design']);
+            $table->enum('ratio', ['wide', 'square', 'tall'])->default('wide')->change();
         });
     }
 };

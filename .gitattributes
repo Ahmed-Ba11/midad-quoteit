@@ -9,3 +9,13 @@
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore
+
+# Not part of the submitted source (git archive): AI-tool guidance and internal working notes.
+/.claude export-ignore
+/.mcp.json export-ignore
+/boost.json export-ignore
+/AGENTS.md export-ignore
+/CLAUDE.md export-ignore
+/HANDOVER.md export-ignore
+/PROJECT.md export-ignore
+/DESIGN.md export-ignore

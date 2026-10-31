@@ -97,9 +97,9 @@ test('highlight indexes past the last word are dropped', function () {
 });
 
 test('adjacent highlighted words merge into one piece', function () {
-    $quote = new Quote(['content' => 'العلم  نور   والجهل ظلام', 'highlights' => [0, 1, 3]]);
+    $quote = new Quote(['content' => 'العلم  نور   والجهل ظلام', 'highlights' => [0, 1, 3], 'layout' => 'prose']);
 
-    expect($quote->contentPieces())->toBe([
+    expect($quote->typeset()['paragraphs'][0][0])->toBe([
         ['text' => 'العلم نور', 'highlighted' => true],
         ['text' => 'والجهل', 'highlighted' => false],
         ['text' => 'ظلام', 'highlighted' => true],
